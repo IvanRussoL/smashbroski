@@ -90,7 +90,10 @@ Ogni requisito indica il caso dell'audit che risolve. "—" indica un requisito 
   - **Starters**: 5 pz e 10 pz (solo per gli Straccetti di pollo).
   - **Kids Menù, Soft Drinks, Beers**: nessun formato.
 - Una voce ha **un prezzo unico senza formato** oppure **uno o più prezzi con i formati della sua categoria**, mai le due cose insieme; ogni formato compare al massimo una volta. Il server rifiuta un formato di un'altra categoria.
+- Il **nome di una voce è unico nella sua categoria**: il servizio rifiuta un doppione con un messaggio sul campo, prima che intervenga il vincolo univoco del database. In modifica la voce può tenere il proprio nome.
+- Il proprietario scrive i prezzi in euro con la **virgola** e al massimo due decimali: "7" vale 7,00 €, "7,5" e "7,50" valgono 7,50 €; il punto ("7.50") è rifiutato, per non confondere decimali e migliaia.
 - Una voce non si cancella ma si **nasconde**: non compare nel menù pubblico e si può rimostrare senza riscriverla (utile per le voci stagionali).
+- Una **categoria senza voci visibili** non compare nel menù pubblico, né come titolo né nell'indice; ricompare quando il proprietario rimostra almeno una sua voce. Nell'area proprietario resta sempre elencata.
 - L'**etichetta di edizione** (es. "Winter Edition") e le **note** di categoria e di voce (es. "Ortaggio su base stagionale") sono testi facoltativi che si mostrano e basta: nessuna logica di stagione in questa fase.
 - I prezzi dei dati iniziali si prendono dalla **resa visiva del PDF**, controllati a vista voce per voce, e non dal suo livello di testo, che li assegna alla riga sbagliata (AU-NAV04).
 
@@ -454,7 +457,7 @@ L'applicazione non è creata a livello di modulo, ma dalla funzione `create_app(
 - **CSRF**: `CSRFProtect` di Flask-WTF protegge tutti i moduli POST, compreso il logout.
 - **SQL injection**: tutte le query usano parametri (`%s`) passati separatamente al driver.
 - **XSS**: Jinja applica l'escape automatico; `|safe` non si usa mai su dati inseriti dal proprietario. Il JSON-LD si scrive con il filtro `tojson`, che rende innocui i caratteri `<`, `>` e `&`.
-- **Validazione sul server** di ogni dato del proprietario: lunghezze massime come nella sezione 4, prezzi nel formato "7" o "7,50" tra 0,01 € e 999,99 €, orari nel formato HH:MM, voce e formati della stessa categoria.
+- **Validazione sul server** di ogni dato del proprietario: lunghezze massime come nella sezione 4, prezzi nel formato "7", "7,5" o "7,50" (virgola, mai il punto) tra 0,01 € e 999,99 €, nome della voce unico nella categoria, orari nel formato HH:MM, voce e formati della stessa categoria.
 
 ### Header di sicurezza (AU-NET07)
 

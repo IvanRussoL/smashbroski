@@ -4,7 +4,7 @@ Prototipo funzionante del nuovo sito dell'hamburgeria SmashBroski Pompei, da pre
 
 Il progetto nasce da un audit QA del sito attuale (32 casi di test, 21 FAIL). Ogni requisito del nuovo sito è collegato al FAIL che risolve.
 
-**Stato:** progettazione (Fase 1). Il codice non è ancora iniziato.
+**Stato:** progettazione completata (Fase 1). Il codice non è ancora iniziato.
 
 **Tecnologie previste:** Python 3.13, Flask 3, MySQL 8, Jinja2, argon2-cffi, Flask-WTF, Flask-Limiter, pytest.
 
@@ -12,5 +12,7 @@ Il progetto nasce da un audit QA del sito attuale (32 casi di test, 21 FAIL). Og
 
 - [Progettazione](docs/PROGETTAZIONE.md): obiettivo, requisiti, regole, modello dati, architettura, sicurezza
 - [Wireframe](docs/WIREFRAME.md): Home e Menù, mobile e desktop
+- [Piano di test](docs/PIANO_TEST.md): casi manuali, test pytest, matrice audit → requisiti → test
+- [DEVLOG](DEVLOG.md): decisioni prese, con motivazioni e alternative scartate
 
 > Telefono, email, link social e foto sono segnaposto finché i titolari non forniscono i dati reali.

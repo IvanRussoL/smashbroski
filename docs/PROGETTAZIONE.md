@@ -222,7 +222,7 @@ Contiene i dati del locale mostrati nelle pagine. Ha una sola riga, creata dai d
 | `id` | TINYINT, chiave primaria, vale sempre 1 (CHECK) | Garantisce una sola riga |
 | `nome_locale` | VARCHAR(100), obbligatoria | Nome mostrato sul sito |
 | `indirizzo` | VARCHAR(255), obbligatoria | Indirizzo mostrato e usato per costruire il link a Google Maps |
-| `telefono` | VARCHAR(20), obbligatoria | Telefono con prefisso internazionale |
+| `telefono` | VARCHAR(20), obbligatoria | Telefono con prefisso internazionale, senza spazi (es. `+390810000000`), come serve al link `tel:`; sul sito si mostra con gli spazi |
 | `telefono_di_prova` | BOOLEAN, obbligatoria, predefinito sì | Se vale sì il sito mostra "numero di prova" accanto al numero e lo esclude dal JSON-LD |
 | `email` | VARCHAR(255), obbligatoria | Email del locale |
 | `url_facebook` | VARCHAR(255), obbligatoria | Indirizzo della pagina Facebook |

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block titolo %}Area riservata – Orari{% endblock %}
+
+{% block contenuto %}
+<div class="pagina-testo pagina-modulo area">
+    {% include "proprietario/_testata.html" %}
+    <h1>Orari settimanali</h1>
+    <p>Ogni turno appartiene al giorno in cui inizia: se finisce dopo la mezzanotte, scrivi l'ora di fine così
+    com'è (es. lunedì 18:00–01:00). Lascia vuote le righe che non servono; un giorno senza turni è chiuso.</p>
+
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% for giorno in giorni %}
+        <fieldset class="giorno-orari">
+            <legend>{{ giorno.nome }}</legend>
+            {% for inizio, fine in giorno.righe %}
+            {% set id = giorno.numero ~ "-" ~ loop.index %}
+            <p class="riga-turno">
+                <input type="hidden" name="giorno" value="{{ giorno.numero }}">
+                <label for="inizio-{{ id }}">Dalle</label>
+                <input id="inizio-{{ id }}" name="inizio" type="time" value="{{ inizio }}">
+                <label for="fine-{{ id }}">alle</label>
+                <input id="fine-{{ id }}" name="fine" type="time" value="{{ fine }}">
+            </p>
+            {% endfor %}
+        </fieldset>
+        {% endfor %}
+        <p><button class="pulsante-modulo" type="submit">Salva gli orari</button></p>
+    </form>
+</div>
+{% endblock %}

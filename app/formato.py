@@ -11,6 +11,13 @@ def euro(centesimi: int) -> str:
     return f"{centesimi // 100},{centesimi % 100:02d} €"
 
 
+def prezzo_per_modulo(centesimi: int) -> str:
+    """
+    Prezzo come lo scrive il proprietario nel modulo, senza simbolo dell'euro. 750 -> "7,50".
+    """
+    return f"{centesimi // 100},{centesimi % 100:02d}"
+
+
 def telefono_leggibile(telefono: str) -> str:
     """
     Filtro Jinja: numero salvato senza spazi, mostrato a gruppi. "+390810000000" -> "+39 081 000 0000".

@@ -83,3 +83,30 @@ a:focus-visible { outline: 3px solid var(--blu); outline-offset: 2px; }
 
 .footer { padding: 1.5rem 1rem; background: var(--blu-scuro); color: #fff; text-align: center; }
 .footer a { color: #fff; }
+
+/* Moduli e area riservata */
+.pagina-modulo label { display: block; font-weight: 600; }
+.pagina-modulo input:not([type="hidden"]) { width: 100%; max-width: 28rem; padding: 0.5rem; font-size: 1rem; }
+.riga-turno input[type="time"] { width: auto; }
+.riga-turno label { display: inline; font-weight: normal; }
+.pulsante-modulo {
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    border: 0;
+    border-radius: 4px;
+    background: var(--blu);
+    color: #fff;
+    font-size: 1rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+.pulsante-link { padding: 0; border: 0; background: none; color: var(--blu); font-size: 1rem; text-decoration: underline; cursor: pointer; }
+.area-riservata ul { display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; list-style: none; }
+.area-riservata form { display: inline; }
+.utente { font-size: 0.875rem; }
+.errori { padding: 0.75rem 1rem; border-left: 4px solid var(--rosso); background: #fdecef; }
+.avviso { padding: 0.75rem 1rem; border-left: 4px solid var(--blu); background: #e8f1fb; }
+.tabella-voci { width: 100%; border-collapse: collapse; }
+.tabella-voci th, .tabella-voci td { padding: 0.4rem; border-bottom: 1px solid var(--grigio); text-align: left; vertical-align: top; }
+.tabella-voci form { display: inline; }
+.nascosta { color: #666; background: var(--grigio); }

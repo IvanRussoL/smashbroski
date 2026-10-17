@@ -1,0 +1,22 @@
+<nav class="area-riservata" aria-label="Area riservata">
+    <ul>
+        <li><a href="{{ url_for('proprietario.indice') }}">Menù</a></li>
+        <li><a href="{{ url_for('proprietario.orari') }}">Orari</a></li>
+        <li>
+            <form method="post" action="{{ url_for('auth.logout') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="pulsante-link" type="submit">Esci</button>
+            </form>
+        </li>
+    </ul>
+    <p class="utente">Accesso come {{ g.utente.email }}</p>
+</nav>
+{% for messaggio in get_flashed_messages() %}
+<p class="avviso" role="status">{{ messaggio }}</p>
+{% endfor %}
+{% if errori %}
+<div class="errori" role="alert">
+    <p>Controlla questi dati:</p>
+    <ul>{% for errore in errori %}<li>{{ errore }}</li>{% endfor %}</ul>
+</div>
+{% endif %}

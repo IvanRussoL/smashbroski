@@ -32,7 +32,7 @@ Ogni requisito indica il caso dell'audit che risolve. "—" indica un requisito 
 |---|---|---|
 | RF-01 | La home mostra logo, pulsante per il menù, icone Facebook e Instagram, telefono, email e indirizzo, tutti visibili e senza sovrapposizioni su qualsiasi dimensione di schermo, in verticale e in orizzontale, e con lo zoom al 200% | AU-UI01, AU-UI02, AU-UI05, AU-UI06 |
 | RF-02 | Mostra gli orari della settimana, con il giorno di chiusura scritto in modo esplicito ("Martedì: chiuso") | AU-NAV11 |
-| RF-03 | Mostra se il locale è aperto o chiuso in questo momento e, se è chiuso, quando riapre (es. "Chiuso · apre mercoledì alle 12:00") | AU-NAV11 |
+| RF-03 | Mostra se il locale è aperto o chiuso in questo momento e, se è chiuso, quando riapre (es. "Chiuso · apre domani alle 12:00"; "oggi" e "domani" quando la riapertura è vicina, altrimenti il nome del giorno, es. "apre venerdì alle 12:00") | AU-NAV11 |
 | RF-04 | Il telefono è un link `tel:` che avvia la chiamata; nessun link WhatsApp | AU-CON02, AU-NAV08 (BLOCKED) |
 | RF-05 | L'email è un link `mailto:` scritto in chiaro nell'HTML, che funziona anche senza JavaScript | AU-NAV09 (PASS, da mantenere) |
 | RF-06 | L'indirizzo apre Google Maps sulla posizione del locale, con un link costruito dall'indirizzo al posto del link breve attuale | AU-NAV10 (BLOCKED) |

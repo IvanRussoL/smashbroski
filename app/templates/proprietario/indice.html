@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block titolo %}Area riservata – Menù{% endblock %}
+
+{% block contenuto %}
+<div class="pagina-menu area">
+    {% include "proprietario/_testata.html" %}
+    <h1>Gestione del menù</h1>
+    <p>Le voci nascoste non compaiono nel menù pubblico; una categoria con tutte le voci nascoste non compare.</p>
+
+    {% for categoria in categorie %}
+    <section class="categoria" aria-labelledby="{{ categoria.slug }}">
+        <h2 id="{{ categoria.slug }}">{{ categoria.nome }}</h2>
+        <p><a class="pulsante-modulo" href="{{ url_for('proprietario.nuova_voce', categoria=categoria.id) }}">Aggiungi una voce in {{ categoria.nome }}</a></p>
+        {% if categoria.voci %}
+        <table class="tabella-voci">
+            <thead>
+                <tr><th scope="col">Pos.</th><th scope="col">Voce</th><th scope="col">Prezzi</th><th scope="col">Stato</th><th scope="col">Azioni</th></tr>
+            </thead>
+            <tbody>
+                {% for voce in categoria.voci %}
+                <tr{% if not voce.attiva %} class="nascosta"{% endif %}>
+                    <td>{{ voce.posizione }}</td>
+                    <td>{{ voce.nome }}{% if voce.edizione %} <small>({{ voce.edizione }})</small>{% endif %}</td>
+                    <td>
+                        {% for prezzo in voce.prezzi %}
+                        {% if prezzo.etichetta_formato %}{{ prezzo.etichetta_formato }}: {% endif %}{{ prezzo.prezzo_centesimi|euro }}{% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ "Visibile" if voce.attiva else "Nascosta" }}</td>
+                    <td>
+                        <a href="{{ url_for('proprietario.modifica_voce', voce_id=voce.id) }}">Modifica</a>
+                        <form method="post" action="{{ url_for('proprietario.visibilita_voce', voce_id=voce.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="attiva" value="{{ '0' if voce.attiva else '1' }}">
+                            <button class="pulsante-link" type="submit">{{ "Nascondi" if voce.attiva else "Mostra" }}</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nessuna voce in questa categoria.</p>
+        {% endif %}
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

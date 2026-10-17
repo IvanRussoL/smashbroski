@@ -84,6 +84,16 @@ class MenuService:
             raise NonTrovatoError("Voce del menù non trovata.")
         return voce
 
+    def leggi_categoria(self, categoria_id) -> Categoria:
+        """
+        Returns: la categoria con i suoi formati di prezzo e le sue voci (anche nascoste).
+        Raises: NonTrovatoError se la categoria non esiste.
+        """
+        categoria = self._categoria(categoria_id)
+        if categoria is None:
+            raise NonTrovatoError("Categoria non trovata.")
+        return categoria
+
     # --- Scrittura ---
 
     def crea_voce(self, dati: DatiVoce) -> int:

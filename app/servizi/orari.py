@@ -74,12 +74,15 @@ def valida_turni(righe: list[tuple]) -> list[Turno]:
     inizio diverso dalla fine, nessuna sovrapposizione (anche oltre la mezzanotte e tra domenica
     e lunedì). Raccoglie tutti gli errori invece di fermarsi al primo.
     Args: righe, tuple (giorno, ora_inizio, ora_fine); giorno numero o testo, ore come testo "HH:MM".
+    Le righe con inizio e fine entrambi vuoti sono saltate (righe libere del modulo).
     Returns: i Turni pronti da salvare.
     Raises: DatiNonValidiError con l'elenco dei messaggi.
     """
     messaggi = []
     turni = []
     for numero, (giorno, inizio_testo, fine_testo) in enumerate(righe, start=1):
+        if not (inizio_testo or "").strip() and not (fine_testo or "").strip():
+            continue  # riga lasciata vuota nel modulo: nessun turno
         try:
             giorno = int(giorno)
         except (TypeError, ValueError):

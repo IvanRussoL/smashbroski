@@ -777,7 +777,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 |---|---|
 | test_home_contenuti | GET `/` → 200; un solo `<h1>`; `<title>` con "Hamburgeria" e "Pompei"; meta description; `tel:+390810000000` con "numero di prova"; `mailto:info@example.com`; link a Google Maps; link a `/privacy`; nessun `wa.me` |
 | test_home_nessun_link_area_riservata | Nell'HTML di `/` e `/menu` nessun link a `/auth` o `/proprietario` |
-| test_home_stato_apertura | Con l'ora sostituita nel test (monkeypatch): martedì 10:00 → "Chiuso · apre mercoledì alle 12:00" |
+| test_home_stato_apertura | Con l'ora sostituita nel test (monkeypatch): martedì 10:00 → "Chiuso · apre domani alle 12:00" ("oggi" e "domani" quando la riapertura è vicina, altrimenti il nome del giorno) |
 | test_home_json_ld | JSON-LD leggibile, `@type` Restaurant, indirizzo, orari, link al menù; nessun `telephone` con `telefono_di_prova` = sì; `telephone` presente con `telefono_di_prova` = no |
 | test_json_ld_escape | Nome del locale con `</script>` → il JSON-LD non chiude lo script |
 | test_menu_struttura | GET `/menu` → 200; 7 `<h2>` con `id` uguale allo slug, nell'ordine del PDF; 25 `<h3>`; "Smash Cheeseburger" scritto così nell'HTML |

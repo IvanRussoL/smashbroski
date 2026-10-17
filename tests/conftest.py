@@ -6,17 +6,34 @@ from dotenv import load_dotenv
 
 from app import create_app
 from app.db import crea_connessione
+from app.servizi.auth import AuthService
 
 load_dotenv()
 
 CARTELLA_DATABASE = Path(__file__).resolve().parent.parent / "database"
 
 # Tutti i test usano il database di prova, anche le richieste inviate all'app.
+# CSRF e limite dei tentativi di login sono spenti, tranne nei test che li verificano.
 CONFIGURAZIONE_TEST = {
     "TESTING": True,
     "SECRET_KEY": "chiave-solo-per-i-test",
     "DB_NAME": os.environ.get("DB_NAME_TEST"),
+    "WTF_CSRF_ENABLED": False,
+    "RATELIMIT_ENABLED": False,
 }
+
+
+
+def configurazione_test(**modifiche) -> dict:
+    """
+    Configurazione di test con alcuni valori cambiati (es. CSRF o limite dei tentativi accesi).
+    """
+    return {**CONFIGURAZIONE_TEST, **modifiche}
+
+
+# Proprietario presente nel database di prova (sezione 1.3 del piano di test).
+EMAIL_PROPRIETARIO = "proprietario@example.com"
+PASSWORD_PROPRIETARIO = "password-dei-test-123"
 
 
 def esegui_file_sql(connessione, percorso: Path) -> None:
@@ -48,9 +65,17 @@ def database_di_prova():
     if not nome or not nome.endswith("_test"):
         raise RuntimeError(f"DB_NAME_TEST deve indicare un database che finisce con _test, non {nome!r}.")
     connessione = crea_connessione(configurazione)
+    prepara_database(connessione)
+    connessione.close()
+
+
+def prepara_database(connessione) -> None:
+    """
+    Ricrea le tabelle, carica i dati iniziali e crea il proprietario di prova, con commit.
+    """
     esegui_file_sql(connessione, CARTELLA_DATABASE / "schema.sql")
     esegui_file_sql(connessione, CARTELLA_DATABASE / "dati_iniziali.sql")
-    connessione.close()
+    AuthService(connessione).crea_proprietario(EMAIL_PROPRIETARIO, PASSWORD_PROPRIETARIO)
 
 
 @pytest.fixture
@@ -109,6 +134,15 @@ def database_modificato(app, database_di_prova):
     conn = crea_connessione(app.config)
     yield conn
     conn.rollback()
-    esegui_file_sql(conn, CARTELLA_DATABASE / "schema.sql")
-    esegui_file_sql(conn, CARTELLA_DATABASE / "dati_iniziali.sql")
+    prepara_database(conn)
     conn.close()
+
+
+@pytest.fixture
+def client_proprietario(client):
+    """
+    Client già entrato nell'area riservata come proprietario di prova (sessione con il suo id).
+    """
+    with client.session_transaction() as sessione:
+        sessione["utente_id"] = 1
+    return client

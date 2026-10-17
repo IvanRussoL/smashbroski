@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block titolo %}Area riservata – {{ "Modifica voce" if voce else "Nuova voce" }}{% endblock %}
+
+{% block contenuto %}
+<div class="pagina-testo pagina-modulo area">
+    {% include "proprietario/_testata.html" %}
+    <h1>{% if voce %}Modifica «{{ voce.nome }}»{% else %}Nuova voce{% endif %} – {{ categoria.nome }}</h1>
+
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p>
+            <label for="nome">Nome</label>
+            <input id="nome" name="nome" maxlength="100" value="{{ valori.get('nome', '') }}" required>
+        </p>
+        <p>
+            <label for="descrizione">Ingredienti o descrizione (facoltativo)</label>
+            <input id="descrizione" name="descrizione" maxlength="255" value="{{ valori.get('descrizione', '') }}">
+        </p>
+        <p>
+            <label for="edizione">Etichetta, es. Winter Edition (facoltativo)</label>
+            <input id="edizione" name="edizione" maxlength="30" value="{{ valori.get('edizione', '') }}">
+        </p>
+        <p>
+            <label for="nota">Nota (facoltativo)</label>
+            <input id="nota" name="nota" maxlength="255" value="{{ valori.get('nota', '') }}">
+        </p>
+        <p>
+            <label for="posizione">Posizione nella categoria (vuoto = in fondo)</label>
+            <input id="posizione" name="posizione" inputmode="numeric" value="{{ valori.get('posizione', '') }}">
+        </p>
+
+        <fieldset>
+            <legend>Prezzi in euro, con la virgola (es. 7,50)</legend>
+            {% if categoria.formati %}
+            <p>Compila i formati offerti e lascia vuoti gli altri, oppure indica solo il prezzo unico.</p>
+            {% for formato in categoria.formati %}
+            {% set campo = "prezzo_" ~ formato.id %}
+            <p>
+                <label for="{{ campo }}">{{ formato.etichetta }}</label>
+                <input id="{{ campo }}" name="{{ campo }}" inputmode="decimal" value="{{ valori.get(campo, '') }}">
+            </p>
+            {% endfor %}
+            {% endif %}
+            <p>
+                <label for="prezzo_unico">Prezzo unico</label>
+                <input id="prezzo_unico" name="prezzo_unico" inputmode="decimal" value="{{ valori.get('prezzo_unico', '') }}">
+            </p>
+        </fieldset>
+
+        <p>
+            <button class="pulsante-modulo" type="submit">Salva</button>
+            <a href="{{ url_for('proprietario.indice') }}#{{ categoria.slug }}">Annulla</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

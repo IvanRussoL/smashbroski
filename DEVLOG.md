@@ -150,3 +150,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Nei test `commit()` non conferma niente (`ConnessioneDiTest` in `conftest.py`)**: i servizi chiamano `commit` come in produzione, ma a fine test il `rollback` annulla tutto, quindi un test che crea una voce non cambia i totali controllati da un altro. Alternativa scartata: ricaricare il database di prova prima di ogni test (lento).
 - **Numero di query del menù pubblico verificato con un contatore**: lo stesso con 25 e con 35 voci.
 - **Test**: 41 test in `tests/test_menu_service.py` (15 sulla conversione dei prezzi senza database, 26 con il database).
+
+## 2026-10-17 · Fase 2 – AuthService
+
+- **Argon2id con `PasswordHasher` di `argon2-cffi` e i parametri predefiniti della libreria** (oggi m=65536, t=3, p=4): non scelgo io i parametri, li aggiorna la libreria con le nuove versioni. Alternativa scartata: `generate_password_hash` di Werkzeug, usato nel progetto del barbiere (in questo progetto la progettazione chiede Argon2id esplicitamente).
+- **Verifica eseguita anche per un'email inesistente, contro un hash fittizio calcolato all'avvio**: il tempo di risposta è lo stesso con email registrate e non, quindi dai tempi non si capisce quali email esistono. Il login restituisce `None` in tutti i casi di errore (email, password, account disattivato) senza dire quale controllo è fallito.
+- **Hash ricalcolato al login quando `check_needs_rehash()` lo chiede**: un hash creato con parametri più deboli viene aggiornato la prima volta che il proprietario entra, l'unico momento in cui la password in chiaro è disponibile.
+- **Hasher passato al servizio come parametro facoltativo**: in produzione si usa quello predefinito; i test ne passano uno che registra le verifiche, per controllare che la verifica avvenga anche con un'email inesistente.
+- **Email salvata in minuscolo e cercata senza distinguere le maiuscole**: "Proprietario@Example.com" e "proprietario@example.com" sono lo stesso account.
+- **Test**: 14 test in `tests/test_auth_service.py`, tutti con il database. Il comando `flask crea-proprietario` si scrive con le rotte di login, perché serve a provarle.

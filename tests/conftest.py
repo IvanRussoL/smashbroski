@@ -61,13 +61,30 @@ def app():
     return create_app(CONFIGURAZIONE_TEST)
 
 
+class ConnessioneDiTest:
+    """
+    Connessione vera al database di prova, ma commit() non conferma niente: i servizi possono
+    chiamarlo come in produzione e a fine test il rollback annulla tutto.
+    Le altre chiamate (cursor, rollback, ...) passano alla connessione vera.
+    """
+
+    def __init__(self, connessione):
+        self._conn = connessione
+
+    def commit(self) -> None:
+        pass
+
+    def __getattr__(self, nome):
+        return getattr(self._conn, nome)
+
+
 @pytest.fixture
 def connessione(app, database_di_prova):
     """
-    Connessione al database di prova per un test; a fine test le modifiche senza commit
-    vengono annullate, così un test non lascia tracce per il successivo.
+    Connessione al database di prova per un test; a fine test tutte le modifiche vengono annullate,
+    anche quelle che un servizio ha "confermato", così un test non lascia tracce per il successivo.
     """
     conn = crea_connessione(app.config)
-    yield conn
+    yield ConnessioneDiTest(conn)
     conn.rollback()
     conn.close()

@@ -138,3 +138,15 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Regole in funzioni del modulo, senza database (`calcola_stato`, `valida_turni`), e `OrariService` che le collega al repository**: i 21 casi delle sezioni 3.1 e 3.2 si provano in millisecondi senza MySQL; con il database si provano lettura, salvataggio e salvataggio rifiutato. `salva_turni` valida prima di toccare il database e salva in una transazione.
 - **Ore accettate solo nel formato HH:MM a due cifre (da 00:00 a 23:59)**: rifiutati anche "24:00" e "9:00", oltre ai casi del piano; il modulo HTML con `<input type="time">` invia sempre questo formato.
 - **Test**: 30 test in `tests/test_orari_service.py` (27 senza database, 3 con il database).
+
+## 2026-10-17 · Fase 2 – MenuService
+
+- **Prezzi scritti dal proprietario convertiti con un'espressione regolare (`^\d{1,3}(,\d{1,2})?$`)**: "7", "7,5" e "7,50" accettati, il punto rifiutato, limiti da 0,01 a 999,99 euro (sezione 7). La conversione in centesimi usa solo interi, mai numeri decimali.
+- **`DatiVoce`: i dati del modulo come testi, validati dal servizio**: la rotta resta sottile e le regole si provano senza Flask. I prezzi per formato arrivano come lista di coppie (formato, prezzo) e non come dizionario, così un formato inviato due volte si riconosce e si rifiuta; un prezzo vuoto vuol dire "formato non offerto".
+- **Tutti gli errori raccolti insieme** (nome, lunghezze, posizione, prezzi, formati, nome già usato) e mostrati nel modulo in una volta. La categoria non valida ferma subito la validazione, perché senza categoria non si possono controllare formati e nome.
+- **Posizione vuota = in fondo alla categoria**: il proprietario che aggiunge una voce non deve conoscere le posizioni delle altre.
+- **Salvataggio di voce e prezzi in una transazione**, con `rollback` su qualunque errore; la validazione avviene prima di toccare il database. In modifica la visibilità non cambia: si nasconde e si rimostra solo con `imposta_visibilita`.
+- **Categorie senza voci visibili tolte da `menu_pubblico()`**, non dal repository: l'area proprietario usa `menu_completo()` e le vede sempre.
+- **Nei test `commit()` non conferma niente (`ConnessioneDiTest` in `conftest.py`)**: i servizi chiamano `commit` come in produzione, ma a fine test il `rollback` annulla tutto, quindi un test che crea una voce non cambia i totali controllati da un altro. Alternativa scartata: ricaricare il database di prova prima di ogni test (lento).
+- **Numero di query del menù pubblico verificato con un contatore**: lo stesso con 25 e con 35 voci.
+- **Test**: 41 test in `tests/test_menu_service.py` (15 sulla conversione dei prezzi senza database, 26 con il database).

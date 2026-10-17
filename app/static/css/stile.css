@@ -1,0 +1,85 @@
+/* Foglio di stile provvisorio: impaginazione minima e leggibile.
+   La grafica definitiva (navbar stile Habita79, hero con foto) arriva in un passo dedicato. */
+
+:root {
+    --rosso: #B00C36;
+    --blu: #1969BC;
+    --blu-scuro: #203E56;
+    --testo: #1d1d1f;
+    --sfondo: #ffffff;
+    --grigio: #f2f4f7;
+    --altezza-navbar: 56px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--testo);
+    background: var(--sfondo);
+}
+
+a { color: var(--blu); }
+a:focus-visible { outline: 3px solid var(--blu); outline-offset: 2px; }
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: var(--altezza-navbar);
+    padding: 0 1rem;
+    background: var(--rosso);
+}
+.navbar a { color: #fff; text-decoration: none; font-weight: 600; }
+.navbar a[aria-current="page"] { text-decoration: underline; }
+.navbar-link { display: flex; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+
+[id] { scroll-margin-top: calc(var(--altezza-navbar) + 0.5rem); }
+
+.hero {
+    min-height: 60dvh;
+    display: flex;
+    align-items: center;
+    padding: 2rem 1rem;
+    background: var(--blu-scuro);
+    color: #fff;
+}
+.hero h1 { margin-top: 0; }
+.pulsante {
+    display: inline-block;
+    margin: 0.25rem 0.5rem 0.25rem 0;
+    padding: 0.75rem 1.25rem;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+.pulsante-principale { background: var(--rosso); border-color: var(--rosso); }
+
+.sezioni-home, .pagina-menu, .pagina-testo { max-width: 900px; margin: 0 auto; padding: 1rem; }
+.orari-giorno { display: flex; justify-content: space-between; gap: 1rem; padding: 0.25rem 0; }
+.orari dd { margin: 0; text-align: right; }
+.contatti { padding-left: 1.25rem; }
+.segnaposto { font-style: italic; }
+
+.indice ul { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; list-style: none; }
+.indice a { display: inline-block; padding: 0.4rem 0.75rem; background: var(--grigio); border-radius: 4px; }
+.voce { padding: 0.75rem 0; border-bottom: 1px solid var(--grigio); }
+.voce h3 { margin: 0; }
+.nome-voce { text-transform: uppercase; }
+.edizione { font-size: 0.875rem; font-weight: normal; color: var(--blu-scuro); }
+.descrizione, .nota-voce { margin: 0.25rem 0; }
+.prezzi { margin: 0.25rem 0 0; }
+.prezzo { display: flex; justify-content: space-between; max-width: 22rem; }
+.prezzo dd, .prezzo-unico { margin: 0; font-weight: 600; white-space: nowrap; }
+
+.footer { padding: 1.5rem 1rem; background: var(--blu-scuro); color: #fff; text-align: center; }
+.footer a { color: #fff; }

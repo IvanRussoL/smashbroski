@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block titolo %}Errore {{ codice }} – SmashBroski Pompei{% endblock %}
+
+{% block contenuto %}
+<div class="pagina-testo">
+    <h1>{{ messaggio }}</h1>
+    <p><a href="{{ url_for('pubblico.home') }}">Torna alla home</a> oppure <a href="{{ url_for('pubblico.menu') }}">guarda il menù</a>.</p>
+</div>
+{% endblock %}

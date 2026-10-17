@@ -159,3 +159,16 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Hasher passato al servizio come parametro facoltativo**: in produzione si usa quello predefinito; i test ne passano uno che registra le verifiche, per controllare che la verifica avvenga anche con un'email inesistente.
 - **Email salvata in minuscolo e cercata senza distinguere le maiuscole**: "Proprietario@Example.com" e "proprietario@example.com" sono lo stesso account.
 - **Test**: 14 test in `tests/test_auth_service.py`, tutti con il database. Il comando `flask crea-proprietario` si scrive con le rotte di login, perché serve a provarle.
+
+## 2026-10-17 · Fase 2 – Pagine pubbliche, header di sicurezza ed errori
+
+- **Blueprint `pubblico` con home, menù e privacy, rotte sottili**: leggono impostazioni, orari e menù dai servizi e passano i dati ai template. L'ora attuale si legge con una funzione separata (`ora_attuale`), che i test sostituiscono per controllare la home martedì alle 10:00 o alle 00:30.
+- **Template con `base.html` (navbar, footer) e una pagina per rotta**: un solo `<h1>` per pagina, `<title>` con tipo di locale e città, meta description. Nessun link visibile all'area riservata.
+- **Menù con `h2` per categoria (con `id` uguale allo slug), `h3` per voce e prezzi in `<dl>`** (formato e prezzo), come nel wireframe; prezzo unico su una riga. Il maiuscolo dei nomi lo applica il CSS: nell'HTML resta "Smash Burger".
+- **Stato di apertura scritto per esteso**, con "oggi" e "domani" quando la riapertura è vicina e il nome del giorno negli altri casi ("Chiuso · apre domani alle 12:00", "Chiuso · apre venerdì alle 12:00").
+- **Filtri Jinja `euro`, `ora` e `telefono_leggibile`** in `app/formato.py`: la presentazione resta fuori dai servizi. Il telefono si mostra a gruppi ("+39 081 000 0000") con una regola provvisoria per i numeri italiani di 10 cifre, da rivedere con il numero reale.
+- **JSON-LD `Restaurant` scritto con `tojson`**: nome, indirizzo, orari, link al menù; il telefono solo se non è di prova. `tojson` rende innocui `<`, `>` e `&`, quindi un nome con `</script>` non chiude lo script.
+- **Header di sicurezza in un `after_request`** con i valori della sezione 7; `Strict-Transport-Security` solo con `PRODUZIONE=1` nel `.env`, perché in sviluppo il sito non è in HTTPS.
+- **Pagina di errore del sito per 404, 405 e 500 e per `NonTrovatoError`**, con link alla home e al menù, invece delle pagine predefinite di Flask.
+- **CSS provvisorio, solo per leggere le pagine**: colori del menù in variabili `:root`, navbar rossa, `scroll-margin-top` per i link interni. La grafica definitiva (navbar stile Habita79 semi-trasparente, hero con foto, logo) ha un passo dedicato; mancano ancora il file del logo e la foto del locale.
+- **Test delle pagine sul database di prova**: i test che cambiano dati da guardare attraverso le pagine usano commit veri (l'app ha una connessione sua) e a fine test ricaricano schema e dati iniziali. 35 test nuovi in `test_filtri.py`, `test_rotte_pubbliche.py` e `test_header_sicurezza.py`.

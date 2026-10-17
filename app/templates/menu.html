@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block titolo %}Menù – SmashBroski Pompei, hamburgeria a Pompei{% endblock %}
+{% block descrizione %}Il menù di SmashBroski Pompei: smash burger, The Originals, insalate, menù kids e bevande, con tutti i prezzi.{% endblock %}
+
+{% block contenuto %}
+<div class="pagina-menu">
+    <h1>Menù</h1>
+    <p>Prezzi in euro.</p>
+
+    <nav id="indice" class="indice" aria-label="Categorie del menù">
+        <ul>
+            {% for categoria in categorie %}
+            <li><a href="#{{ categoria.slug }}">{{ categoria.nome }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    {% for categoria in categorie %}
+    <section class="categoria" aria-labelledby="{{ categoria.slug }}">
+        <h2 id="{{ categoria.slug }}">{{ categoria.nome }}</h2>
+        {% if categoria.nota %}<p class="nota-categoria">{{ categoria.nota }}</p>{% endif %}
+
+        {% for voce in categoria.voci %}
+        <article class="voce">
+            <h3>
+                <span class="nome-voce">{{ voce.nome }}</span>
+                {% if voce.edizione %}<span class="edizione">{{ voce.edizione }}</span>{% endif %}
+            </h3>
+            {% if voce.descrizione %}<p class="descrizione">{{ voce.descrizione }}</p>{% endif %}
+            {% if voce.nota %}<p class="nota-voce">{{ voce.nota }}</p>{% endif %}
+            {% if voce.ha_prezzo_unico() %}
+            <p class="prezzo-unico">{{ voce.prezzi[0].prezzo_centesimi|euro }}</p>
+            {% else %}
+            <dl class="prezzi">
+                {% for prezzo in voce.prezzi %}
+                <div class="prezzo">
+                    <dt>{{ prezzo.etichetta_formato or "Prezzo" }}</dt>
+                    <dd>{{ prezzo.prezzo_centesimi|euro }}</dd>
+                </div>
+                {% endfor %}
+            </dl>
+            {% endif %}
+        </article>
+        {% endfor %}
+
+        <p class="torna-indice"><a href="#indice">↑ Torna all'indice</a></p>
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

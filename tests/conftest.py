@@ -88,3 +88,27 @@ def connessione(app, database_di_prova):
     yield ConnessioneDiTest(conn)
     conn.rollback()
     conn.close()
+
+
+@pytest.fixture
+def client(app, database_di_prova):
+    """
+    Client che simula il browser: invia richieste all'app senza avviare il server.
+    L'app usa la sua connessione al database di prova.
+    """
+    return app.test_client()
+
+
+@pytest.fixture
+def database_modificato(app, database_di_prova):
+    """
+    Connessione con commit veri, per i test che cambiano i dati e poi li guardano attraverso le
+    pagine (l'app usa una connessione sua e vede solo i dati confermati). A fine test il database
+    di prova viene ricaricato da schema e dati iniziali.
+    """
+    conn = crea_connessione(app.config)
+    yield conn
+    conn.rollback()
+    esegui_file_sql(conn, CARTELLA_DATABASE / "schema.sql")
+    esegui_file_sql(conn, CARTELLA_DATABASE / "dati_iniziali.sql")
+    conn.close()

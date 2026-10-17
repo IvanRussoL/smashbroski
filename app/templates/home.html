@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block testa %}
+<script type="application/ld+json">{{ json_ld|tojson }}</script>
+{% endblock %}
+
+{% block contenuto %}
+<section class="hero">
+    <div class="hero-contenuto">
+        <h1>SmashBroski – Hamburgeria a Pompei</h1>
+        <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
+        <p class="hero-pulsanti">
+            <a class="pulsante pulsante-principale" href="{{ url_for('pubblico.menu') }}">Guarda il menù</a>
+            <a class="pulsante" href="{{ impostazioni.link_maps() }}" rel="noopener">Come arrivare</a>
+        </p>
+    </div>
+</section>
+
+<div class="sezioni-home">
+    <section id="orari" class="sezione">
+        <h2>Orari</h2>
+        <dl class="orari">
+            {% for giorno in orari %}
+            <div class="orari-giorno{% if giorno.numero == oggi %} oggi{% endif %}">
+                <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} (oggi)</strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
+                <dd>
+                    {%- if giorno.turni -%}
+                    {% for turno in giorno.turni %}{{ turno.ora_inizio|ora }}–{{ turno.ora_fine|ora }}{% if not loop.last %} · {% endif %}{% endfor %}
+                    {%- else -%}
+                    Chiuso
+                    {%- endif -%}
+                </dd>
+            </div>
+            {% endfor %}
+        </dl>
+    </section>
+
+    <section id="contatti" class="sezione">
+        <h2>Contatti</h2>
+        <ul class="contatti">
+            <li>
+                Telefono: <a href="tel:{{ impostazioni.telefono }}">{{ impostazioni.telefono|telefono_leggibile }}</a>
+                {% if impostazioni.telefono_di_prova %}<span class="segnaposto">(numero di prova)</span>{% endif %}
+            </li>
+            <li>Email: <a href="mailto:{{ impostazioni.email }}">{{ impostazioni.email }}</a></li>
+            <li>
+                Indirizzo: {{ impostazioni.indirizzo }}
+                <a href="{{ impostazioni.link_maps() }}" rel="noopener">Apri in Google Maps</a>
+            </li>
+            <li class="social">
+                <a href="{{ impostazioni.url_facebook }}" rel="noopener">Facebook</a>
+                <a href="{{ impostazioni.url_instagram }}" rel="noopener">Instagram</a>
+            </li>
+        </ul>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titolo %}SmashBroski Pompei – Hamburgeria a Pompei{% endblock %}</title>
+    <meta name="description" content="{% block descrizione %}SmashBroski Pompei, hamburgeria in Vico dei Paninari a Pompei: smash burger, menù, orari e contatti.{% endblock %}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stile.css') }}">
+    {% block testa %}{% endblock %}
+</head>
+<body>
+    <header class="navbar">
+        <a class="navbar-logo" href="{{ url_for('pubblico.home') }}">SmashBroski</a>
+        <nav aria-label="Principale">
+            <ul class="navbar-link">
+                <li><a href="{{ url_for('pubblico.menu') }}"{% if request.endpoint == 'pubblico.menu' %} aria-current="page"{% endif %}>Menù</a></li>
+                <li><a href="{{ url_for('pubblico.home') }}#orari">Orari</a></li>
+                <li><a href="{{ url_for('pubblico.home') }}#contatti">Contatti</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="contenuto">
+        {% block contenuto %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        {% if impostazioni %}
+        <p>{{ impostazioni.nome_locale }} · {{ impostazioni.indirizzo }}</p>
+        {% else %}
+        <p>SmashBroski Pompei</p>
+        {% endif %}
+        <p><a href="{{ url_for('pubblico.privacy') }}">Privacy e cookie</a> · © {{ anno }}</p>
+    </footer>
+</body>
+</html>

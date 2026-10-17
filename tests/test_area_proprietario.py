@@ -126,3 +126,35 @@ def test_comando_crea_proprietario_password_corta(app, database_di_prova):
     risultato = app.test_cli_runner().invoke(args=["crea-proprietario"], input="corta@example.com\ncorta\ncorta\n")
     assert risultato.exit_code != 0
     assert "La password deve avere almeno 12 caratteri." in risultato.output
+
+
+# --- Cambio di categoria ---
+
+THE_ORIGINALS, BURGER_ORIGINALS, MENU_ORIGINALS = 7, 9, 10
+
+
+def test_cambio_categoria_mostra_i_nuovi_formati(client_proprietario):
+    pagina = html(client_proprietario.get(f"/proprietario/voci/6?categoria={THE_ORIGINALS}"))
+    assert "Stai spostando la voce in <strong>The Originals</strong>" in pagina
+    assert f'name="prezzo_{BURGER_ORIGINALS}"' in pagina
+    assert f'name="prezzo_{PANINO_SINGLE}"' not in pagina
+    assert f'name="categoria_id" value="{THE_ORIGINALS}"' in pagina
+    assert 'value="Smash Burger"' in pagina  # gli altri campi restano compilati
+
+
+def test_cambio_categoria_salvato(client_proprietario, database_modificato):
+    risposta = client_proprietario.post("/proprietario/voci/6", data=dati_voce(
+        categoria_id=str(THE_ORIGINALS), nome="Smash Burger",
+        **{f"prezzo_{BURGER_ORIGINALS}": "8", f"prezzo_{MENU_ORIGINALS}": "12"},
+    ))
+    assert risposta.status_code == 302
+    assert risposta.headers["Location"].endswith("#the-originals")
+    menu = html(client_proprietario.get("/menu"))
+    originals = menu.split('id="the-originals"')[1]
+    assert "Smash Burger</span>" in originals
+
+
+def test_cambio_categoria_senza_salvare_non_sposta(client_proprietario):
+    client_proprietario.get(f"/proprietario/voci/6?categoria={THE_ORIGINALS}")
+    burger = html(client_proprietario.get("/menu")).split('id="burger"')[1].split('id="kids-menu"')[0]
+    assert "Smash Burger</span>" in burger

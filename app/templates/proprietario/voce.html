@@ -7,8 +7,25 @@
     {% include "proprietario/_testata.html" %}
     <h1>{% if voce %}Modifica «{{ voce.nome }}»{% else %}Nuova voce{% endif %} – {{ categoria.nome }}</h1>
 
+    {% if voce %}
+    <form class="cambia-categoria" method="get" action="{{ url_for('proprietario.modifica_voce', voce_id=voce.id) }}">
+        <label for="categoria">Categoria</label>
+        <select id="categoria" name="categoria">
+            {% for altra in categorie %}
+            <option value="{{ altra.id }}"{% if altra.id == categoria.id %} selected{% endif %}>{{ altra.nome }}</option>
+            {% endfor %}
+        </select>
+        <button class="pulsante-link" type="submit">Cambia categoria</button>
+    </form>
+    {% if spostamento %}
+    <p class="avviso" role="status">Stai spostando la voce in <strong>{{ categoria.nome }}</strong>: indica i prezzi
+    con i formati di questa categoria e salva. Finché non salvi, la voce resta dov'è.</p>
+    {% endif %}
+    {% endif %}
+
     <form method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if voce %}<input type="hidden" name="categoria_id" value="{{ categoria.id }}">{% endif %}
         <p>
             <label for="nome">Nome</label>
             <input id="nome" name="nome" maxlength="100" value="{{ valori.get('nome', '') }}" required>

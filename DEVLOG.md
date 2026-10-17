@@ -186,3 +186,8 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Test**: il database di prova contiene anche il proprietario di prova (ricreato quando il database viene ricaricato); 25 test nuovi in `test_accessi.py` e `test_area_proprietario.py`, comandi da terminale compresi.
 - **Comando registrato con `@with_appcontext`**: un comando aggiunto con `app.cli.add_command` non apre da solo il contesto dell'app, che serve alla connessione al database (emerso dal primo test del comando).
 - **Stato di apertura con "oggi" e "domani" confermato** anche di notte: dopo la chiusura delle 01:00 di martedì la home scrive "apre domani alle 12:00". Aggiornati l'esempio di RF-03 in `PROGETTAZIONE.md` e la riga del test della home in `PIANO_TEST.md`.
+
+## 2026-10-17 · Fase 2 – Cambio di categoria di una voce
+
+- **La categoria di una voce si cambia dalla pagina di modifica** (sostituisce la scelta precedente di non permetterlo, per lasciare più libertà al proprietario, come chiede RF-17). Il proprietario sceglie la nuova categoria da un elenco; la pagina si ricarica con `?categoria=<id>` e mostra i formati di prezzo della nuova categoria, con un avviso. Nome, ingredienti, etichetta e nota restano compilati; i prezzi per formato si riscrivono, perché i formati della vecchia categoria non valgono nella nuova; la voce va in fondo alla nuova categoria se la posizione resta vuota. Finché non si salva la voce resta dov'è. Funziona senza JavaScript.
+- **Le regole sono quelle di sempre, applicate alla nuova categoria**: `MenuService.modifica_voce` valida i formati e il nome unico nella categoria di arrivo; un prezzo con un formato della vecchia categoria viene rifiutato. 6 test nuovi (3 sul servizio, 3 sulle pagine).

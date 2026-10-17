@@ -255,3 +255,35 @@ def test_testo_con_apici_salvato_come_testo(connessione):
     voce_id = servizio.crea_voce(DatiVoce(BURGER, nome, prezzi_formati=[(PANINO_SINGLE, "7")]))
     assert servizio.leggi_voce(voce_id).nome == nome
     assert len(nomi_voci(servizio.menu_completo(), BURGER)) == 8  # la tabella esiste ancora
+
+
+# --- Cambio di categoria ---
+
+THE_ORIGINALS, BURGER_ORIGINALS, MENU_ORIGINALS = 7, 9, 10
+
+
+def test_modifica_sposta_la_voce_in_altra_categoria(connessione):
+    servizio = MenuService(connessione)
+    servizio.modifica_voce(SMASH_BURGER, DatiVoce(
+        THE_ORIGINALS, "Smash Burger", prezzi_formati=[(BURGER_ORIGINALS, "8"), (MENU_ORIGINALS, "12")],
+    ))
+    voce = servizio.leggi_voce(SMASH_BURGER)
+    assert voce.categoria_id == THE_ORIGINALS
+    assert voce.posizione == 6  # in fondo, dopo le 5 voci di The Originals
+    assert [(p.etichetta_formato, p.prezzo_centesimi) for p in voce.prezzi] == [("Burger", 800), ("Menù", 1200)]
+    assert "Smash Burger" not in nomi_voci(servizio.menu_pubblico(), BURGER)
+    assert "Smash Burger" in nomi_voci(servizio.menu_pubblico(), THE_ORIGINALS)
+
+
+def test_spostamento_con_i_formati_della_vecchia_categoria_errore(connessione):
+    with pytest.raises(DatiNonValidiError):
+        MenuService(connessione).modifica_voce(SMASH_BURGER, DatiVoce(
+            THE_ORIGINALS, "Smash Burger", prezzi_formati=[(PANINO_SINGLE, "7")],
+        ))
+
+
+def test_spostamento_con_nome_gia_usato_nella_nuova_categoria_errore(connessione):
+    with pytest.raises(DatiNonValidiError):
+        MenuService(connessione).modifica_voce(SMASH_BURGER, DatiVoce(
+            THE_ORIGINALS, "Scapece", prezzi_formati=[(BURGER_ORIGINALS, "8")],
+        ))

@@ -106,20 +106,36 @@ def nuova_voce():
 @bp.route("/voci/<int:voce_id>", methods=["GET", "POST"])
 def modifica_voce(voce_id: int):
     """
-    Modifica di una voce nella sua categoria (la categoria non si cambia da qui).
+    Modifica di una voce. Per spostarla in un'altra categoria il proprietario la sceglie dall'elenco:
+    la pagina si ricarica con ?categoria=<id> e mostra i formati di prezzo della nuova categoria,
+    da compilare di nuovo (i formati della categoria di partenza non valgono nell'altra).
     """
     servizio = MenuService(ottieni_connessione())
     voce = servizio.leggi_voce(voce_id)
-    categoria = servizio.leggi_categoria(voce.categoria_id)
+    if request.method == "POST":
+        categoria = servizio.leggi_categoria(request.form.get("categoria_id", voce.categoria_id))
+    else:
+        categoria = servizio.leggi_categoria(request.args.get("categoria", voce.categoria_id))
+    spostamento = categoria.id != voce.categoria_id
+
     if request.method == "POST":
         try:
             servizio.modifica_voce(voce_id, _dati_voce_dal_modulo(categoria.id))
         except DatiNonValidiError as errore:
             return render_template("proprietario/voce.html", categoria=categoria, voce=voce,
-                                   valori=request.form, errori=errore.messaggi), 400
-        flash("Voce salvata.")
+                                   valori=request.form, errori=errore.messaggi, spostamento=spostamento,
+                                   categorie=servizio.categorie()), 400
+        flash(f"Voce spostata in {categoria.nome} e salvata." if spostamento else "Voce salvata.")
         return redirect(url_for("proprietario.indice") + f"#{categoria.slug}")
-    return render_template("proprietario/voce.html", categoria=categoria, voce=voce, valori=_valori_da_voce(voce))
+
+    valori = _valori_da_voce(voce)
+    if spostamento:
+        # I prezzi per formato della vecchia categoria non valgono nella nuova; la voce va in fondo.
+        valori = {chiave: valore for chiave, valore in valori.items() if not chiave.startswith("prezzo_")
+                  or chiave == "prezzo_unico"}
+        valori["posizione"] = ""
+    return render_template("proprietario/voce.html", categoria=categoria, voce=voce, valori=valori,
+                           spostamento=spostamento, categorie=servizio.categorie())
 
 
 @bp.post("/voci/<int:voce_id>/visibilita")

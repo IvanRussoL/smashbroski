@@ -84,6 +84,12 @@ class MenuService:
             raise NonTrovatoError("Voce del menù non trovata.")
         return voce
 
+    def categorie(self) -> list[Categoria]:
+        """
+        Returns: tutte le categorie in ordine, con i loro formati e senza voci (per gli elenchi di scelta).
+        """
+        return self._repo.leggi_categorie()
+
     def leggi_categoria(self, categoria_id) -> Categoria:
         """
         Returns: la categoria con i suoi formati di prezzo e le sue voci (anche nascoste).
@@ -115,7 +121,8 @@ class MenuService:
     def modifica_voce(self, voce_id: int, dati: DatiVoce) -> None:
         """
         Valida i dati e salva la voce con i nuovi prezzi (quelli vecchi sono sostituiti) in una
-        transazione. La visibilità non cambia.
+        transazione. La visibilità non cambia. Se dati.categoria_id è un'altra categoria la voce
+        viene spostata: prezzi e nome si controllano con le regole della nuova categoria.
         Raises: NonTrovatoError se la voce non esiste; DatiNonValidiError con tutti i messaggi.
         """
         esistente = self.leggi_voce(voce_id)

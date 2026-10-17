@@ -69,7 +69,7 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 
 ## 2026-10-16 · Repository Git
 
-- **`git init` e primo commit (`e359a85`, "Fase 1: progettazione e wireframe")** in `smashbroski/`, con `.gitignore` creato prima del primo commit: `.env`, cache di Python ed editor non entrano mai nella cronologia.
+- **`git init` e primo commit (`925fa81`, "Fase 1: progettazione e wireframe")** in `smashbroski/`, con `.gitignore` creato prima del primo commit: `.env`, cache di Python ed editor non entrano mai nella cronologia.
 
 ## 2026-10-16 · Progettazione – Piano di test
 
@@ -81,3 +81,14 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Nome della voce unico nella categoria, controllato dal servizio con un messaggio sul campo**: senza il controllo un doppione arriverebbe al vincolo `UNIQUE` del database come errore 500. Aggiunto alle sezioni 3 e 7 di `PROGETTAZIONE.md`.
 - **Categoria con tutte le voci nascoste esclusa dal menù pubblico e dall'indice**: il cliente non trova titoli senza piatti; la categoria torna da sola quando il proprietario rimostra una voce. Aggiunto alla sezione 3 di `PROGETTAZIONE.md`. Alternativa scartata: titolo con la scritta "Al momento non disponibile" (una sezione vuota che non serve a chi legge il menù).
 - **Correzione nel foglio dell'audit**: data di AU-NET02 da 2016-10-15 a 2026-10-15 (errore di battitura).
+
+## 2026-10-17 · Fase 2 – Ambiente e struttura del progetto
+
+- **Python 3.13.15 e MySQL 8.0.41, gli stessi del progetto del barbiere**: stesso PC e stesse versioni già provate; MySQL applica i vincoli `CHECK` dalla 8.0.16, e lo schema li usa (prezzi maggiori di 0, giorno da 1 a 7, una sola riga di `impostazioni`).
+- **Ambiente virtuale `venv/` nella cartella del repository, escluso da Git**: le librerie del progetto non si mescolano con quelle di altri progetti; chi clona il repository lo ricrea con `requirements.txt`.
+- **`requirements.txt` con le versioni bloccate**: le librerie usate direttamente più le dipendenze principali di Flask, come nel progetto del barbiere; chi installa ottiene lo stesso ambiente su cui passano i test. Nuove rispetto al barbiere: `argon2-cffi` 25.1.0 (password) e `Pillow` 13.0.0 (script delle immagini). `tzdata` serve su Windows, che non ha il database dei fusi orari usato da `zoneinfo`. Alternativa scartata: versioni libere (un aggiornamento di una libreria può rompere il progetto senza che il codice cambi).
+- **Utente MySQL dedicato `smashbroski_app` e due database, `smashbroski` (sviluppo) e `smashbroski_test` (pytest)**: l'utente ha permessi solo su questi due database, quindi un errore sfruttato nel sito non arriva al resto del server; i test svuotano e ricaricano il loro database senza toccare i dati di sviluppo. Alternative scartate: collegarsi come `root` (permessi su tutto il server) e un solo database per sviluppo e test (ogni esecuzione dei test cancellerebbe le prove fatte a mano).
+- **`.env.example` nel repository, `.env` escluso**: elenca le variabili con valori finti; password del database e `SECRET_KEY` restano solo sul PC.
+- **`create_app()` che riceve la configurazione come parametro e si ferma se manca `SECRET_KEY`**: i test passano la loro configurazione senza dipendere da `.env`; senza chiave il sito non parte, invece di partire con una sessione falsificabile. `.env` lo carica `run.py`, non `create_app()`. Alternativa scartata: una chiave predefinita scritta nel codice (finirebbe su GitHub).
+- **Test eseguiti con `python -m pytest` dalla cartella del progetto**, come nel progetto del barbiere: il comando aggiunge la cartella al percorso di Python, quindi `from app import create_app` funziona senza file di configurazione di pytest. Primo test: 2 casi su `create_app()`, entrambi PASS.
+- **Correzioni**: hash del primo commit in questo diario (`925fa81`) e nome della cartella principale nella sezione 6 di `PROGETTAZIONE.md` (`smashbroski/`, il nome reale del repository).

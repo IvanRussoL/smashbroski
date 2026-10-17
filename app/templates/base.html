@@ -8,9 +8,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stile.css') }}">
     {% block testa %}{% endblock %}
 </head>
-<body>
+<body class="{% block classe_pagina %}pagina-interna{% endblock %}">
+    <a class="salta-al-contenuto" href="#contenuto">Vai al contenuto</a>
     <header class="navbar">
-        <a class="navbar-logo" href="{{ url_for('pubblico.home') }}">SmashBroski</a>
+        <a class="navbar-logo" href="{{ url_for('pubblico.home') }}">
+            <img src="{{ url_for('static', filename='img/logo-navbar.webp') }}" width="96" height="85" alt="SmashBroski Pompei, vai alla home">
+        </a>
         <nav aria-label="Principale">
             <ul class="navbar-link">
                 <li><a href="{{ url_for('pubblico.menu') }}"{% if request.endpoint == 'pubblico.menu' %} aria-current="page"{% endif %}>Menù</a></li>
@@ -31,6 +34,7 @@
         <p>SmashBroski Pompei</p>
         {% endif %}
         <p><a href="{{ url_for('pubblico.privacy') }}">Privacy e cookie</a> · © {{ anno }}</p>
+        {% block crediti %}{% endblock %}
     </footer>
 </body>
 </html>

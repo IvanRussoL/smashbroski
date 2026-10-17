@@ -1,112 +1,377 @@
-/* Foglio di stile provvisorio: impaginazione minima e leggibile.
-   La grafica definitiva (navbar stile Habita79, hero con foto) arriva in un passo dedicato. */
+/* Foglio di stile di SmashBroski Pompei.
+   Colori del marchio: rosso dell'insegna e del menù, blu e crema del logo.
+   Mobile-first: le regole base valgono per i telefoni, le media query allargano il layout. */
 
 :root {
     --rosso: #B00C36;
-    --blu: #1969BC;
+    --rosso-scuro: #8A0A2B;
+    --blu: #0963AD;
     --blu-scuro: #203E56;
-    --testo: #1d1d1f;
-    --sfondo: #ffffff;
-    --grigio: #f2f4f7;
-    --altezza-navbar: 56px;
+    --crema: #FFFAF0;
+    --crema-scura: #F3EBDA;
+    --testo: #1F1F24;
+    --testo-secondario: #4A4A55;
+    --bordo: #E2D8C3;
+    --navbar-sfondo: rgba(176, 12, 54, 0.85);
+    --altezza-navbar: 64px;
+    --larghezza-contenuto: 1100px;
+    --raggio: 6px;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
+html { scroll-padding-top: calc(var(--altezza-navbar) + 0.75rem); }
+
 body {
     margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: var(--font);
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.55;
     color: var(--testo);
-    background: var(--sfondo);
+    background: var(--crema);
 }
 
-a { color: var(--blu); }
-a:focus-visible { outline: 3px solid var(--blu); outline-offset: 2px; }
+img { max-width: 100%; height: auto; }
+
+a { color: var(--blu); text-underline-offset: 0.15em; }
+a:hover { color: var(--blu-scuro); }
+:focus-visible { outline: 3px solid var(--blu); outline-offset: 3px; }
+
+h1, h2, h3 { line-height: 1.2; }
+h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
+
+.salta-al-contenuto {
+    position: absolute;
+    left: 0.5rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    background: var(--crema);
+    color: var(--testo);
+    border-radius: var(--raggio);
+}
+.salta-al-contenuto:focus { top: 0.5rem; }
+
+/* ---------- Navbar fissa, rossa semi-trasparente con sfocatura (stile Habita79) ---------- */
 
 .navbar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    min-height: var(--altezza-navbar);
-    padding: 0 1rem;
-    background: var(--rosso);
+    gap: 0.75rem;
+    height: var(--altezza-navbar);
+    padding: 0 max(1rem, env(safe-area-inset-left));
+    background: var(--navbar-sfondo);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
 }
-.navbar a { color: #fff; text-decoration: none; font-weight: 600; }
-.navbar a[aria-current="page"] { text-decoration: underline; }
-.navbar-link { display: flex; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.navbar-logo { display: flex; align-items: center; height: 100%; }
+.navbar-logo img { width: 54px; height: auto; display: block; }
+.navbar-link { display: flex; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.navbar-link a {
+    display: block;
+    padding: 0.6rem 0.65rem;
+    color: var(--crema);
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: var(--raggio);
+}
+.navbar-link a:hover { background: rgba(255, 250, 240, 0.15); color: #fff; }
+.navbar-link a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; }
+.navbar :focus-visible { outline-color: var(--crema); }
 
-[id] { scroll-margin-top: calc(var(--altezza-navbar) + 0.5rem); }
+/* Le pagine senza hero partono sotto la navbar fissa. */
+.pagina-interna main { padding-top: var(--altezza-navbar); }
+
+/* ---------- Hero a tutto schermo con la foto del locale ---------- */
 
 .hero {
-    min-height: 60dvh;
+    position: relative;
+    isolation: isolate;
     display: flex;
     align-items: center;
-    padding: 2rem 1rem;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: calc(var(--altezza-navbar) + 1.5rem) 1.25rem 2.5rem;
+    color: var(--crema);
     background: var(--blu-scuro);
-    color: #fff;
 }
-.hero h1 { margin-top: 0; }
-.pulsante {
+/* La foto è uno sfondo: il contenuto resta nel flusso normale e allunga l'hero se serve. */
+.hero-foto, .hero-foto img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+}
+.hero-foto img { object-fit: cover; object-position: center; }
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgba(18, 28, 40, 0.92) 0%, rgba(18, 28, 40, 0.65) 55%, rgba(18, 28, 40, 0.45) 100%);
+}
+.hero-contenuto {
+    width: 100%;
+    max-width: var(--larghezza-contenuto);
+    margin: 0 auto;
+    text-align: center;
+}
+.hero-logo {
+    display: block;
+    width: auto;
+    height: min(30vh, 260px);
+    margin: 0 auto 0.5rem;
+}
+.hero h1 { margin: 0 0 1rem; font-size: clamp(1.3rem, 4.5vw, 2rem); font-weight: 700; letter-spacing: 0.03em; }
+.hero-sottotitolo { display: block; }
+.stato-apertura {
     display: inline-block;
-    margin: 0.25rem 0.5rem 0.25rem 0;
-    padding: 0.75rem 1.25rem;
-    border: 2px solid #fff;
-    border-radius: 4px;
-    color: #fff;
-    text-decoration: none;
+    margin: 0 0 1.25rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(255, 250, 240, 0.12);
+    border: 1px solid rgba(255, 250, 240, 0.35);
     font-weight: 600;
 }
-.pulsante-principale { background: var(--rosso); border-color: var(--rosso); }
+.stato-apertura::before {
+    content: "";
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-right: 0.45rem;
+    border-radius: 50%;
+    vertical-align: 0.05em;
+    background: #F2B33D;
+}
+.stato-apertura.aperto::before { background: #5DD37E; }
+.hero-pulsanti { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin: 0; }
 
-.sezioni-home, .pagina-menu, .pagina-testo { max-width: 900px; margin: 0 auto; padding: 1rem; }
-.orari-giorno { display: flex; justify-content: space-between; gap: 1rem; padding: 0.25rem 0; }
-.orari dd { margin: 0; text-align: right; }
-.contatti { padding-left: 1.25rem; }
-.segnaposto { font-style: italic; }
+.pulsante {
+    display: inline-block;
+    min-height: 48px;
+    padding: 0.8rem 1.4rem;
+    border-radius: var(--raggio);
+    font-weight: 700;
+    text-decoration: none;
+    line-height: 1.2;
+}
+.pulsante-principale { background: var(--rosso); color: var(--crema); border: 2px solid var(--rosso); }
+.pulsante-principale:hover { background: var(--rosso-scuro); border-color: var(--rosso-scuro); color: #fff; }
+.pulsante-secondario { color: var(--crema); border: 2px solid var(--crema); }
+.pulsante-secondario:hover { background: var(--crema); color: var(--blu-scuro); }
+.hero :focus-visible { outline-color: var(--crema); }
 
-.indice ul { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; list-style: none; }
-.indice a { display: inline-block; padding: 0.4rem 0.75rem; background: var(--grigio); border-radius: 4px; }
-.voce { padding: 0.75rem 0; border-bottom: 1px solid var(--grigio); }
-.voce h3 { margin: 0; }
-.nome-voce { text-transform: uppercase; }
-.edizione { font-size: 0.875rem; font-weight: normal; color: var(--blu-scuro); }
-.descrizione, .nota-voce { margin: 0.25rem 0; }
-.prezzi { margin: 0.25rem 0 0; }
-.prezzo { display: flex; justify-content: space-between; max-width: 22rem; }
-.prezzo dd, .prezzo-unico { margin: 0; font-weight: 600; white-space: nowrap; }
+/* ---------- Sezioni della home ---------- */
 
-.footer { padding: 1.5rem 1rem; background: var(--blu-scuro); color: #fff; text-align: center; }
-.footer a { color: #fff; }
+.sezioni-home {
+    display: grid;
+    gap: 1.5rem;
+    max-width: var(--larghezza-contenuto);
+    margin: 0 auto;
+    padding: 2.5rem 1rem;
+}
+.sezione {
+    padding: 1.5rem 1.25rem;
+    background: #fff;
+    border: 1px solid var(--bordo);
+    border-radius: 10px;
+}
+.orari { margin: 0; }
+.orari-giorno {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--bordo);
+}
+.orari-giorno:last-child { border-bottom: 0; }
+.orari dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.orari-giorno.oggi { color: var(--rosso); }
+.contatti { margin: 0; padding: 0; list-style: none; }
+.contatti li { padding: 0.55rem 0; border-bottom: 1px solid var(--bordo); overflow-wrap: anywhere; }
+.contatti li:last-child { border-bottom: 0; }
+.contatti a { font-weight: 600; }
+.social { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.social a {
+    display: inline-block;
+    min-height: 48px;
+    padding: 0.7rem 1.1rem;
+    border: 2px solid var(--blu);
+    border-radius: var(--raggio);
+    text-decoration: none;
+}
+.segnaposto { font-style: italic; color: var(--testo-secondario); }
 
-/* Moduli e area riservata */
-.pagina-modulo label { display: block; font-weight: 600; }
-.pagina-modulo input:not([type="hidden"]) { width: 100%; max-width: 28rem; padding: 0.5rem; font-size: 1rem; }
-.riga-turno input[type="time"] { width: auto; }
-.riga-turno label { display: inline; font-weight: normal; }
+/* ---------- Menù ---------- */
+
+.pagina-menu, .pagina-testo { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.pagina-menu h1, .pagina-testo h1 { margin: 0.5rem 0; font-size: 2rem; color: var(--blu-scuro); }
+
+.indice { margin: 1rem 0 0.5rem; }
+.indice ul { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.indice a {
+    display: inline-block;
+    min-height: 44px;
+    padding: 0.6rem 0.9rem;
+    background: var(--blu);
+    color: var(--crema);
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.indice a:hover { background: var(--blu-scuro); color: #fff; }
+
+.categoria { margin-top: 2.25rem; }
+.categoria h2 { padding-bottom: 0.4rem; border-bottom: 3px solid var(--rosso); }
+.nota-categoria { margin: 0 0 0.75rem; color: var(--testo-secondario); font-style: italic; }
+.intestazione-prezzi, .prezzo-mancante { display: none; }
+
+.voce { padding: 0.9rem 0; border-bottom: 1px solid var(--bordo); }
+.voce h3 { margin: 0; font-size: 1.1rem; }
+.nome-voce { text-transform: uppercase; letter-spacing: 0.02em; }
+.edizione {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: var(--blu);
+    color: var(--crema);
+    font-size: 0.8rem;
+    font-weight: 600;
+    vertical-align: 0.1em;
+}
+.descrizione, .nota-voce { margin: 0.25rem 0 0; color: var(--testo-secondario); }
+.nota-voce { font-style: italic; }
+.prezzi { margin: 0.5rem 0 0; }
+.prezzo { display: flex; justify-content: space-between; gap: 1rem; max-width: 24rem; padding: 0.1rem 0; }
+.prezzo dt { color: var(--testo-secondario); }
+.prezzo dd, .prezzo-unico { margin: 0; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.prezzo-unico { margin-top: 0.35rem; }
+.torna-indice { margin: 0.75rem 0 0; font-size: 0.95rem; }
+
+/* ---------- Footer ---------- */
+
+.footer { padding: 2rem 1rem; background: var(--blu-scuro); color: var(--crema); text-align: center; }
+.footer p { margin: 0.25rem 0; }
+.footer a { color: var(--crema); }
+.footer :focus-visible { outline-color: var(--crema); }
+.crediti { font-size: 0.85rem; opacity: 0.85; }
+
+/* ---------- Pagine di testo, moduli e area riservata ---------- */
+
+.pagina-modulo label { display: block; margin-bottom: 0.2rem; font-weight: 600; }
+.pagina-modulo input:not([type="hidden"]), .pagina-modulo select {
+    width: 100%;
+    max-width: 28rem;
+    padding: 0.6rem;
+    font: inherit;
+    border: 1px solid #9C9384;
+    border-radius: var(--raggio);
+    background: #fff;
+}
+.pagina-modulo fieldset { margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--bordo); border-radius: var(--raggio); background: #fff; }
+.cambia-categoria { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem 1rem; margin-bottom: 1rem; }
+.cambia-categoria label { width: 100%; }
+.cambia-categoria select { width: auto; }
+.riga-turno { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.riga-turno label { display: inline; margin: 0; font-weight: normal; }
+.pagina-modulo .riga-turno input[type="time"] { width: auto; }
 .pulsante-modulo {
     display: inline-block;
-    padding: 0.6rem 1rem;
+    min-height: 44px;
+    padding: 0.65rem 1.1rem;
     border: 0;
-    border-radius: 4px;
+    border-radius: var(--raggio);
     background: var(--blu);
     color: #fff;
-    font-size: 1rem;
+    font: inherit;
+    font-weight: 700;
     text-decoration: none;
     cursor: pointer;
 }
-.pulsante-link { padding: 0; border: 0; background: none; color: var(--blu); font-size: 1rem; text-decoration: underline; cursor: pointer; }
-.area-riservata ul { display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; list-style: none; }
+.pulsante-modulo:hover { background: var(--blu-scuro); color: #fff; }
+.pulsante-link { padding: 0; border: 0; background: none; color: var(--blu); font: inherit; text-decoration: underline; cursor: pointer; }
+.area-riservata { margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--bordo); }
+.area-riservata ul { display: flex; flex-wrap: wrap; gap: 1rem; margin: 0; padding: 0; list-style: none; font-weight: 600; }
 .area-riservata form { display: inline; }
-.utente { font-size: 0.875rem; }
-.errori { padding: 0.75rem 1rem; border-left: 4px solid var(--rosso); background: #fdecef; }
-.avviso { padding: 0.75rem 1rem; border-left: 4px solid var(--blu); background: #e8f1fb; }
-.tabella-voci { width: 100%; border-collapse: collapse; }
-.tabella-voci th, .tabella-voci td { padding: 0.4rem; border-bottom: 1px solid var(--grigio); text-align: left; vertical-align: top; }
-.tabella-voci form { display: inline; }
-.nascosta { color: #666; background: var(--grigio); }
+.utente { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--testo-secondario); }
+.errori { padding: 0.75rem 1rem; border-left: 4px solid var(--rosso); background: #FBE9EC; }
+.avviso { padding: 0.75rem 1rem; border-left: 4px solid var(--blu); background: #E7F0F9; }
+.area .pagina-menu, .area { max-width: 1000px; }
+.tabella-voci { width: 100%; border-collapse: collapse; background: #fff; }
+.tabella-voci th, .tabella-voci td { padding: 0.5rem; border-bottom: 1px solid var(--bordo); text-align: left; vertical-align: top; }
+.tabella-voci form { display: inline; margin-left: 0.5rem; }
+.nascosta { color: var(--testo-secondario); background: var(--crema-scura); }
+
+/* Tabella delle voci su telefono: una scheda per voce, senza scroll orizzontale. */
+@media (max-width: 640px) {
+    .tabella-voci thead { display: none; }
+    .tabella-voci tr { display: block; padding: 0.5rem 0; border-bottom: 1px solid var(--bordo); }
+    .tabella-voci td { display: block; padding: 0.15rem 0.5rem; border: 0; }
+}
+
+/* ---------- Schermi bassi o telefono ruotato: hero più compatto ---------- */
+
+@media (max-height: 500px) {
+    .hero { padding-top: calc(var(--altezza-navbar) + 0.75rem); padding-bottom: 1.25rem; }
+    .hero-logo { height: 26vh; }
+    .stato-apertura { margin-bottom: 0.75rem; }
+}
+
+/* ---------- Tablet e computer ---------- */
+
+@media (min-width: 768px) {
+    .sezioni-home { grid-template-columns: 1fr 1fr; padding: 3.5rem 1.5rem; }
+    .navbar-link a { padding: 0.6rem 1rem; }
+}
+
+@media (min-width: 900px) and (orientation: landscape) {
+    /* Contenuto dell'hero a sinistra, dove la sfumatura è più scura. */
+    .hero::after {
+        background: linear-gradient(to right, rgba(18, 28, 40, 0.92) 0%, rgba(18, 28, 40, 0.7) 45%, rgba(18, 28, 40, 0.15) 100%);
+    }
+    .hero-contenuto { text-align: left; }
+    .hero-logo { margin-left: 0; }
+    .hero-pulsanti { justify-content: flex-start; }
+}
+
+/* Menù su desktop: prezzi allineati in colonne, con l'intestazione dei formati (solo visiva). */
+@media (min-width: 768px) {
+    .colonne-2, .colonne-4 { --prezzi: 2; }
+    .colonne-4 { --prezzi: 4; }
+    .colonne-2 .intestazione-prezzi, .colonne-4 .intestazione-prezzi,
+    .colonne-2 .voce, .colonne-4 .voce {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) repeat(var(--prezzi), 6.5rem);
+        column-gap: 0.75rem;
+        align-items: start;
+    }
+    .intestazione-prezzi { padding-bottom: 0.4rem; border-bottom: 1px solid var(--bordo); font-size: 0.85rem; font-weight: 700; color: var(--blu-scuro); text-align: right; }
+    .colonne-2 .voce > :not(.prezzi):not(.prezzo-mancante), .colonne-4 .voce > :not(.prezzi):not(.prezzo-mancante) { grid-column: 1; }
+    .colonne-2 .prezzi, .colonne-4 .prezzi { display: contents; }
+    .colonne-2 .prezzo, .colonne-4 .prezzo { grid-row: 1; display: block; max-width: none; padding: 0; text-align: right; }
+    .colonne-2 .prezzo dt, .colonne-4 .prezzo dt {
+        position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
+    /* Prezzo unico in una categoria con formati (es. Patatine stick): sotto il nome, non sotto una colonna. */
+    .colonne-2 .prezzo-unico, .colonne-4 .prezzo-unico { grid-column: 1; }
+    .colonne-2 .prezzo-mancante, .colonne-4 .prezzo-mancante { display: block; grid-row: 1; text-align: right; color: var(--testo-secondario); }
+    .colonna-1 { grid-column: 2; }
+    .colonna-2 { grid-column: 3; }
+    .colonna-3 { grid-column: 4; }
+    .colonna-4 { grid-column: 5; }
+    .colonne-0 .voce { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 1rem; }
+    .colonne-0 .voce > :not(.prezzo-unico) { grid-column: 1; }
+    .colonne-0 .prezzo-unico { grid-column: 2; grid-row: 1; margin: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}

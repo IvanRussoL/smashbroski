@@ -1,17 +1,27 @@
 {% extends "base.html" %}
 
+{% block classe_pagina %}pagina-home{% endblock %}
+
 {% block testa %}
 <script type="application/ld+json">{{ json_ld|tojson }}</script>
 {% endblock %}
 
 {% block contenuto %}
 <section class="hero">
+    <picture class="hero-foto">
+        <source media="(orientation: portrait)" srcset="{{ url_for('static', filename='img/hero-verticale.webp') }}" width="900" height="1600">
+        <source media="(min-width: 1400px)" srcset="{{ url_for('static', filename='img/hero-orizzontale.webp') }}" width="1920" height="1080">
+        <img src="{{ url_for('static', filename='img/hero-orizzontale-piccola.webp') }}" width="1280" height="720" alt="" fetchpriority="high">
+    </picture>
     <div class="hero-contenuto">
-        <h1>SmashBroski – Hamburgeria a Pompei</h1>
+        <h1>
+            <img class="hero-logo" src="{{ url_for('static', filename='img/logo-hero.webp') }}" width="480" height="427" alt="SmashBroski">
+            <span class="hero-sottotitolo">Hamburgeria a Pompei</span>
+        </h1>
         <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
         <p class="hero-pulsanti">
             <a class="pulsante pulsante-principale" href="{{ url_for('pubblico.menu') }}">Guarda il menù</a>
-            <a class="pulsante" href="{{ impostazioni.link_maps() }}" rel="noopener">Come arrivare</a>
+            <a class="pulsante pulsante-secondario" href="{{ impostazioni.link_maps() }}" rel="noopener">Come arrivare</a>
         </p>
     </div>
 </section>
@@ -54,4 +64,8 @@
         </ul>
     </section>
 </div>
+{% endblock %}
+
+{% block crediti %}
+<p class="crediti">Foto di lavoro: Mathias Reding, Pexels.</p>
 {% endblock %}

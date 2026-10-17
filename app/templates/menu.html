@@ -17,9 +17,14 @@
     </nav>
 
     {% for categoria in categorie %}
-    <section class="categoria" aria-labelledby="{{ categoria.slug }}">
+    <section class="categoria colonne-{{ categoria.formati|length }}" aria-labelledby="{{ categoria.slug }}">
         <h2 id="{{ categoria.slug }}">{{ categoria.nome }}</h2>
         {% if categoria.nota %}<p class="nota-categoria">{{ categoria.nota }}</p>{% endif %}
+        {% if categoria.formati %}
+        <div class="intestazione-prezzi" aria-hidden="true">
+            {% for formato in categoria.formati %}<span class="colonna-{{ formato.posizione }}">{{ formato.etichetta }}</span>{% endfor %}
+        </div>
+        {% endif %}
 
         {% for voce in categoria.voci %}
         <article class="voce">
@@ -34,12 +39,16 @@
             {% else %}
             <dl class="prezzi">
                 {% for prezzo in voce.prezzi %}
-                <div class="prezzo">
+                <div class="prezzo{% if prezzo.formato_id %} colonna-{{ (categoria.formati|selectattr('id', 'equalto', prezzo.formato_id)|first).posizione }}{% endif %}">
                     <dt>{{ prezzo.etichetta_formato or "Prezzo" }}</dt>
                     <dd>{{ prezzo.prezzo_centesimi|euro }}</dd>
                 </div>
                 {% endfor %}
             </dl>
+            {% set formati_della_voce = voce.prezzi|map(attribute='formato_id')|list %}
+            {% for formato in categoria.formati if formato.id not in formati_della_voce %}
+            <span class="prezzo-mancante colonna-{{ formato.posizione }}" aria-hidden="true">—</span>
+            {% endfor %}
             {% endif %}
         </article>
         {% endfor %}

@@ -118,3 +118,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **`Impostazioni.link_maps()` con l'URL di ricerca ufficiale di Google Maps (`/maps/search/?api=1&query=`)** e l'indirizzo codificato con `quote_plus`: un link stabile al posto di `maps.app.goo.gl` (AU-NAV10).
 - **Formattazione del telefono rimandata alla home**: la regola degli spazi dipende dal numero reale, che non abbiamo ancora.
 - **Test dei modelli senza database**: 5 test in `tests/test_modelli.py` (turno oltre la mezzanotte, intervallo nello stesso giorno e nel giorno dopo, prezzo unico, link a Maps), tutti PASS.
+
+## 2026-10-17 · Fase 2 – Repository
+
+- **Quattro repository, unico posto in cui si scrive SQL**: `UtenteRepository`, `MenuRepository`, `OrariRepository`, `ImpostazioniRepository`. Query sempre parametrizzate (`%s`), cursori con `dictionary=True` e righe trasformate in modelli. Nessun repository fa `commit`: la transazione la chiude il servizio, così una voce e i suoi prezzi si salvano insieme o per niente.
+- **`MenuRepository.leggi_menu()` con 4 query fisse** (categorie, formati, voci, prezzi con l'etichetta del formato) ricomposte in Python: il numero di query non cresce con le voci. Restituisce anche le categorie senza voci visibili; escluderle dal menù pubblico è una regola di business e la applica `MenuService`.
+- **Prezzi e turni salvati per sostituzione** (`sostituisci_prezzi`, `sostituisci_turni`: cancella e reinserisce): il modulo invia sempre l'elenco completo, quindi non serve capire quali righe sono cambiate. Alternativa scartata: confrontare vecchi e nuovi prezzi per aggiornare solo le differenze (più codice, nessun vantaggio con pochi prezzi per voce).
+- **`esiste_nome()` confronta il nome nel database**, con la stessa regola del vincolo `UNIQUE` (senza maiuscole e accenti): il controllo del servizio e il vincolo non possono dare risposte diverse.
+- **Colonne TIME convertite da `timedelta` a `time`**: il driver restituisce le TIME come durata dalla mezzanotte; `OrariRepository` le riporta al tipo usato da `Turno`.
+- **Test dei repository sul database di prova**: 20 test in `tests/test_repository.py` (dati iniziali, ordine, prezzi con formato, voci nascoste, nome unico, scrittura e rilettura, testo con apici); ogni test annulla le sue modifiche a fine esecuzione.

@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {# Il sito ha solo i colori chiari del marchio: chiede ai browser di non scurire la pagina da soli. #}
+    <meta name="color-scheme" content="only light">
     <title>{% block titolo %}SmashBroski Pompei – Hamburgeria a Pompei{% endblock %}</title>
     <meta name="description" content="{% block descrizione %}SmashBroski Pompei, hamburgeria in Vico dei Paninari a Pompei: smash burger, menù, orari e contatti.{% endblock %}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stile.css') }}">

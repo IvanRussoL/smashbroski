@@ -35,7 +35,7 @@ Tra parentesi quadre `[ ]` sono indicati i pulsanti e i link; tra parentesi tond
 ### Sfondo di loghi (Menù e Orari e contatti)
 
 - Come i vasi del pannello di Habita79: piccoli loghi (il personaggio, senza scritta) in due tinte tenui, in file che scorrono in orizzontale, a file alterne in direzioni opposte. Solo CSS, mattonella WebP di circa 5 KB.
-- Il contenuto sta su un **pannello crema pieno** con angoli arrotondati: i loghi non passano mai sotto testi e prezzi.
+- Su Orari e contatti il contenuto sta su un **pannello crema pieno** con angoli arrotondati; sul Menù ogni categoria è un blocco pieno (vedi "Menù"). I loghi non passano mai sotto testi e prezzi.
 - Fermo con "riduci movimento"; nascosto ai lettori di schermo (`aria-hidden`).
 
 ## Home – mobile (360×800)
@@ -191,7 +191,7 @@ Note:
 Note:
 
 - Il menù è una sola pagina scritta dal server; l'indice usa link interni e funziona senza JavaScript (RNF-05, RNF-08).
-- Il contenuto sta sul pannello crema sopra lo sfondo di loghi (sezione "Elementi comuni").
+- **Grafica dal 18/10, "sticker a blocchi"** (DEVLOG): ogni categoria è un blocco-adesivo con bordo blu scuro spesso e ombra piena, nei colori del PDF (Starters, Salad, Kids Menù rossi; Burger e The Originals crema con scritte blu; Soft Drinks e Beers blu), sopra lo sfondo di loghi. Titolo "MENÙ" su un'etichetta inclinata, indice a pillole fisso sotto la navbar, nastro "SMASH ★ BRO ★ POMPEI". Caratteri Anton (titoli) e Archivo Black (voci e prezzi). Su telefono i prezzi sono tessere con il formato sopra; il prezzo unico è un bollino accanto al nome. Da 900 px i blocchi sono disposti come nel PDF: Starters | Salad, Burger a tutta larghezza, Kids/Soft Drinks/Beers a sinistra e The Originals a destra. Gli schizzi qui sotto mostrano la struttura dei contenuti, non la grafica.
 - Struttura per i lettori di schermo (RF-14, AU-NAV05): `h1` della pagina, `h2` per categoria, `h3` per voce; i prezzi di una voce sono una lista di coppie formato–prezzo (`<dl>`), così il lettore dice "Panino single, 7,00 euro" invece di una serie di numeri.
 - Nomi in maiuscolo solo con il CSS: nell'HTML restano "Smash Burger", così la ricerca (Ctrl+F) e la copia funzionano (RF-13).
 - Testo dei prezzi almeno grande quanto il testo normale (16 px), leggibile senza zoom a 360 px (RF-10, AU-NAV02).

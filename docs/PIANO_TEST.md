@@ -80,6 +80,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | TC-UI09 | Pulsante a tre linee della navbar | Demo |
 | TC-UI10 | Ora di Pompei nella navbar | Demo |
 | TC-UI11 | Sfondo di loghi e "riduci movimento" | Demo |
+| TC-UI12 | Modalità scura del telefono | Demo |
 | TC-H01 | Orari della settimana | Demo |
 | TC-H02 | Stato "aperto ora" | Demo |
 | TC-H03 | Link del telefono | Demo + Pubblicazione |
@@ -238,6 +239,16 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Passi** | 1) Aprire `/menu` a 1366×768 e osservare lo sfondo per 30 secondi.<br>2) Scorrere tutto il menù; ripetere i passi 1-2 su `/info`.<br>3) Ripetere i passi 1-2 a 360×800.<br>4) Impostare "prefers-reduced-motion: reduce" e ricaricare `/menu` e `/info`.<br>5) In Elements → Accessibility controllare il contenitore `.sfondo-loghi`.<br>6) In Network, filtro "Img", leggere il peso di `motivo-loghi.webp`.<br>7) Aprire `/` e `/privacy`. |
 | **Atteso** | Passi 1-3: piccoli loghi in due tinte tenui che scorrono in orizzontale, a file alterne in direzioni opposte, senza salti né scatti. Nomi, descrizioni, prezzi, orari e contatti stanno sul pannello crema pieno: i loghi non passano mai sotto il testo. Passo 4: loghi fermi. Passo 5: `aria-hidden="true"`, nessun contenuto esposto ai lettori di schermo. Passo 6: un solo file WebP, sotto i 10 KB. Passo 7: nessuno sfondo di loghi. |
 
+#### TC-UI12 — Modalità scura del telefono
+
+| | |
+|---|---|
+| **Origine** | — · DEVLOG 18/10 (modalità scura forzata) |
+| **Traguardo** | Demo |
+| **Precondizione** | Oppo Reno 12 Pro con Chrome; se disponibile, un telefono Samsung con Samsung Internet. Tema scuro del telefono attivo. |
+| **Passi** | 1) In Chrome attivare il tema scuro del telefono (ed eventualmente `chrome://flags` → "Auto Dark Mode for Web Contents") e aprire `/`, `/menu` e `/info`.<br>2) In Elements (o nel sorgente) cercare `color-scheme`.<br>3) Su Samsung Internet aprire `/menu` con la modalità scura del browser attiva, poi disattivarla (menu ☰ → Modalità scura) e ricaricare. |
+| **Atteso** | Passo 1: colori del marchio invariati (fondo crema, rosso, blu), nessuna pagina scurita. Passo 2: `<meta name="color-scheme" content="only light">` e `color-scheme: only light` in `:root`. Passo 3: con la modalità scura di Samsung Internet attiva i colori cambiano (limite noto del browser, osservato il 18/10 su un Samsung Galaxy Fold: fondo nero, "MENÙ" rosa, titoli celesti); disattivata, colori del marchio. |
+
 ### TC-H — Home e Orari e contatti
 
 #### TC-H01 — Orari della settimana
@@ -361,7 +372,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo |
 | **Precondizione** | Database con i dati iniziali. `/menu` aperto a 360×800 e a 1366×768. |
 | **Passi** | 1) Contare le voci per categoria.<br>2) Per ogni voce confrontare nome, descrizione e prezzi con la sezione 4 di `PROGETTAZIONE.md`.<br>3) Controllare le voci Los Pollos Classic e Los Pollos Bacon a entrambi i viewport. |
-| **Atteso** | 25 voci (3, 2, 7, 2, 3, 3, 5), tutte uguali ai dati iniziali, nell'ordine della sezione 4 (negli Starters prima gli Straccetti di pollo, poi le patatine). Ogni prezzo ha il formato scritto accanto (es. "Panino single 7,00 €") e il formato italiano "7,00 €". Mobile: per Los Pollos solo i formati esistenti, senza righe vuote. Desktop: prezzi in colonne con l'intestazione a cascata; per i double di Los Pollos la cella mostra "—". |
+| **Atteso** | 25 voci (3, 2, 7, 2, 3, 3, 5), tutte uguali ai dati iniziali, nell'ordine della sezione 4 (negli Starters prima gli Straccetti di pollo, poi le patatine). Ogni prezzo ha il formato scritto accanto (es. "Panino single 7,00 €") e il formato italiano "7,00 €". Mobile: per Los Pollos solo i formati esistenti, senza righe vuote. Mobile: ogni prezzo in una tessera con il formato sopra. Desktop: prezzi in colonne con le intestazioni dei formati a pillola; per i double di Los Pollos la cella mostra "—"; il prezzo unico delle patatine è un bollino accanto al nome, non sotto una colonna. Ogni categoria è un blocco con i colori del PDF (Starters, Salad, Kids rossi; Burger e The Originals crema; Soft Drinks e Beers blu). |
 
 #### TC-M05 — Ricerca nel menù (Ctrl+F)
 
@@ -599,7 +610,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo |
 | **Precondizione** | DevTools → Network, Preserve log attivo, Disable cache attivo. |
 | **Passi** | 1) Aprire `/`, `/menu` e `/info`.<br>2) Ordinare le richieste per dominio. |
-| **Atteso** | Tutte le richieste vanno al sito stesso. Nessuna richiesta a `googletagmanager.com`, `google-analytics.com`, font o script esterni. |
+| **Atteso** | Tutte le richieste vanno al sito stesso. Nessuna richiesta a `googletagmanager.com`, `google-analytics.com`, font o script esterni: i caratteri del menù arrivano da `/static/fonts/`. |
 
 #### TC-S08 — Pagine di errore e nessuna registrazione pubblica
 

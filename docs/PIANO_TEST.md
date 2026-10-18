@@ -2,9 +2,9 @@
 
 Test funzionali manuali e test unitari con pytest del nuovo sito (Flask + MySQL).
 
-| Versione | 1.0 |
+| Versione | 1.1 |
 |---|---|
-| Data | 16 ottobre 2026 |
+| Data | 16 ottobre 2026 (1.0); 18 ottobre 2026 (1.1: navbar con pulsante e ora di Pompei, pagina Orari e contatti, sfondo di loghi, doppio footer) |
 | Riferimenti | `PROGETTAZIONE.md` (requisiti RF/RNF, regole di business, sicurezza), `WIREFRAME.md`, `Audit_SmashBroski_Fase0.xlsx` (casi AU-xx del sito attuale) |
 
 Il piano ripete sul nuovo sito i casi dell'audit della Fase 0: i FAIL e i BLOCKED devono diventare PASS, i PASS devono restare tali. A questi si aggiungono i casi dell'area proprietario e della sicurezza, che il sito attuale non ha.
@@ -76,14 +76,17 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | TC-UI05 | Assenza di scroll orizzontale | Demo |
 | TC-UI06 | Navigazione da tastiera | Demo |
 | TC-UI07 | Hero con barra degli indirizzi dinamica (smartphone reale) | Demo + Pubblicazione |
-| TC-UI08 | Navbar e impaginazione desktop | Demo |
+| TC-UI08 | Navbar staccata e impaginazione desktop | Demo |
+| TC-UI09 | Pulsante a tre linee della navbar | Demo |
+| TC-UI10 | Ora di Pompei nella navbar | Demo |
+| TC-UI11 | Sfondo di loghi e "riduci movimento" | Demo |
 | TC-H01 | Orari della settimana | Demo |
 | TC-H02 | Stato "aperto ora" | Demo |
 | TC-H03 | Link del telefono | Demo + Pubblicazione |
 | TC-H04 | Link dell'email con e senza JavaScript | Demo |
 | TC-H05 | Indirizzo e Google Maps | Demo + Pubblicazione |
 | TC-H06 | Link ai social | Demo + Pubblicazione |
-| TC-H07 | Footer, pagina Privacy e nessun link all'area riservata | Demo |
+| TC-H07 | Doppio footer, pagina Privacy e nessun link all'area riservata | Demo |
 | TC-H08 | Dati reali al posto dei segnaposto | Pubblicazione |
 | TC-M01 | Apertura del menù e ritorno alla home | Demo |
 | TC-M02 | Leggibilità del menù a 360 px senza zoom | Demo |
@@ -132,8 +135,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-UI02 · RF-01, RNF-01 |
 | **Traguardo** | Demo |
 | **Precondizione** | DevTools in modalità device toolbar. Home `/` aperta. |
-| **Passi** | 1) Impostare 360×800 e ricaricare.<br>2) Scorrere tutta la pagina e catturare uno screenshot dell'hero e della sezione Contatti.<br>3) In Elements misurare il box dei link Facebook e Instagram.<br>4) Ripetere a 390×844 e 412×915. |
-| **Atteso** | Logo, H1, stato di apertura, pulsanti "Guarda il menù" e "Come arrivare" interamente visibili nell'hero. Orari e Contatti sotto l'hero, nessun elemento coperto da un altro. Area di tocco dei link social di almeno 44×44 px. |
+| **Passi** | 1) Impostare 360×800 e ricaricare.<br>2) Catturare uno screenshot dell'hero, poi scorrere fino in fondo e catturare la fascia "Dove siamo" e il footer.<br>3) Aprire `/info` e in Elements misurare il box dei link Facebook e Instagram, nei contatti e nella colonna "Seguici" del footer.<br>4) Ripetere a 390×844 e 412×915. |
+| **Atteso** | Logo, H1, stato di apertura, pulsanti "Guarda il menù" e "Come arrivare" interamente visibili nell'hero, sotto la navbar. Sotto l'hero solo la fascia "Dove siamo" e il footer; la foto sfuma nel blu della fascia senza una linea di stacco. Nessun elemento coperto da un altro. Area di tocco dei link social di almeno 44×44 px. |
 
 #### TC-UI02 — Home su schermi bassi
 
@@ -142,8 +145,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-UI01, AU-UI02 · RF-01, RNF-01 |
 | **Traguardo** | Demo |
 | **Precondizione** | Come TC-UI01. |
-| **Passi** | 1) Impostare 375×667 e ricaricare.<br>2) Scorrere tutta la pagina e catturare uno screenshot dell'hero e delle icone social.<br>3) In Elements controllare `position` e `height` dell'hero e del blocco che lo segue.<br>4) Ripetere a 390×666 e 390×600. |
-| **Atteso** | Nessun elemento coperto: l'hero si allunga invece di tagliare il contenuto. L'hero usa `min-height: 100dvh`, non `height: 100vh`. Nessun blocco in `position: absolute` sopra l'hero. Icone social intere. |
+| **Passi** | 1) Impostare 375×667 e ricaricare.<br>2) Scorrere tutta la pagina e catturare uno screenshot dell'hero e del footer.<br>3) In Elements controllare `position` e `height` dell'hero e del blocco che lo segue.<br>4) Ripetere a 390×666 e 390×600. |
+| **Atteso** | Nessun elemento coperto: l'hero si allunga invece di tagliare il contenuto. L'hero usa `min-height: 100dvh`, non `height: 100vh`. Nessun blocco in `position: absolute` sopra l'hero. Fascia "Dove siamo" e footer interi. |
 
 #### TC-UI03 — Home e menù in orizzontale
 
@@ -152,8 +155,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-UI05 · RF-01, RNF-01 |
 | **Traguardo** | Demo |
 | **Precondizione** | Come TC-UI01. |
-| **Passi** | 1) Impostare 844×390 e aprire `/`.<br>2) Scorrere la pagina e catturare uno screenshot dell'hero.<br>3) Ripetere a 667×375.<br>4) Aprire `/menu` agli stessi viewport e scorrere fino in fondo. |
-| **Atteso** | Il logo grande non spinge fuori stato di apertura e pulsanti; niente sovrapposizioni con la navbar fissa. Il menù è leggibile e completo. |
+| **Passi** | 1) Impostare 844×390 e aprire `/`.<br>2) Scorrere la pagina e catturare uno screenshot dell'hero.<br>3) Ripetere a 667×375.<br>4) Aprire `/menu` e `/info` agli stessi viewport e scorrere fino in fondo. |
+| **Atteso** | Il logo grande non spinge fuori stato di apertura e pulsanti; niente sovrapposizioni con la navbar fissa. Menù e Orari e contatti leggibili e completi. A entrambi i viewport (sotto i 900 px) la navbar mostra il pulsante a tre linee. |
 
 #### TC-UI04 — Zoom al 200%
 
@@ -162,8 +165,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-UI06 · RF-01, RNF-01 |
 | **Traguardo** | Demo |
 | **Precondizione** | Chrome desktop, finestra 1366×768. |
-| **Passi** | 1) Aprire `/` e impostare lo zoom al 200% (Ctrl +).<br>2) Scorrere tutta la pagina.<br>3) Ripetere su `/menu`.<br>4) Ripristinare lo zoom (Ctrl 0). |
-| **Atteso** | Testo e link leggibili, nessuna perdita di contenuto né sovrapposizione. Il logo non è coperto. Nessuno scroll orizzontale. |
+| **Passi** | 1) Aprire `/` e impostare lo zoom al 200% (Ctrl +).<br>2) Scorrere tutta la pagina.<br>3) Ripetere su `/menu` e `/info`, aprendo anche il pannello della navbar.<br>4) Ripristinare lo zoom (Ctrl 0). |
+| **Atteso** | Testo e link leggibili, nessuna perdita di contenuto né sovrapposizione. Il logo non è coperto. Nessuno scroll orizzontale. La navbar mostra il pulsante a tre linee (larghezza equivalente sotto i 900 px) e il pannello delle voci resta dentro lo schermo. |
 
 #### TC-UI05 — Assenza di scroll orizzontale
 
@@ -172,7 +175,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-UI03 · RNF-02 |
 | **Traguardo** | Demo |
 | **Precondizione** | DevTools in modalità device toolbar, Console aperta. |
-| **Passi** | 1) Per ogni viewport della sezione 1.4 aprire `/`, `/menu`, `/privacy` e `/auth/login`.<br>2) In Console eseguire `document.documentElement.scrollWidth > document.documentElement.clientWidth`. |
+| **Passi** | 1) Per ogni viewport della sezione 1.4 aprire `/`, `/menu`, `/info`, `/privacy`, `/auth/login` e `/pagina-inesistente`.<br>2) In Console eseguire `document.documentElement.scrollWidth > document.documentElement.clientWidth`.<br>3) A 360×800 su `/menu` ripetere il controllo con il pannello della navbar aperto. |
 | **Atteso** | Risultato `false` per ogni pagina e viewport. |
 
 #### TC-UI06 — Navigazione da tastiera
@@ -182,8 +185,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-UI07 · RNF-02 |
 | **Traguardo** | Demo |
 | **Precondizione** | Chrome desktop 1366×768, `/` aperta, nessun clic sulla pagina. |
-| **Passi** | 1) Premere ripetutamente Tab fino al footer e annotare l'ordine del focus.<br>2) Con il focus su "Orari" nella navbar premere Invio.<br>3) Aprire `/menu`, raggiungere con Tab il link "Burger" dell'indice e premere Invio. |
-| **Atteso** | Ordine logico: logo e link della navbar, pulsanti dell'hero, link dei contatti, social, footer. Focus sempre visibile. Dopo Invio il titolo raggiunto ("Orari", "Burger") è visibile e non finisce sotto la navbar fissa. |
+| **Passi** | 1) Premere ripetutamente Tab fino al footer e annotare l'ordine del focus.<br>2) Con il focus su "Orari e contatti" nella navbar premere Invio.<br>3) Aprire `/menu`, raggiungere con Tab il link "Burger" dell'indice e premere Invio. |
+| **Atteso** | Ordine logico: "Vai al contenuto", logo, voci della navbar, pulsanti dell'hero, "Come arrivare" della fascia "Dove siamo", link delle colonne del footer. L'ora della navbar non riceve il focus. Focus sempre visibile, anche sul fondo rosso e blu. Passo 2: si apre `/info`. Passo 3: il titolo "Burger" è visibile e non finisce sotto la navbar fissa. |
 
 #### TC-UI07 — Hero con barra degli indirizzi dinamica (smartphone reale)
 
@@ -195,17 +198,47 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Passi** | 1) Aprire la home con la barra degli indirizzi visibile e fare uno screenshot.<br>2) Scorrere in basso finché la barra si nasconde e fare uno screenshot.<br>3) Tornare in cima e ruotare il telefono in orizzontale. |
 | **Atteso** | Nessun contenuto tagliato in entrambi gli stati della barra né in orizzontale. Pulsanti dell'hero raggiungibili. Nessun salto del layout quando la barra compare o scompare. |
 
-#### TC-UI08 — Navbar e impaginazione desktop
+#### TC-UI08 — Navbar staccata e impaginazione desktop
 
 | | |
 |---|---|
-| **Origine** | — · `WIREFRAME.md` (navbar, home desktop) |
+| **Origine** | — · `WIREFRAME.md` (navbar, home desktop), DEVLOG 18/10 (navbar stile Habita79) |
 | **Traguardo** | Demo |
-| **Precondizione** | Chrome desktop con DevTools. |
-| **Passi** | 1) A 360×800 controllare che i tre link della navbar stiano in una riga.<br>2) Su `/` e `/menu` scorrere in modo che sotto la navbar passino la zona più chiara e la più scura della foto e del contenuto; misurare il contrasto del testo della navbar (DevTools, selettore colore).<br>3) Su `/menu` controllare in Elements il link "Menù" della navbar.<br>4) A 1366×768 e a 768×1024 osservare Orari e Contatti. |
-| **Atteso** | Link della navbar su una sola riga, senza menù a scomparsa. Contrasto del testo almeno 4,5:1 in tutti i punti. Il link della pagina aperta ha `aria-current="page"` ed è sottolineato. A 1366 px Orari e Contatti sono in due colonne affiancate; sotto i 768 px uno sotto l'altro. |
+| **Precondizione** | Chrome desktop con DevTools, JavaScript attivo. |
+| **Passi** | 1) A 1366×768 aprire `/`, `/menu` e `/info` e osservare la navbar.<br>2) In Console confrontare il centro del logo con il centro della finestra: `const r = document.querySelector('.navbar-logo').getBoundingClientRect(); r.left + r.width / 2 - innerWidth / 2`.<br>3) Su `/` scorrere in modo che sotto la navbar passino la zona più chiara e la più scura della foto; su `/menu` e `/info` la zona crema. Misurare il contrasto del testo della navbar (DevTools, selettore colore).<br>4) Su `/menu` e `/info` controllare in Elements la voce corrispondente della navbar.<br>5) Su `/info` osservare Orari e Contatti a 1366×768, 768×1024 e 767×1024. |
+| **Atteso** | Navbar staccata dai bordi, con angoli arrotondati e vetro rosso: a sinistra "SmashBroski Pompei", al centro il logo, a destra ora e voci "Menù" e "Orari e contatti" (da 900 px in su nella barra, senza pulsante). Passo 2: differenza entro 1 px. Contrasto del testo almeno 4,5:1 in tutti i punti; sul crema la barra resta rossa, non rosa. La voce della pagina aperta ha `aria-current="page"` ed è sottolineata. Da 768 px Orari e Contatti sono in due colonne affiancate; a 767 px uno sotto l'altro. |
 
-### TC-H — Home
+#### TC-UI09 — Pulsante a tre linee della navbar
+
+| | |
+|---|---|
+| **Origine** | — · DEVLOG 18/10 (pulsante a tre linee), RNF-02 |
+| **Traguardo** | Demo |
+| **Precondizione** | DevTools in modalità device toolbar a 360×800, `/menu` aperto. Per il passo 7: DevTools → Rendering → "Emulate CSS media feature prefers-reduced-motion". |
+| **Passi** | 1) Osservare la navbar e leggere in Elements `aria-expanded` e `aria-controls` del pulsante.<br>2) Toccare il pulsante.<br>3) Scorrere le voci del pannello con Tab, poi premere Esc.<br>4) Riaprire il pannello e toccare un punto della pagina fuori dalla navbar.<br>5) Riaprire il pannello e toccare "Orari e contatti".<br>6) Su `/info` riaprire il pannello e portare la finestra a 1366×768.<br>7) Impostare "prefers-reduced-motion: reduce", tornare a 360×800, aprire e chiudere il pannello.<br>8) Disattivare JavaScript e ricaricare `/menu` a 360×800. |
+| **Atteso** | Passo 1: pulsante visibile, voci nascoste, `aria-expanded="false"`, `aria-controls="navbar-voci"`; logo al centro. Passo 2: le tre linee diventano una X, il pannello di vetro scende sotto la barra e le voci entrano una dopo l'altra; `aria-expanded="true"`. Passo 3: focus visibile sulle voci; Esc chiude il pannello e il focus torna sul pulsante. Passo 4: il pannello si chiude. Passo 5: si apre `/info`. Passo 6: il pannello si chiude, il pulsante scompare e le voci tornano nella barra. Passo 7: apertura e chiusura immediate, senza animazione. Passo 8: nessun pulsante; "Menù" e "Orari e contatti" visibili nella barra, senza scroll orizzontale. |
+
+#### TC-UI10 — Ora di Pompei nella navbar
+
+| | |
+|---|---|
+| **Origine** | — · DEVLOG 18/10 (ora di Pompei con sole e luna) |
+| **Traguardo** | Demo |
+| **Precondizione** | Chrome desktop con DevTools. Ora di Roma di riferimento e orari di alba e tramonto di Pompei del giorno (es. timeanddate.com). |
+| **Passi** | 1) Aprire `/` e confrontare l'ora della navbar con l'ora di Roma.<br>2) Lasciare la pagina aperta al cambio del minuto.<br>3) DevTools → More tools → Sensors → Location: impostare un altro fuso (Timezone ID `America/New_York`) e ricaricare.<br>4) Annotare l'icona in un'esecuzione di giorno e in una dopo il tramonto e confrontarla con alba e tramonto del giorno.<br>5) Lasciare la scheda in secondo piano per alcuni minuti, poi tornarci.<br>6) Aprire `/pagina-inesistente`.<br>7) Leggere l'ora con NVDA o nell'albero di accessibilità di DevTools.<br>8) Osservare la navbar a 360×800 e a 375×667; poi disattivare JavaScript e ricaricare. |
+| **Atteso** | Passi 1-2: ora di Roma nel formato "21:35", aggiornata entro un secondo dal cambio del minuto senza ricaricare. Passo 3: l'ora resta quella di Pompei, non quella del fuso emulato. Passo 4: sole tra alba e tramonto, luna dopo il tramonto; vicino ad alba e tramonto è ammesso uno scarto di qualche minuto. Passo 5: ora aggiornata subito al ritorno sulla scheda. Passo 6: ora presente anche nella pagina di errore. Passo 7: letto "Ora a Pompei: 21:35"; le icone non vengono lette. Passo 8: ora e pulsante non toccano il logo, che resta al centro; senza JavaScript l'ora non compare e non lascia uno spazio vuoto. |
+
+#### TC-UI11 — Sfondo di loghi e "riduci movimento"
+
+| | |
+|---|---|
+| **Origine** | — · DEVLOG 18/10 (sfondo di loghi), WCAG 2.3.3 (animazioni da interazione) |
+| **Traguardo** | Demo |
+| **Precondizione** | DevTools in modalità device toolbar; DevTools → Rendering per l'emulazione di "prefers-reduced-motion". |
+| **Passi** | 1) Aprire `/menu` a 1366×768 e osservare lo sfondo per 30 secondi.<br>2) Scorrere tutto il menù; ripetere i passi 1-2 su `/info`.<br>3) Ripetere i passi 1-2 a 360×800.<br>4) Impostare "prefers-reduced-motion: reduce" e ricaricare `/menu` e `/info`.<br>5) In Elements → Accessibility controllare il contenitore `.sfondo-loghi`.<br>6) In Network, filtro "Img", leggere il peso di `motivo-loghi.webp`.<br>7) Aprire `/` e `/privacy`. |
+| **Atteso** | Passi 1-3: piccoli loghi in due tinte tenui che scorrono in orizzontale, a file alterne in direzioni opposte, senza salti né scatti. Nomi, descrizioni, prezzi, orari e contatti stanno sul pannello crema pieno: i loghi non passano mai sotto il testo. Passo 4: loghi fermi. Passo 5: `aria-hidden="true"`, nessun contenuto esposto ai lettori di schermo. Passo 6: un solo file WebP, sotto i 10 KB. Passo 7: nessuno sfondo di loghi. |
+
+### TC-H — Home e Orari e contatti
 
 #### TC-H01 — Orari della settimana
 
@@ -214,8 +247,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV11 · RF-02 |
 | **Traguardo** | Demo |
 | **Precondizione** | Database con gli orari iniziali. |
-| **Passi** | 1) Aprire `/` e andare alla sezione Orari.<br>2) Confrontare ogni giorno con la tabella degli orari della sezione 4 di `PROGETTAZIONE.md`.<br>3) Individuare il giorno di oggi. |
-| **Atteso** | 7 giorni da lunedì a domenica. "Martedì: Chiuso" scritto per esteso. Turni nel formato "12:00–15:00 · 18:00–01:00"; sabato e domenica "18:00–02:00", nel giorno in cui iniziano. Il giorno di oggi è in grassetto con la parola "oggi". |
+| **Passi** | 1) Aprire `/info` dalla voce "Orari e contatti" della navbar.<br>2) Confrontare ogni giorno con la tabella degli orari della sezione 4 di `PROGETTAZIONE.md`.<br>3) Individuare il giorno di oggi. |
+| **Atteso** | 7 giorni da lunedì a domenica. "Martedì: Chiuso" scritto per esteso. Turni nel formato "12:00–15:00 · 18:00–01:00"; sabato e domenica "18:00–02:00", nel giorno in cui iniziano. Il giorno di oggi è evidenziato e in grassetto, con "(oggi)" dopo il nome. A 360×800 nessun turno va a capo sul trattino. |
 
 #### TC-H02 — Stato "aperto ora"
 
@@ -224,8 +257,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV11 · RF-03, RF-19 |
 | **Traguardo** | Demo |
 | **Precondizione** | Database con gli orari iniziali. Proprietario di test esistente. |
-| **Passi** | 1) Annotare giorno e ora attuali di Roma e ricavare dagli orari lo stato atteso.<br>2) Aprire `/` e leggere lo stato nell'hero.<br>3) Dall'area proprietario rendere il giorno di oggi chiuso (o, se oggi è martedì, aggiungere un turno che comprende l'ora attuale); ricaricare `/`.<br>4) Dall'area proprietario togliere tutti i turni della settimana; ricaricare `/`.<br>5) Ripristinare gli orari iniziali. |
-| **Atteso** | Passo 2: stato coerente con l'ora reale, scritto per intero ("Aperto · chiude alle 01:00" oppure "Chiuso · apre mercoledì alle 12:00"), non solo un pallino colorato. Passo 3: stato opposto, con l'orario corretto. Passo 4: "orari non disponibili". |
+| **Passi** | 1) Annotare giorno e ora attuali di Roma e ricavare dagli orari lo stato atteso.<br>2) Aprire `/` e `/info` e leggere lo stato (nell'hero e sotto il titolo "Orari e contatti").<br>3) Dall'area proprietario rendere il giorno di oggi chiuso (o, se oggi è martedì, aggiungere un turno che comprende l'ora attuale); ricaricare `/` e `/info`.<br>4) Dall'area proprietario togliere tutti i turni della settimana; ricaricare `/` e `/info`.<br>5) Ripristinare gli orari iniziali. |
+| **Atteso** | Passo 2: stato coerente con l'ora reale e uguale nelle due pagine, scritto per intero ("Aperto · chiude alle 01:00" oppure "Chiuso · apre mercoledì alle 12:00"), non solo un pallino colorato. Passo 3: stato opposto, con l'orario corretto. Passo 4: "orari non disponibili". |
 | **Nota** | *I casi limite (mezzanotte, inizio e fine del turno, ora legale) sono coperti da pytest, sezione 3.1.* |
 
 #### TC-H03 — Link del telefono
@@ -234,9 +267,9 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 |---|---|
 | **Origine** | AU-NAV08 (BLOCKED), AU-CON02 · RF-04 |
 | **Traguardo** | Demo + Pubblicazione |
-| **Precondizione** | Home aperta su desktop; smartphone reale per il passo 3. |
-| **Passi** | 1) In Elements leggere l'`href` del telefono.<br>2) Cercare `wa.me` e `whatsapp` nel sorgente (Ctrl+U).<br>3) Su smartphone reale toccare il numero. |
-| **Atteso** | `href="tel:+390810000000"`; accanto al numero la scritta "numero di prova". Nessun link WhatsApp. Sul telefono si apre il compositore con il numero già scritto, senza chiamare. Per la pubblicazione: numero reale, senza la scritta. |
+| **Precondizione** | `/info` aperta su desktop; smartphone reale per il passo 3. |
+| **Passi** | 1) In Elements leggere l'`href` del telefono.<br>2) Cercare `wa.me` e `whatsapp` nel sorgente (Ctrl+U) di `/` e `/info`.<br>3) Su smartphone reale toccare il numero. |
+| **Atteso** | `href="tel:+390810000000"`, numero mostrato come "+39 081 000 0000"; accanto al numero la scritta "numero di prova". Nessun link WhatsApp. Sul telefono si apre il compositore con il numero già scritto, senza chiamare. Per la pubblicazione: numero reale, senza la scritta. |
 
 #### TC-H04 — Link dell'email con e senza JavaScript
 
@@ -244,7 +277,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 |---|---|
 | **Origine** | AU-NAV09 (PASS, da mantenere) · RF-05 |
 | **Traguardo** | Demo |
-| **Precondizione** | Chrome desktop. |
+| **Precondizione** | Chrome desktop, `/info` aperta. |
 | **Passi** | 1) Fare clic sull'email e annotare cosa si apre.<br>2) Disattivare JavaScript (DevTools → Ctrl+Shift+P → "Disable JavaScript") e ricaricare.<br>3) Leggere l'`href` dell'email nel sorgente (Ctrl+U). |
 | **Atteso** | `href="mailto:info@example.com"` scritto in chiaro nell'HTML; il link funziona anche senza JavaScript. |
 
@@ -254,9 +287,9 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 |---|---|
 | **Origine** | AU-NAV10 (BLOCKED) · RF-06 |
 | **Traguardo** | Demo + Pubblicazione |
-| **Precondizione** | Home aperta su desktop; smartphone reale per il passo 3. |
-| **Passi** | 1) Leggere l'`href` del pulsante "Come arrivare" e del link "Apri in Google Maps".<br>2) Fare clic su entrambi da desktop.<br>3) Toccarli su smartphone reale. |
-| **Atteso** | Link a Google Maps costruito dall'indirizzo "Vico dei Paninari, 7 - 80045 Pompei (NA)", non un link breve `maps.app.goo.gl`. Google Maps (sito o app) si apre sulla posizione del locale. |
+| **Precondizione** | `/` e `/info` aperte su desktop; smartphone reale per il passo 3. |
+| **Passi** | 1) Leggere l'`href` dei pulsanti "Come arrivare" (hero della home e fascia "Dove siamo" in fondo alle pagine) e del link "Apri in Google Maps" di `/info`.<br>2) Fare clic su ognuno da desktop.<br>3) Toccarli su smartphone reale. |
+| **Atteso** | I tre link sono uguali, costruiti dall'indirizzo "Vico dei Paninari, 7 - 80045 Pompei (NA)", non link brevi `maps.app.goo.gl`. Google Maps (sito o app) si apre sulla posizione del locale. |
 
 #### TC-H06 — Link ai social
 
@@ -264,19 +297,19 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 |---|---|
 | **Origine** | AU-NAV07 · RF-07 |
 | **Traguardo** | Demo + Pubblicazione |
-| **Precondizione** | Home aperta. |
-| **Passi** | 1) Leggere l'`href` dei link Facebook e Instagram.<br>2) Controllare che ogni icona abbia anche il testo visibile.<br>3) Solo per la pubblicazione: aprire i due link senza essere loggati a Facebook o Instagram. |
-| **Atteso** | Demo: `https://example.com/facebook-segnaposto` e `https://example.com/instagram-segnaposto`. Nessun link di condivisione temporaneo (`/share/`). Pubblicazione: si aprono le pagine corrette di SmashBroski Pompei anche senza login. |
+| **Precondizione** | `/info` aperta. |
+| **Passi** | 1) Leggere l'`href` dei link Facebook e Instagram nei contatti e nella colonna "Seguici" del footer.<br>2) Controllare che ogni link abbia un testo visibile (per ora non ci sono icone).<br>3) Solo per la pubblicazione: aprire i due link senza essere loggati a Facebook o Instagram. |
+| **Atteso** | Demo: `https://example.com/facebook-segnaposto` e `https://example.com/instagram-segnaposto`, uguali nei due punti. Nessun link di condivisione temporaneo (`/share/`). Pubblicazione: si aprono le pagine corrette di SmashBroski Pompei anche senza login. |
 
-#### TC-H07 — Footer, pagina Privacy e nessun link all'area riservata
+#### TC-H07 — Doppio footer, pagina Privacy e nessun link all'area riservata
 
 | | |
 |---|---|
-| **Origine** | AU-NAV12 · RF-08, regola "nessun link visibile all'area riservata" |
+| **Origine** | AU-NAV12 · RF-08, regola "nessun link visibile all'area riservata", DEVLOG 18/10 (doppio footer) |
 | **Traguardo** | Demo |
 | **Precondizione** | Nessun login. |
-| **Passi** | 1) Aprire `/`, `/menu`, `/privacy` e `/auth/login` e scorrere fino in fondo.<br>2) Fare clic su "Privacy e cookie".<br>3) Cercare nel sorgente di `/` e `/menu` i testi `auth`, `login` e `proprietario`. |
-| **Atteso** | Su ogni pagina un footer con nome del locale, indirizzo e link "Privacy e cookie". La pagina Privacy si apre; finché mancano i testi dei titolari mostra un testo segnaposto marcato come tale. Nessun link all'area riservata nelle pagine pubbliche. |
+| **Passi** | 1) Aprire `/`, `/menu`, `/info` e `/privacy` a 360×800 e a 1366×768 e scorrere fino in fondo.<br>2) Aprire `/pagina-inesistente` e `/auth/login` e scorrere fino in fondo.<br>3) Su `/` osservare il passaggio dalla foto dell'hero alla fascia "Dove siamo".<br>4) Fare clic sui link del footer, compreso "Privacy e cookie".<br>5) Cercare nel sorgente di `/`, `/menu`, `/info` e `/privacy` i testi `auth`, `login` e `proprietario`. |
+| **Atteso** | Passo 1: prima la fascia "Dove siamo" nel blu del logo, con indirizzo e pulsante "Come arrivare"; poi il footer rosso con logo, colonne "Il locale" (Menù, Orari e contatti), "Seguici" (Facebook, Instagram) e "Informazioni" (Privacy e cookie), e una riga con © e l'anno corrente; il credito della foto solo nella home. A 360 px le colonne vanno a capo senza uscire dallo schermo; a 1366 px sono affiancate a destra del logo. Passo 2: solo il footer rosso, senza fascia "Dove siamo" e senza "Seguici". Passo 3: nessuna linea di stacco tra foto e fascia. Passo 4: ogni link apre la pagina giusta; la pagina Privacy, finché mancano i testi dei titolari, mostra un testo segnaposto marcato come tale. Passo 5: nessun link all'area riservata. |
 
 #### TC-H08 — Dati reali al posto dei segnaposto
 
@@ -328,7 +361,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo |
 | **Precondizione** | Database con i dati iniziali. `/menu` aperto a 360×800 e a 1366×768. |
 | **Passi** | 1) Contare le voci per categoria.<br>2) Per ogni voce confrontare nome, descrizione e prezzi con la sezione 4 di `PROGETTAZIONE.md`.<br>3) Controllare le voci Los Pollos Classic e Los Pollos Bacon a entrambi i viewport. |
-| **Atteso** | 25 voci (3, 2, 7, 2, 3, 3, 5), tutte uguali ai dati iniziali. Ogni prezzo ha il formato scritto accanto (es. "Panino single 7,00 €") e il formato italiano "7,00 €". Mobile: per Los Pollos solo i formati esistenti, senza righe vuote. Desktop: prezzi in colonne con l'intestazione a cascata; per i double di Los Pollos la cella mostra "—". |
+| **Atteso** | 25 voci (3, 2, 7, 2, 3, 3, 5), tutte uguali ai dati iniziali, nell'ordine della sezione 4 (negli Starters prima gli Straccetti di pollo, poi le patatine). Ogni prezzo ha il formato scritto accanto (es. "Panino single 7,00 €") e il formato italiano "7,00 €". Mobile: per Los Pollos solo i formati esistenti, senza righe vuote. Desktop: prezzi in colonne con l'intestazione a cascata; per i double di Los Pollos la cella mostra "—". |
 
 #### TC-M05 — Ricerca nel menù (Ctrl+F)
 
@@ -481,8 +514,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV11 · RF-18, RF-19 |
 | **Traguardo** | Demo |
 | **Precondizione** | Proprietario autenticato. Database con gli orari iniziali. |
-| **Passi** | 1) Aprire `/proprietario/orari`.<br>2) Rendere chiuso il mercoledì.<br>3) Cambiare il secondo turno del venerdì in 18:00–02:00.<br>4) Salvare e aprire `/`. |
-| **Atteso** | In home: "Mercoledì: Chiuso" e "Venerdì 12:00–15:00 · 18:00–02:00", con il turno oltre la mezzanotte nel giorno in cui inizia. Lo stato "aperto ora" tiene conto dei nuovi orari. |
+| **Passi** | 1) Aprire `/proprietario/orari`.<br>2) Rendere chiuso il mercoledì.<br>3) Cambiare il secondo turno del venerdì in 18:00–02:00.<br>4) Salvare e aprire `/info` e `/`. |
+| **Atteso** | In `/info`: "Mercoledì: Chiuso" e "Venerdì 12:00–15:00 · 18:00–02:00", con il turno oltre la mezzanotte nel giorno in cui inizia. Lo stato "aperto ora", in `/info` e nella home, tiene conto dei nuovi orari. |
 | **Ripristino** | Rimettere gli orari iniziali o ricaricare il database. |
 
 #### TC-P11 — Orari non validi
@@ -535,7 +568,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NET07 · RNF-06 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | DevTools → Network. |
-| **Passi** | 1) Aprire `/`, `/menu`, `/auth/login` e, da autenticato, `/proprietario/`.<br>2) Per ognuna leggere Response Headers del documento HTML. |
+| **Passi** | 1) Aprire `/`, `/menu`, `/info`, `/auth/login` e, da autenticato, `/proprietario/`.<br>2) Per ognuna leggere Response Headers del documento HTML. |
 | **Atteso** | Su tutte: `Content-Security-Policy` con il valore della sezione 7 di `PROGETTAZIONE.md`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`. Su `/proprietario/` anche `Cache-Control: no-store`. In sviluppo nessun `Strict-Transport-Security`; in pubblicazione `Strict-Transport-Security: max-age=31536000`. |
 
 #### TC-S05 — Cookie
@@ -545,7 +578,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV12 · RNF-11, sezione 7 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | Finestra in incognito appena aperta. |
-| **Passi** | 1) Aprire `/`, `/menu` e `/privacy`; in DevTools → Application → Cookies annotare i cookie.<br>2) Aprire `/auth/login` e annotare i cookie. |
+| **Passi** | 1) Aprire `/`, `/menu`, `/info` e `/privacy`; in DevTools → Application → Cookies annotare i cookie.<br>2) Aprire `/auth/login` e annotare i cookie. |
 | **Atteso** | Passo 1: nessun cookie. Passo 2: solo il cookie di sessione, con `HttpOnly` e `SameSite=Lax`; in pubblicazione anche `Secure`. Nessun banner cookie necessario, perché ci sono solo cookie tecnici. |
 
 #### TC-S06 — Testo HTML inserito dal proprietario
@@ -565,7 +598,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV12 · RNF-11, sezione 7 |
 | **Traguardo** | Demo |
 | **Precondizione** | DevTools → Network, Preserve log attivo, Disable cache attivo. |
-| **Passi** | 1) Aprire `/` e `/menu`.<br>2) Ordinare le richieste per dominio. |
+| **Passi** | 1) Aprire `/`, `/menu` e `/info`.<br>2) Ordinare le richieste per dominio. |
 | **Atteso** | Tutte le richieste vanno al sito stesso. Nessuna richiesta a `googletagmanager.com`, `google-analytics.com`, font o script esterni. |
 
 #### TC-S08 — Pagine di errore e nessuna registrazione pubblica
@@ -576,7 +609,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | Nessun login. |
 | **Passi** | 1) Aprire `/pagina-inesistente`.<br>2) Aprire `/auth/register` e `/registrazione`.<br>3) Da autenticato, aprire `/proprietario/voci/99999`. |
-| **Atteso** | Pagina 404 del sito, con navbar e footer, senza dettagli tecnici. Nessuna pagina di registrazione. In pubblicazione nessuna pagina di debug di Flask in nessun caso. |
+| **Atteso** | Pagina 404 del sito, con navbar (ora compresa) e footer rosso, senza dettagli tecnici. Nessuna pagina di registrazione. In pubblicazione nessuna pagina di debug di Flask in nessun caso. |
 
 #### TC-S09 — HTTPS e redirect
 
@@ -607,8 +640,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NET02 · RNF-03, RNF-04 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | Come TC-NS01, filtro "Img". |
-| **Passi** | 1) Aprire `/` e annotare formato, peso e dimensioni di logo e foto dell'hero.<br>2) In Elements leggere gli attributi `<img>` e `<picture>`. |
-| **Atteso** | Logo in WebP sotto i 200 KB con `width` e `height` nell'HTML. Foto dell'hero in WebP, con il taglio verticale a 390 px e quello orizzontale a 1366 px, senza `loading="lazy"`. |
+| **Passi** | 1) Aprire `/` e annotare formato, peso e dimensioni di logo e foto dell'hero.<br>2) In Elements leggere gli attributi `<img>` e `<picture>`.<br>3) Aprire `/menu` e annotare formato e peso di `motivo-loghi.webp`. |
+| **Atteso** | Logo in WebP sotto i 200 KB con `width` e `height` nell'HTML. Foto dell'hero in WebP, con il taglio verticale a 390 px e quello orizzontale a 1366 px, senza `loading="lazy"`. Logo del footer con `loading="lazy"`. Motivo dello sfondo in WebP sotto i 10 KB. |
 
 #### TC-NS03 — Lighthouse mobile
 
@@ -628,7 +661,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo |
 | **Precondizione** | Chrome desktop 1366×768, DevTools aperto. |
 | **Passi** | 1) Ctrl+Shift+P → "Show Coverage".<br>2) Ricaricare dal pannello Coverage `/` e poi `/menu`.<br>3) Annotare file, peso e percentuale non utilizzata. |
-| **Atteso** | Un solo foglio di stile del sito, nessun framework CSS né file del page builder. Percentuale di codice non utilizzato annotata e inferiore a quella del sito attuale (57%, 450 KB su 779 KB). |
+| **Atteso** | Un solo foglio di stile e un solo script del sito (`navbar.js`), nessun framework CSS né file del page builder. Percentuale di codice non utilizzato annotata e inferiore a quella del sito attuale (57%, 450 KB su 779 KB). |
 
 #### TC-NS05 — Console e pannello Issues
 
@@ -637,7 +670,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-CON01 (PASS, da mantenere), AU-CON02 |
 | **Traguardo** | Demo |
 | **Precondizione** | Finestra in incognito. Console su "All levels", Preserve log attivo. |
-| **Passi** | 1) Aprire `/`, `/menu`, `/privacy`, `/auth/login` e, da autenticato, `/proprietario/` e `/proprietario/orari`.<br>2) Annotare errori e avvisi in Console.<br>3) Aprire DevTools → More tools → Issues e annotare le segnalazioni. |
+| **Passi** | 1) Aprire `/`, `/menu`, `/info`, `/privacy`, `/auth/login`, `/pagina-inesistente` e, da autenticato, `/proprietario/` e `/proprietario/orari`.<br>2) Annotare errori e avvisi in Console.<br>3) Aprire DevTools → More tools → Issues e annotare le segnalazioni. |
 | **Atteso** | Nessun errore in Console (comprese violazioni della CSP e risorse 404). Nessuna segnalazione nel pannello Issues. |
 
 #### TC-NS06 — Titolo, descrizione e intestazioni
@@ -647,8 +680,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-SEO01 · RNF-07 |
 | **Traguardo** | Demo |
 | **Precondizione** | Sorgente delle pagine pubbliche (Ctrl+U). |
-| **Passi** | Per `/`, `/menu` e `/privacy`:<br>1) annotare `<title>`;<br>2) cercare `meta name="description"`;<br>3) contare gli `<h1>`. |
-| **Atteso** | `<title>` con tipo di locale e città, es. "SmashBroski Pompei – Hamburgeria a Pompei" per la home. Meta description presente e diversa per ogni pagina. Un solo `<h1>` per pagina. |
+| **Passi** | Per `/`, `/menu`, `/info` e `/privacy`:<br>1) annotare `<title>`;<br>2) cercare `meta name="description"`;<br>3) contare gli `<h1>`. |
+| **Atteso** | `<title>` con tipo di locale e città, es. "SmashBroski Pompei – Hamburgeria a Pompei" per la home e "Orari e contatti – SmashBroski Pompei, hamburgeria a Pompei" per `/info`. Meta description presente e diversa per ogni pagina. Un solo `<h1>` per pagina. |
 
 #### TC-NS07 — Menù nel sorgente e nessuna versione esposta
 
@@ -657,7 +690,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-SEO02, AU-SEO03 · RNF-08, RNF-09 |
 | **Traguardo** | Demo |
 | **Precondizione** | Sorgente di `/menu` e `/` (Ctrl+U), cioè l'HTML inviato dal server. |
-| **Passi** | 1) Nel sorgente di `/menu` cercare "Cheeseburger" e "Los Pollos".<br>2) Nel sorgente di `/` e `/menu` cercare "generator". |
+| **Passi** | 1) Nel sorgente di `/menu` cercare "Cheeseburger" e "Los Pollos".<br>2) Nel sorgente di `/`, `/menu` e `/info` cercare "generator". |
 | **Atteso** | "Cheeseburger" e "Los Pollos" presenti come testo nell'HTML. Nessun meta `generator` né altra versione del software. |
 
 #### TC-NS08 — Dati strutturati Restaurant
@@ -725,6 +758,7 @@ File: `tests/test_menu_service.py`
 | test_converti_prezzo_non_validi | "0", "0,00", "1000", "-1", "7,505", "7.50", "abc", "" → `DatiNonValidiError` |
 | test_menu_pubblico_categorie_in_ordine | 7 categorie nell'ordine del PDF |
 | test_menu_pubblico_25_voci_in_ordine_di_posizione | 25 voci, ognuna nella sua categoria e in ordine di posizione |
+| test_starters_straccetti_prima_delle_patatine | Starters nell'ordine: Straccetti di pollo, Patatine stick, Patatine stick bacon & cheese |
 | test_menu_pubblico_esclude_voci_nascoste | Una voce nascosta non compare |
 | test_menu_pubblico_esclude_categorie_senza_voci_visibili | Tutte le voci del Kids Menù nascoste → la categoria non c'è; una voce rimostrata → la categoria torna |
 | test_menu_pubblico_query_costanti | Il numero di query non cresce con il numero di voci (nessuna query per voce) |
@@ -775,18 +809,21 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 
 | Test | Scenario |
 |---|---|
-| test_home_contenuti | GET `/` → 200; un solo `<h1>`; `<title>` con "Hamburgeria" e "Pompei"; meta description; `tel:+390810000000` con "numero di prova"; `mailto:info@example.com`; link a Google Maps; link a `/privacy`; nessun `wa.me` |
-| test_home_nessun_link_area_riservata | Nell'HTML di `/` e `/menu` nessun link a `/auth` o `/proprietario` |
-| test_home_stato_apertura | Con l'ora sostituita nel test (monkeypatch): martedì 10:00 → "Chiuso · apre domani alle 12:00" ("oggi" e "domani" quando la riapertura è vicina, altrimenti il nome del giorno) |
-| test_home_json_ld | JSON-LD leggibile, `@type` Restaurant, indirizzo, orari, link al menù; nessun `telephone` con `telefono_di_prova` = sì; `telephone` presente con `telefono_di_prova` = no |
+| test_home_contenuti | GET `/` → 200; un solo `<h1>`; `<title>` con "Hamburgeria" e "Pompei"; meta description; link a Google Maps e indirizzo; link a `/info` e a `/privacy`; nessun `wa.me` |
+| test_home_nessun_link_area_riservata | Nell'HTML di `/`, `/menu`, `/info` e `/privacy` nessun link a `/auth` o `/proprietario` |
+| test_home_stato_apertura_chiuso, test_home_stato_apertura_dopo_mezzanotte, test_home_stato_apertura_tra_piu_giorni | Con l'ora sostituita nel test (monkeypatch): martedì 10:00 → "Chiuso · apre domani alle 12:00"; martedì 00:30 → "Aperto · chiude alle 01:00" (turno di lunedì); lunedì 01:30 → "Aperto · chiude alle 02:00" (turno di domenica) |
+| test_home_json_ld, test_home_json_ld_con_telefono_reale | JSON-LD leggibile, `@type` Restaurant, indirizzo, orari, link al menù; nessun `telephone` con `telefono_di_prova` = sì; `telephone` presente con `telefono_di_prova` = no, e allora nessun "numero di prova" in `/info` |
 | test_json_ld_escape | Nome del locale con `</script>` → il JSON-LD non chiude lo script |
-| test_menu_struttura | GET `/menu` → 200; 7 `<h2>` con `id` uguale allo slug, nell'ordine del PDF; 25 `<h3>`; "Smash Cheeseburger" scritto così nell'HTML |
+| test_info_contenuti | GET `/info` → 200; un solo `<h1>`; `<title>` con "Orari e contatti"; `tel:+390810000000` mostrato come "+39 081 000 0000" con "numero di prova"; `mailto:info@example.com`; link a Google Maps; voce della navbar con `aria-current="page"` |
+| test_info_orari_martedi_chiuso | Martedì "Chiuso"; turni "12:00–15:00 · 18:00–01:00", ogni turno in uno `<span class="turno">` (non va a capo sul trattino) |
+| test_info_oggi_evidenziato | Con l'ora sostituita: martedì 10:00 → "Martedì (oggi)" in grassetto e stato "Chiuso · apre domani alle 12:00" |
+| test_menu_struttura | GET `/menu` → 200; nel contenuto di `<main>` (il footer ha altri `<h2>`) 7 `<h2>` con `id` uguale allo slug, nell'ordine del PDF; 25 `<h3>`; "Smash Cheeseburger" scritto così nell'HTML |
 | test_menu_prezzi_e_formati | "Panino single" e "7,00 €" accanto a Smash Burger; Los Pollos senza prezzi double |
 | test_menu_voce_nascosta_assente | Voce nascosta assente dall'HTML |
 | test_menu_categoria_vuota_assente | Kids Menù con tutte le voci nascoste → nessun `<h2 id="kids-menu">` e nessun link `#kids-menu` nell'indice |
 | test_escape_testo_proprietario | Voce con nome `<b>Prova</b>` → nell'HTML `&lt;b&gt;Prova&lt;/b&gt;` |
-| test_nessun_generator | Nessun meta `generator` in `/`, `/menu`, `/privacy` |
-| test_pagine_pubbliche_senza_cookie | GET `/`, `/menu`, `/privacy` → nessun `Set-Cookie` |
+| test_nessun_generator | Nessun meta `generator` in `/`, `/menu`, `/info`, `/privacy` |
+| test_pagine_pubbliche_senza_cookie | GET `/`, `/menu`, `/info`, `/privacy` → nessun `Set-Cookie` |
 | test_pagina_404 | GET `/pagina-inesistente` → 404 con la pagina del sito |
 | test_nessuna_registrazione | GET `/auth/register` → 404 |
 | test_rotte_proprietario_anonimo_redirect | Per **ogni** rotta registrata con prefisso `/proprietario` (lette da `app.url_map`): anonimo → redirect a `/auth/login` |
@@ -799,7 +836,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | test_rate_limit_login | Con il limite attivo: il sesto POST a `/auth/login` nello stesso minuto → 429 |
 | test_dati_non_validi_400 | POST di una voce con prezzo "abc" → 400 con il messaggio nel modulo |
 | test_voce_inesistente_404 | GET `/proprietario/voci/99999` da autenticato → 404 |
-| test_header_sicurezza | Su `/`, `/menu`, `/privacy`, `/auth/login` e sulla pagina 404: CSP con il valore della sezione 7, `nosniff`, `DENY`, `strict-origin-when-cross-origin` |
+| test_header_sicurezza | Su `/`, `/menu`, `/info`, `/privacy` e sulla pagina 404: CSP con il valore della sezione 7, `nosniff`, `DENY`, `strict-origin-when-cross-origin` |
 | test_cache_no_store_area_riservata | Pagine `/proprietario` → `Cache-Control: no-store` |
 | test_hsts_solo_produzione | Configurazione di test → nessun `Strict-Transport-Security`; configurazione di produzione → `max-age=31536000` |
 | test_cookie_sessione_attributi | Cookie di sessione `HttpOnly` e `SameSite=Lax`; con la configurazione di produzione anche `Secure` |
@@ -818,14 +855,14 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | AU-NET06 | PASS | — (hosting) | TC-S09 | — |
 | AU-NET07 | FAIL | RNF-06 | TC-S04 | test_header_sicurezza, test_hsts_solo_produzione |
 | AU-CON01 | PASS | — | TC-NS05 | — |
-| AU-CON02 | FAIL | RF-04 | TC-NS05, TC-H03 | test_home_contenuti |
+| AU-CON02 | FAIL | RF-04 | TC-NS05, TC-H03 | test_info_contenuti |
 | AU-UI01 | FAIL | RF-01, RNF-01 | TC-UI02 | — |
 | AU-UI02 | FAIL | RF-01, RNF-01 | TC-UI01, TC-UI02 | — |
 | AU-UI03 | PASS | RNF-02 | TC-UI05 | — |
 | AU-UI04 | BLOCKED | RNF-01 | TC-UI07 | — |
 | AU-UI05 | FAIL | RF-01, RNF-01 | TC-UI03 | — |
 | AU-UI06 | FAIL | RF-01, RNF-01 | TC-UI04 | — |
-| AU-UI07 | PASS | RNF-02 | TC-UI06 | — |
+| AU-UI07 | PASS | RNF-02 | TC-UI06, TC-UI09 | — |
 | AU-NAV01 | FAIL | RF-09 | TC-M01 | — |
 | AU-NAV02 | FAIL | RF-10, RF-11 | TC-M02, TC-M03 | test_menu_struttura |
 | AU-NAV03 | FAIL | RF-13 | TC-M05 | test_menu_struttura |
@@ -833,12 +870,12 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | AU-NAV05 | FAIL | RF-14 | TC-M07 | test_menu_struttura |
 | AU-NAV06 | FAIL | RF-11, RF-12, RF-15 | TC-M03, TC-M04, TC-M08 | test_menu_prezzi_e_formati |
 | AU-NAV07 | FAIL | RF-07 | TC-H06, TC-H08 | — |
-| AU-NAV08 | BLOCKED | RF-04 | TC-H03 | test_home_contenuti |
-| AU-NAV09 | PASS | RF-05 | TC-H04 | test_home_contenuti |
+| AU-NAV08 | BLOCKED | RF-04 | TC-H03 | test_info_contenuti |
+| AU-NAV09 | PASS | RF-05 | TC-H04 | test_info_contenuti |
 | AU-NAV10 | BLOCKED | RF-06 | TC-H05 | test_link_maps |
-| AU-NAV11 | FAIL | RF-02, RF-03, RF-18 | TC-H01, TC-H02, TC-P10 | sezioni 3.1 e 3.2, test_home_stato_apertura |
+| AU-NAV11 | FAIL | RF-02, RF-03, RF-18 | TC-H01, TC-H02, TC-P10 | sezioni 3.1 e 3.2, test_home_stato_apertura_*, test_info_orari_martedi_chiuso, test_info_oggi_evidenziato |
 | AU-NAV12 | FAIL | RF-08, RNF-11 | TC-H07, TC-S05, TC-S07 | test_pagine_pubbliche_senza_cookie |
-| AU-SEO01 | FAIL | RNF-07 | TC-NS06 | test_home_contenuti |
+| AU-SEO01 | FAIL | RNF-07 | TC-NS06 | test_home_contenuti, test_info_contenuti |
 | AU-SEO02 | FAIL | RNF-08 | TC-NS07 | test_menu_struttura |
 | AU-SEO03 | FAIL | RNF-09 | TC-NS07 | test_nessun_generator |
 | AU-SEO04 | FAIL | RNF-10 | TC-NS08 | test_home_json_ld |
@@ -855,7 +892,11 @@ Parti dell'audit lasciate fuori perimetro (sezione 2 di `PROGETTAZIONE.md`): all
 | RF-19 Modifiche visibili subito | TC-P05, TC-P06, TC-P07, TC-P10 | test_menu_voce_nascosta_assente |
 | Accessi (sezione 6-7) | TC-S01, TC-P04, TC-S08 | test_rotte_proprietario_*, test_account_disattivato_perde_accesso, test_nessuna_registrazione |
 | CSRF, rate limiting, XSS, SQL | TC-S02, TC-S03, TC-S06 | test_csrf_post_senza_token, test_rate_limit_login, test_escape_testo_proprietario, test_testo_con_apici_salvato_come_testo |
-| Navbar e impaginazione (`WIREFRAME.md`) | TC-UI08 | — |
+| Navbar staccata e impaginazione (`WIREFRAME.md`, DEVLOG 18/10) | TC-UI08 | — |
+| Pulsante a tre linee della navbar | TC-UI09, TC-UI04 | — |
+| Ora di Pompei nella navbar | TC-UI10 | — |
+| Sfondo di loghi e "riduci movimento" | TC-UI11 | — |
+| Doppio footer | TC-H07, TC-S08 | — |
 | Menù senza JavaScript (RNF-05, RNF-08) | TC-M09 | — |
 | Segnaposto sostituiti | TC-H08 | — |
 

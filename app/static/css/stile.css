@@ -12,8 +12,11 @@
     --testo: #1F1F24;
     --testo-secondario: #4A4A55;
     --bordo: #E2D8C3;
-    --navbar-sfondo: rgba(176, 12, 54, 0.85);
+    --navbar-sfondo: rgba(176, 12, 54, 0.78);
     --altezza-navbar: 64px;
+    --margine-navbar: 0.75rem;
+    /* Spazio occupato in alto dalla navbar staccata dal bordo. */
+    --ingombro-navbar: calc(var(--altezza-navbar) + var(--margine-navbar));
     --larghezza-contenuto: 1100px;
     --raggio: 6px;
     --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -21,7 +24,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-padding-top: calc(var(--altezza-navbar) + 0.75rem); }
+html { scroll-padding-top: calc(var(--ingombro-navbar) + 0.75rem); }
 
 body {
     margin: 0;
@@ -41,6 +44,16 @@ a:hover { color: var(--blu-scuro); }
 h1, h2, h3 { line-height: 1.2; }
 h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
+/* Testo letto dai lettori di schermo ma non mostrato. */
+.visivamente-nascosto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
 .salta-al-contenuto {
     position: absolute;
     left: 0.5rem;
@@ -53,40 +66,159 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .salta-al-contenuto:focus { top: 0.5rem; }
 
-/* ---------- Navbar fissa, rossa semi-trasparente con sfocatura (stile Habita79) ---------- */
+/* ---------- Navbar stile Habita79: barra staccata dai bordi, vetro rosso sfocato ---------- */
 
 .navbar {
     position: fixed;
-    inset: 0 0 auto 0;
+    top: var(--margine-navbar);
+    left: 0;
+    right: 0;
     z-index: 50;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* il logo resta al centro esatto */
     align-items: center;
-    justify-content: space-between;
     gap: 0.75rem;
+    width: min(100% - 2 * var(--margine-navbar), 1240px);
     height: var(--altezza-navbar);
-    padding: 0 max(1rem, env(safe-area-inset-left));
+    margin: 0 auto;
+    padding: 0 0.75rem 0 1rem;
+    color: var(--crema);
     background: var(--navbar-sfondo);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.navbar-marchio {
+    justify-self: start;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 .navbar-logo { display: flex; align-items: center; height: 100%; }
-.navbar-logo img { width: 54px; height: auto; display: block; }
+.navbar-logo img { width: auto; height: 48px; display: block; }
+.navbar-nav { justify-self: end; display: flex; align-items: center; gap: 0.5rem; }
+
+/* Ora di Pompei con sole o luna, come l'ora e il meteo di Habita79. */
+.navbar-ora {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.navbar-ora[hidden] { display: none; }
+.navbar-ora svg { flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.navbar-ora .icona-luna { display: none; }
+.navbar-ora.notte .icona-sole { display: none; }
+.navbar-ora.notte .icona-luna { display: block; }
+/* Telefoni stretti: ora e pulsante più compatti, così il logo resta al centro della barra. */
+@media (max-width: 379.98px) {
+    .navbar-nav { gap: 0.3rem; }
+    .navbar-ora { gap: 0.25rem; font-size: 0.85rem; letter-spacing: 0.02em; }
+    .navbar-ora svg { width: 16px; height: 16px; }
+    .navbar-pulsante { width: 42px; }
+    .navbar-linee { width: 30px; }
+}
 .navbar-link { display: flex; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
 .navbar-link a {
     display: block;
     padding: 0.6rem 0.65rem;
     color: var(--crema);
+    font-size: 0.85rem;
     font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     text-decoration: none;
     border-radius: var(--raggio);
 }
 .navbar-link a:hover { background: rgba(255, 250, 240, 0.15); color: #fff; }
-.navbar-link a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; }
+.navbar-link a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.35em; }
 .navbar :focus-visible { outline-color: var(--crema); }
 
-/* Le pagine senza hero partono sotto la navbar fissa. */
-.pagina-interna main { padding-top: var(--altezza-navbar); }
+/* Pulsante con le tre linee lunghe e sottili; aperto, le linee diventano una X. */
+.navbar-pulsante {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--raggio);
+    background: none;
+    color: var(--crema);
+    cursor: pointer;
+}
+.navbar-linee { position: relative; display: block; width: 34px; height: 16px; }
+.navbar-linee span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+}
+.navbar-linee span:nth-child(1) { top: 0; }
+.navbar-linee span:nth-child(2) { top: 7px; }
+.navbar-linee span:nth-child(3) { top: 14px; }
+.navbar-aperta .navbar-linee span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.navbar-aperta .navbar-linee span:nth-child(2) { opacity: 0; transform: scaleX(0.2); }
+.navbar-aperta .navbar-linee span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Telefoni e tablet in verticale. */
+@media (max-width: 899.98px) {
+    /* Con JavaScript: le voci stanno in un pannello di vetro che scende sotto la barra. */
+    .js .navbar-pulsante { display: flex; }
+    .js .navbar-link {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 0;
+        padding: 0.5rem;
+        background: rgba(176, 12, 54, 0.92);
+        -webkit-backdrop-filter: blur(14px) saturate(140%);
+        backdrop-filter: blur(14px) saturate(140%);
+        border-radius: 12px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-0.75rem) scale(0.98);
+        transform-origin: top center;
+        transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.35s;
+    }
+    .js .navbar-aperta .navbar-link {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition-delay: 0s;
+    }
+    .js .navbar-link a { padding: 0.95rem 1rem; font-size: 1rem; }
+    /* Le voci entrano una dopo l'altra. */
+    .js .navbar-link li { opacity: 0; transform: translateY(-0.4rem); transition: opacity 0.25s ease, transform 0.3s ease; }
+    .js .navbar-aperta .navbar-link li { opacity: 1; transform: none; }
+    .js .navbar-aperta .navbar-link li:nth-child(2) { transition-delay: 0.05s; }
+    .js .navbar-aperta .navbar-link li:nth-child(3) { transition-delay: 0.1s; }
+
+    /* Senza JavaScript: niente marchio, logo a sinistra e voci compatte nella barra. */
+    html:not(.js) .navbar { grid-template-columns: auto 1fr; }
+    html:not(.js) .navbar-marchio { display: none; }
+    html:not(.js) .navbar-link a { padding: 0.5rem 0.4rem; font-size: 0.75rem; letter-spacing: 0.06em; }
+}
+
+/* Le pagine senza hero partono sotto la navbar fissa; sul fondo crema il vetro è quasi pieno,
+   altrimenti il rosso schiarisce e diventa rosa. */
+.pagina-interna main { padding-top: var(--ingombro-navbar); }
+.pagina-interna .navbar { background: rgba(176, 12, 54, 0.94); }
 
 /* ---------- Hero a tutto schermo con la foto del locale ---------- */
 
@@ -94,10 +226,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     position: relative;
     isolation: isolate;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     min-height: 100vh;
     min-height: 100dvh;
-    padding: calc(var(--altezza-navbar) + 1.5rem) 1.25rem 2.5rem;
+    padding: calc(var(--ingombro-navbar) + 1.5rem) 1.25rem 2.5rem;
     color: var(--crema);
     background: var(--blu-scuro);
 }
@@ -115,12 +247,13 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(to top, rgba(18, 28, 40, 0.92) 0%, rgba(18, 28, 40, 0.65) 55%, rgba(18, 28, 40, 0.45) 100%);
+    /* In fondo il velo diventa il blu del logo (9, 99, 173 = --blu), come la fascia "Dove siamo". */
+    background: linear-gradient(to top, rgb(9, 99, 173) 0%, rgba(9, 99, 173, 0.55) 22%, rgba(18, 28, 40, 0.6) 55%, rgba(18, 28, 40, 0.45) 100%);
 }
 .hero-contenuto {
     width: 100%;
     max-width: var(--larghezza-contenuto);
-    margin: 0 auto;
+    margin: auto; /* centrato in verticale nell'hero */
     text-align: center;
 }
 .hero-logo {
@@ -168,15 +301,12 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pulsante-secondario:hover { background: var(--crema); color: var(--blu-scuro); }
 .hero :focus-visible { outline-color: var(--crema); }
 
-/* ---------- Sezioni della home ---------- */
+/* ---------- Pagina Orari e contatti ---------- */
 
-.sezioni-home {
-    display: grid;
-    gap: 1.5rem;
-    max-width: var(--larghezza-contenuto);
-    margin: 0 auto;
-    padding: 2.5rem 1rem;
-}
+.pagina-info { --larghezza-pannello: var(--larghezza-contenuto); max-width: var(--larghezza-contenuto); margin-inline: auto; padding: 1.5rem 1rem 2rem; }
+.pagina-info h1 { margin: 0.5rem 0 0.75rem; font-size: 2rem; color: var(--blu-scuro); }
+.pagina-info .stato-apertura { background: #fff; border-color: var(--bordo); color: var(--testo); }
+.sezioni-info { display: grid; gap: 1.5rem; margin-top: 0.5rem; }
 .sezione {
     padding: 1.5rem 1.25rem;
     background: #fff;
@@ -193,6 +323,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .orari-giorno:last-child { border-bottom: 0; }
 .orari dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
 .orari-giorno.oggi { color: var(--rosso); }
 .contatti { margin: 0; padding: 0; list-style: none; }
 .contatti li { padding: 0.55rem 0; border-bottom: 1px solid var(--bordo); overflow-wrap: anywhere; }
@@ -209,9 +340,47 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .segnaposto { font-style: italic; color: var(--testo-secondario); }
 
+/* ---------- Sfondo animato di Menù e Orari e contatti ---------- */
+
+/* Fisso dietro la pagina; ogni fila è più larga dello schermo di una mattonella (192 px) e scorre
+   di una mattonella per ciclo, quindi il movimento non ha salti. Si muove solo transform. */
+.sfondo-loghi {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: var(--crema);
+    pointer-events: none;
+}
+.fila-loghi {
+    width: calc(100% + 192px);
+    height: 84px;
+    margin-left: -192px;
+    background: url("../img/motivo-loghi.webp") 0 0 / 192px 84px repeat-x;
+    animation: scorri-loghi 16s linear infinite;
+    will-change: transform;
+}
+/* File alterne: direzione opposta e tinte sfalsate (rosso sopra blu, come i vasi di Habita79). */
+.fila-loghi:nth-child(even) { background-position: 96px 0; animation-direction: reverse; }
+@keyframes scorri-loghi {
+    from { transform: translateX(0); }
+    to { transform: translateX(192px); }
+}
+
+/* Contenuto su un pannello crema pieno: i loghi non passano sotto prezzi e testi. */
+.sfondo-loghi ~ .pagina-menu, .sfondo-loghi ~ .pagina-info {
+    width: min(100% - 1rem, var(--larghezza-pannello));
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    background: var(--crema);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(32, 62, 86, 0.12);
+}
+
 /* ---------- Menù ---------- */
 
-.pagina-menu, .pagina-testo { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.pagina-testo { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.pagina-menu { --larghezza-pannello: 900px; max-width: 900px; margin-inline: auto; padding: 1.5rem 1rem 2rem; }
 .pagina-menu h1, .pagina-testo h1 { margin: 0.5rem 0; font-size: 2rem; color: var(--blu-scuro); }
 
 .indice { margin: 1rem 0 0.5rem; }
@@ -258,11 +427,76 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 /* ---------- Footer ---------- */
 
-.footer { padding: 2rem 1rem; background: var(--blu-scuro); color: var(--crema); text-align: center; }
-.footer p { margin: 0.25rem 0; }
-.footer a { color: var(--crema); }
-.footer :focus-visible { outline-color: var(--crema); }
-.crediti { font-size: 0.85rem; opacity: 0.85; }
+/* Due fasce come Habita79: "Dove siamo" nel blu del logo, poi il footer rosso con logo e colonne. */
+.footer-dove, .footer { color: var(--crema); }
+.footer-dove :focus-visible, .footer :focus-visible { outline-color: var(--crema); }
+.etichetta-footer {
+    margin: 0 0 0.6rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: inherit;
+}
+.footer-dove { background: var(--blu); }
+.footer-dove-contenuto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    max-width: var(--larghezza-contenuto);
+    margin: 0 auto;
+    padding: 2.75rem 1.25rem;
+}
+.footer-dove .etichetta-footer { opacity: 0.9; }
+.footer-indirizzo { margin: 0; font-size: clamp(1.25rem, 3.5vw, 1.9rem); font-weight: 300; letter-spacing: 0.06em; line-height: 1.3; }
+.pulsante-footer {
+    display: inline-block;
+    min-height: 48px;
+    padding: 0.85rem 1.75rem;
+    border: 1px solid rgba(255, 250, 240, 0.6);
+    color: var(--crema);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+.pulsante-footer:hover { background: var(--crema); color: var(--blu); }
+
+.footer { background: var(--rosso); }
+.footer-contenuto {
+    display: grid;
+    gap: 2rem;
+    max-width: var(--larghezza-contenuto);
+    margin: 0 auto;
+    padding: 3rem 1.25rem 2rem;
+}
+.footer-marchio img { display: block; width: 150px; height: auto; }
+.footer-marchio p { margin: 0.5rem 0 0; font-weight: 600; letter-spacing: 0.04em; }
+.footer-colonne { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1.75rem; }
+.footer-colonne ul { margin: 0; padding: 0; list-style: none; }
+.footer-colonne a { display: inline-block; padding: 0.35rem 0; color: var(--crema); text-decoration: none; }
+.footer-colonne a:hover { text-decoration: underline; color: #fff; }
+.footer-fondo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    max-width: var(--larghezza-contenuto);
+    margin: 0 auto;
+    padding: 1.1rem 1.25rem 1.5rem;
+    border-top: 1px solid rgba(255, 250, 240, 0.3);
+    font-size: 0.85rem;
+}
+.footer-fondo p { margin: 0; }
+.crediti { opacity: 0.9; }
+
+@media (min-width: 768px) {
+    .footer-contenuto { grid-template-columns: auto 1fr; align-items: start; gap: 3rem; padding-top: 4rem; }
+    .footer-colonne { justify-self: end; grid-template-columns: repeat(3, minmax(9rem, auto)); gap: 3.5rem; }
+}
 
 /* ---------- Pagine di testo, moduli e area riservata ---------- */
 
@@ -320,7 +554,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* ---------- Schermi bassi o telefono ruotato: hero più compatto ---------- */
 
 @media (max-height: 500px) {
-    .hero { padding-top: calc(var(--altezza-navbar) + 0.75rem); padding-bottom: 1.25rem; }
+    .hero { padding-top: calc(var(--ingombro-navbar) + 0.75rem); padding-bottom: 1.25rem; }
     .hero-logo { height: 26vh; }
     .stato-apertura { margin-bottom: 0.75rem; }
 }
@@ -328,14 +562,28 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* ---------- Tablet e computer ---------- */
 
 @media (min-width: 768px) {
-    .sezioni-home { grid-template-columns: 1fr 1fr; padding: 3.5rem 1.5rem; }
-    .navbar-link a { padding: 0.6rem 1rem; }
+    .sezioni-info { grid-template-columns: 1fr 1fr; }
+}
+
+/* Computer: barra più alta e più staccata, come Habita79; voci sempre visibili. */
+@media (min-width: 900px) {
+    :root { --altezza-navbar: 84px; --margine-navbar: 1.5rem; }
+    .navbar { width: min(100% - 6rem, 1240px); padding: 0 1.25rem 0 1.75rem; border-radius: 14px; }
+    .navbar-marchio { font-size: 0.85rem; }
+    .navbar-logo img { height: 58px; }
+    .navbar-link a { padding: 0.6rem 0.9rem; }
+    .navbar-nav { gap: 1.25rem; }
+    .navbar-ora { font-size: 1.05rem; }
 }
 
 @media (min-width: 900px) and (orientation: landscape) {
     /* Contenuto dell'hero a sinistra, dove la sfumatura è più scura. */
     .hero::after {
-        background: linear-gradient(to right, rgba(18, 28, 40, 0.92) 0%, rgba(18, 28, 40, 0.7) 45%, rgba(18, 28, 40, 0.15) 100%);
+        /* Velo da sinistra per il testo e, sopra, velo dal basso: in fondo la foto diventa blu
+           come la fascia "Dove siamo" che segue (9, 99, 173 = --blu). */
+        background:
+            linear-gradient(to top, rgb(9, 99, 173) 0%, rgba(9, 99, 173, 0) 30%),
+            linear-gradient(to right, rgba(18, 28, 40, 0.92) 0%, rgba(18, 28, 40, 0.7) 45%, rgba(18, 28, 40, 0.15) 100%);
     }
     .hero-contenuto { text-align: left; }
     .hero-logo { margin-left: 0; }
@@ -374,4 +622,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
+    .navbar-linee span, .js .navbar-link, .js .navbar-link li { transition: none !important; }
+    .fila-loghi { animation: none; }
 }

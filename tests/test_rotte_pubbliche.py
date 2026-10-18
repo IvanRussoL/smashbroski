@@ -40,23 +40,15 @@ def test_home_contenuti(client):
     titolo = re.search(r"<title>(.*?)</title>", pagina).group(1)
     assert "Hamburgeria" in titolo and "Pompei" in titolo
     assert '<meta name="description"' in pagina
-    assert 'href="tel:+390810000000"' in pagina
-    assert "+39 081 000 0000" in pagina
-    assert "numero di prova" in pagina
-    assert 'href="mailto:info@example.com"' in pagina
     assert "https://www.google.com/maps/search/?api=1&amp;query=Vico+dei+Paninari" in pagina
+    assert "Vico dei Paninari, 7 - 80045 Pompei (NA)" in pagina
+    assert 'href="/info"' in pagina
     assert 'href="/privacy"' in pagina
     assert "wa.me" not in pagina
 
 
-def test_home_orari_martedi_chiuso(client):
-    pagina = html(client.get("/"))
-    assert re.search(r"<dt>(?:<strong>)?Martedì(?: \(oggi\)</strong>)?</dt>\s*<dd>Chiuso</dd>", pagina)
-    assert "12:00–15:00 · 18:00–01:00" in pagina
-
-
 def test_home_nessun_link_area_riservata(client):
-    for indirizzo in ("/", "/menu", "/privacy"):
+    for indirizzo in ("/", "/menu", "/info", "/privacy"):
         pagina = html(client.get(indirizzo))
         assert "/auth" not in pagina
         assert "/proprietario" not in pagina
@@ -66,7 +58,6 @@ def test_home_stato_apertura_chiuso(client, ora_fissa):
     ora_fissa(2026, 10, 20, 10)  # martedì 10:00
     pagina = html(client.get("/"))
     assert "Chiuso · apre domani alle 12:00" in pagina
-    assert "<strong>Martedì (oggi)</strong>" in pagina
 
 
 def test_home_stato_apertura_dopo_mezzanotte(client, ora_fissa):
@@ -92,9 +83,8 @@ def test_home_json_ld_con_telefono_reale(client, database_modificato):
     with database_modificato.cursor() as cur:
         cur.execute("UPDATE impostazioni SET telefono_di_prova = FALSE")
     database_modificato.commit()
-    pagina = html(client.get("/"))
-    assert json_ld(pagina)["telephone"] == "+390810000000"
-    assert "numero di prova" not in pagina
+    assert json_ld(html(client.get("/")))["telephone"] == "+390810000000"
+    assert "numero di prova" not in html(client.get("/info"))
 
 
 def test_json_ld_escape(client, database_modificato):
@@ -106,6 +96,35 @@ def test_json_ld_escape(client, database_modificato):
     assert json_ld(pagina)["name"] == "Smash</script><b>x"
 
 
+# --- Orari e contatti ---
+
+def test_info_contenuti(client):
+    risposta = client.get("/info")
+    pagina = html(risposta)
+    assert risposta.status_code == 200
+    assert pagina.count("<h1") == 1
+    assert "Orari e contatti" in re.search(r"<title>(.*?)</title>", pagina).group(1)
+    assert 'href="tel:+390810000000"' in pagina
+    assert "+39 081 000 0000" in pagina
+    assert "numero di prova" in pagina
+    assert 'href="mailto:info@example.com"' in pagina
+    assert "https://www.google.com/maps/search/?api=1&amp;query=Vico+dei+Paninari" in pagina
+    assert 'aria-current="page"' in pagina
+
+
+def test_info_orari_martedi_chiuso(client):
+    pagina = html(client.get("/info"))
+    assert re.search(r"<dt>(?:<strong>)?Martedì(?: \(oggi\)</strong>)?</dt>\s*<dd>Chiuso</dd>", pagina)
+    assert '<span class="turno">12:00–15:00</span> · <span class="turno">18:00–01:00</span>' in pagina
+
+
+def test_info_oggi_evidenziato(client, ora_fissa):
+    ora_fissa(2026, 10, 20, 10)  # martedì 10:00
+    pagina = html(client.get("/info"))
+    assert "<strong>Martedì (oggi)</strong>" in pagina
+    assert "Chiuso · apre domani alle 12:00" in pagina
+
+
 # --- Menù ---
 
 def test_menu_struttura(client):
@@ -113,7 +132,8 @@ def test_menu_struttura(client):
     pagina = html(risposta)
     assert risposta.status_code == 200
     assert pagina.count("<h1") == 1
-    assert re.findall(r'<h2 id="([a-z-]+)"', pagina) == [
+    contenuto = pagina.split("<main")[1].split("</main>")[0]  # solo la pagina, senza navbar e footer
+    assert re.findall(r'<h2 id="([a-z-]+)"', contenuto) == [
         "starters", "salad", "burger", "kids-menu", "soft-drinks", "beers", "the-originals",
     ]
     assert pagina.count("<h3>") == 25
@@ -169,12 +189,12 @@ def test_privacy(client):
 
 
 def test_nessun_generator(client):
-    for indirizzo in ("/", "/menu", "/privacy"):
+    for indirizzo in ("/", "/menu", "/info", "/privacy"):
         assert 'name="generator"' not in html(client.get(indirizzo))
 
 
 def test_pagine_pubbliche_senza_cookie(client):
-    for indirizzo in ("/", "/menu", "/privacy"):
+    for indirizzo in ("/", "/menu", "/info", "/privacy"):
         assert "Set-Cookie" not in client.get(indirizzo).headers
 
 

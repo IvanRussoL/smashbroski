@@ -26,18 +26,20 @@ Gli utenti sono due:
 
 Ogni requisito indica il caso dell'audit che risolve. "—" indica un requisito nuovo, senza un FAIL corrispondente.
 
-### Visitatore – Home
+### Visitatore – Home e Orari e contatti
+
+Dal 18/10 (grafica 2) la home è solo l'hero; orari e contatti sono nella pagina **Orari e contatti** (`/info`), raggiungibile dalla navbar e dal footer di ogni pagina (DEVLOG).
 
 | ID | Requisito | Risolve |
 |---|---|---|
-| RF-01 | La home mostra logo, pulsante per il menù, icone Facebook e Instagram, telefono, email e indirizzo, tutti visibili e senza sovrapposizioni su qualsiasi dimensione di schermo, in verticale e in orizzontale, e con lo zoom al 200% | AU-UI01, AU-UI02, AU-UI05, AU-UI06 |
-| RF-02 | Mostra gli orari della settimana, con il giorno di chiusura scritto in modo esplicito ("Martedì: chiuso") | AU-NAV11 |
-| RF-03 | Mostra se il locale è aperto o chiuso in questo momento e, se è chiuso, quando riapre (es. "Chiuso · apre domani alle 12:00"; "oggi" e "domani" quando la riapertura è vicina, altrimenti il nome del giorno, es. "apre venerdì alle 12:00") | AU-NAV11 |
+| RF-01 | La home mostra logo, stato di apertura, pulsante per il menù e "Come arrivare"; la pagina Orari e contatti mostra telefono, email, indirizzo e link Facebook e Instagram; indirizzo e social sono anche nel footer. Tutto visibile e senza sovrapposizioni su qualsiasi dimensione di schermo, in verticale e in orizzontale, e con lo zoom al 200% | AU-UI01, AU-UI02, AU-UI05, AU-UI06 |
+| RF-02 | La pagina Orari e contatti mostra gli orari della settimana, con il giorno di oggi evidenziato e con il giorno di chiusura scritto in modo esplicito ("Martedì: chiuso") | AU-NAV11 |
+| RF-03 | La home e la pagina Orari e contatti mostrano se il locale è aperto o chiuso in questo momento e, se è chiuso, quando riapre (es. "Chiuso · apre domani alle 12:00"; "oggi" e "domani" quando la riapertura è vicina, altrimenti il nome del giorno, es. "apre venerdì alle 12:00") | AU-NAV11 |
 | RF-04 | Il telefono è un link `tel:` che avvia la chiamata; nessun link WhatsApp | AU-CON02, AU-NAV08 (BLOCKED) |
 | RF-05 | L'email è un link `mailto:` scritto in chiaro nell'HTML, che funziona anche senza JavaScript | AU-NAV09 (PASS, da mantenere) |
 | RF-06 | L'indirizzo apre Google Maps sulla posizione del locale, con un link costruito dall'indirizzo al posto del link breve attuale | AU-NAV10 (BLOCKED) |
-| RF-07 | Le icone social portano agli indirizzi stabili delle pagine Facebook e Instagram del locale, non a link di condivisione temporanei | AU-NAV07 |
-| RF-08 | In fondo a ogni pagina c'è un footer con nome del locale, indirizzo e link alla pagina "Privacy e cookie" | AU-NAV12 |
+| RF-07 | I link social (per ora testuali) portano agli indirizzi stabili delle pagine Facebook e Instagram del locale, non a link di condivisione temporanei | AU-NAV07 |
+| RF-08 | In fondo a ogni pagina c'è un footer con nome del locale e link alle pagine del sito e a "Privacy e cookie"; nelle pagine pubbliche lo precede la fascia "Dove siamo" con indirizzo e link a Google Maps, e il footer ha anche i social | AU-NAV12 |
 
 ### Visitatore – Menù
 
@@ -107,11 +109,11 @@ Ogni requisito indica il caso dell'audit che risolve. "—" indica un requisito 
   - martedì 01:00 → chiuso;
   - lunedì 01:30 → aperto (turno di domenica 18:00–02:00);
   - lunedì 12:00 → aperto; lunedì 15:00 → chiuso.
-- La **prossima apertura** è il primo inizio di turno dopo l'istante, cercato nei 7 giorni successivi (es. martedì 10:00 → "apre mercoledì alle 12:00"). Se il calendario non ha turni, la home mostra "orari non disponibili".
+- La **prossima apertura** è il primo inizio di turno dopo l'istante, cercato nei 7 giorni successivi (es. martedì 10:00 → "apre mercoledì alle 12:00"). Se il calendario non ha turni, home e pagina Orari e contatti mostrano "orari non disponibili".
 - I turni non si sovrappongono: né due turni dello stesso giorno, né un turno oltre la mezzanotte con un turno del giorno dopo (es. domenica 18:00–02:00 è incompatibile con un turno di lunedì che inizia prima delle 02:00).
 - Le regole sono **verificate dal server** quando il proprietario salva gli orari, non solo dal modulo HTML.
 - L'ora attuale si calcola nel fuso **Europe/Rome** (modulo `zoneinfo`), non in quello del server, così il cambio dell'ora legale è gestito.
-- In home ogni turno si mostra nel giorno in cui inizia: "Lunedì 12:00–15:00 · 18:00–01:00".
+- Nella pagina Orari e contatti ogni turno si mostra nel giorno in cui inizia: "Lunedì 12:00–15:00 · 18:00–01:00".
 
 ### Contatti e dati del locale
 
@@ -275,9 +277,11 @@ Li carica lo script dei dati iniziali dopo `schema.sql`. I prezzi sono stati let
 
 | Pos. | Voce | Descrizione | Prezzi |
 |---|---|---|---|
-| 1 | Patatine stick | — | 3,00 (unico) |
-| 2 | Patatine stick bacon & cheese | — | 4,00 (unico) |
-| 3 | Straccetti di pollo | Pollo croccante ricetta bro | 5 pz 4,00 · 10 pz 7,00 |
+| 1 | Straccetti di pollo | Pollo croccante ricetta bro | 5 pz 4,00 · 10 pz 7,00 |
+| 2 | Patatine stick | — | 3,00 (unico) |
+| 3 | Patatine stick bacon & cheese | — | 4,00 (unico) |
+
+Ordine diverso dal PDF (decisione del 18/10, DEVLOG): gli Straccetti, l'unica voce con i formati 5 pz e 10 pz, vengono per primi, così l'intestazione delle colonne sta subito sopra di loro e non sembra riferita ai prezzi unici delle patatine.
 
 *Salad*
 
@@ -351,7 +355,7 @@ Classi definite con `@dataclass` che rappresentano una riga del database. Conten
 | `Turno` | `orari_settimanali` | Metodi `supera_mezzanotte()` e `intervallo(data)`, che restituisce inizio e fine del turno come date e ore complete per una data precisa (con la fine nel giorno dopo se il turno supera la mezzanotte) |
 | `Impostazioni` | `impostazioni` | Metodo `link_maps()`, che costruisce il link a Google Maps dall'indirizzo |
 
-Oltre ai modelli delle tabelle c'è `StatoApertura` (`@dataclass`, senza tabella): il risultato del calcolo "aperto ora", con `aperto` (sì/no), il turno in corso e la `prossima_apertura`. La home lo riceve già pronto e si limita a mostrarlo.
+Oltre ai modelli delle tabelle c'è `StatoApertura` (`@dataclass`, senza tabella): il risultato del calcolo "aperto ora", con `aperto` (sì/no), il turno in corso e la `prossima_apertura`. La home e la pagina Orari e contatti lo ricevono già pronto e si limitano a mostrarlo.
 
 Non ci sono sottoclassi: c'è un solo ruolo e le voci di tutte le categorie hanno gli stessi dati. Le differenze tra categorie (quali formati di prezzo sono ammessi) sono dati in `formati_prezzo`, non classi diverse. L'ereditarietà si usa solo per le eccezioni.
 
@@ -406,13 +410,15 @@ smashbroski/
 │   ├── servizi/           # regole di business
 │   ├── rotte/             # Blueprint, uno per area
 │   ├── templates/         # pagine Jinja
-│   ├── static/            # CSS, logo in WebP, favicon
+│   ├── static/            # CSS, js/navbar.js, immagini WebP (logo, foto dell'hero, motivo dello sfondo)
 │   ├── eccezioni.py
 │   ├── comandi.py         # comandi da terminale (flask crea-proprietario)
 │   └── db.py              # connessione a MySQL
 ├── database/
 │   ├── schema.sql         # creazione delle tabelle
 │   └── dati_iniziali.sql  # menù, orari e impostazioni della sezione 4
+├── strumenti/
+│   └── prepara_immagini.py # Pillow, solo sviluppo: originali → WebP
 ├── tests/
 ├── docs/
 ├── DEVLOG.md
@@ -428,13 +434,15 @@ Ogni Blueprint ha un prefisso nell'URL; quello riservato ha un controllo in `bef
 
 | Blueprint | Prefisso | Accesso | Rotte |
 |---|---|---|---|
-| `pubblico` | `/` | Tutti | `/` home, `/menu` menù, `/privacy` privacy e cookie |
+| `pubblico` | `/` | Tutti | `/` home, `/menu` menù, `/info` orari e contatti, `/privacy` privacy e cookie |
 | `auth` | `/auth` | Tutti | `/auth/login` (GET e POST), `/auth/logout` (solo POST) |
 | `proprietario` | `/proprietario` | Solo proprietario con account attivo | `/proprietario/` elenco delle voci per categoria; `/proprietario/voci/nuova`; `/proprietario/voci/<id>` modifica; `/proprietario/voci/<id>/visibilita` nascondi o rimostra (POST); `/proprietario/orari` calendario settimanale |
 
 Un visitatore non loggato che apre una rotta di `proprietario` viene mandato al login. Con un solo ruolo non esiste il caso "ruolo sbagliato" (403).
 
 Il menù pubblico è una sola pagina scritta dal server: l'indice in cima usa link interni (`#burger`), che funzionano senza JavaScript e senza ricaricare la pagina. Per questo non uso HTMX né un filtro in JavaScript (RNF-05, RNF-08).
+
+L'unico JavaScript del sito è `static/js/navbar.js`: pulsante a tre linee della navbar sotto i 900 px e ora di Pompei con sole o luna. È un file del sito (CSP `script-src 'self'`, nessuno script in linea); senza JavaScript le pagine restano complete, con le voci nella barra e senza ora.
 
 ### Application factory
 

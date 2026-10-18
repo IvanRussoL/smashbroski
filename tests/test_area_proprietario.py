@@ -95,9 +95,9 @@ def test_salva_orari(client_proprietario, database_modificato):
         "fine": ["23:00", "", "", "15:00"],
     })
     assert risposta.status_code == 302
-    home = html(client_proprietario.get("/"))
-    assert "19:00–23:00" in home
-    assert "18:00–01:00" not in home
+    info = html(client_proprietario.get("/info"))  # gli orari sono nella pagina Orari e contatti
+    assert "19:00–23:00" in info
+    assert "18:00–01:00" not in info
 
 
 def test_orari_sovrapposti_rifiutati(client_proprietario):
@@ -108,7 +108,7 @@ def test_orari_sovrapposti_rifiutati(client_proprietario):
     pagina = html(risposta)
     assert "Turni sovrapposti: domenica 18:00-02:00 e lunedì 01:00-03:00." in pagina
     assert 'type="time" value="03:00"' in pagina  # il modulo tiene i dati scritti
-    assert "18:00–01:00" in html(client_proprietario.get("/"))  # orari invariati
+    assert "18:00–01:00" in html(client_proprietario.get("/info"))  # orari invariati
 
 
 # --- Comando da terminale ---

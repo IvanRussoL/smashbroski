@@ -84,6 +84,24 @@ def menu():
     )
 
 
+@bp.get("/info")
+def info():
+    """
+    Orari della settimana e contatti, con il giorno di oggi evidenziato.
+    """
+    impostazioni = _impostazioni()
+    servizio = OrariService(ottieni_connessione())
+    adesso = ora_attuale(impostazioni.fuso_orario)
+    return render_template(
+        "info.html",
+        impostazioni=impostazioni,
+        stato=servizio.stato_apertura(adesso),
+        adesso=adesso,
+        oggi=adesso.isoweekday(),
+        orari=_orari_per_giorno(servizio.leggi_turni()),
+    )
+
+
 @bp.get("/privacy")
 def privacy():
     return render_template("privacy.html", impostazioni=_impostazioni())

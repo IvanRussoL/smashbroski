@@ -4,7 +4,7 @@ from app import create_app
 from app.sicurezza import CONTENT_SECURITY_POLICY
 
 
-@pytest.mark.parametrize("indirizzo", ["/", "/menu", "/privacy", "/pagina-inesistente"])
+@pytest.mark.parametrize("indirizzo", ["/", "/menu", "/info", "/privacy", "/pagina-inesistente"])
 def test_header_sicurezza(client, indirizzo):
     header = client.get(indirizzo).headers
     assert header["Content-Security-Policy"] == CONTENT_SECURITY_POLICY

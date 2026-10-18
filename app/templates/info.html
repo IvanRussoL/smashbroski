@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block titolo %}Orari e contatti – SmashBroski Pompei, hamburgeria a Pompei{% endblock %}
+{% block descrizione %}Orari di apertura, indirizzo e contatti di SmashBroski Pompei, hamburgeria in Vico dei Paninari a Pompei.{% endblock %}
+
+{% block contenuto %}
+{% include "_sfondo_loghi.html" %}
+<div class="pagina-info">
+    <h1>Orari e contatti</h1>
+    <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
+
+    <div class="sezioni-info">
+        <section id="orari" class="sezione">
+            <h2>Orari</h2>
+            <dl class="orari">
+                {% for giorno in orari %}
+                <div class="orari-giorno{% if giorno.numero == oggi %} oggi{% endif %}">
+                    <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} (oggi)</strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
+                    <dd>
+                        {%- if giorno.turni -%}
+                        {% for turno in giorno.turni %}<span class="turno">{{ turno.ora_inizio|ora }}–{{ turno.ora_fine|ora }}</span>{% if not loop.last %} · {% endif %}{% endfor %}
+                        {%- else -%}
+                        Chiuso
+                        {%- endif -%}
+                    </dd>
+                </div>
+                {% endfor %}
+            </dl>
+        </section>
+
+        <section id="contatti" class="sezione">
+            <h2>Contatti</h2>
+            <ul class="contatti">
+                <li>
+                    Telefono: <a href="tel:{{ impostazioni.telefono }}">{{ impostazioni.telefono|telefono_leggibile }}</a>
+                    {% if impostazioni.telefono_di_prova %}<span class="segnaposto">(numero di prova)</span>{% endif %}
+                </li>
+                <li>Email: <a href="mailto:{{ impostazioni.email }}">{{ impostazioni.email }}</a></li>
+                <li>
+                    Indirizzo: {{ impostazioni.indirizzo }}
+                    <a href="{{ impostazioni.link_maps() }}" rel="noopener">Apri in Google Maps</a>
+                </li>
+                <li class="social">
+                    <a href="{{ impostazioni.url_facebook }}" rel="noopener">Facebook</a>
+                    <a href="{{ impostazioni.url_instagram }}" rel="noopener">Instagram</a>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
+{% endblock %}

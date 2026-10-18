@@ -81,6 +81,13 @@ def test_menu_pubblico_25_voci_in_ordine_di_posizione(connessione):
         assert [v.posizione for v in categoria.voci] == sorted(v.posizione for v in categoria.voci)
 
 
+def test_starters_straccetti_prima_delle_patatine(connessione):
+    # La voce con i formati 5 pz e 10 pz viene per prima, sotto l'intestazione delle colonne.
+    assert nomi_voci(MenuService(connessione).menu_pubblico(), STARTERS) == [
+        "Straccetti di pollo", "Patatine stick", "Patatine stick bacon & cheese",
+    ]
+
+
 def test_menu_pubblico_esclude_voci_nascoste(connessione):
     servizio = MenuService(connessione)
     servizio.imposta_visibilita(SMASH_BURGER, False)

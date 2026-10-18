@@ -11,30 +11,85 @@
 <body class="{% block classe_pagina %}pagina-interna{% endblock %}">
     <a class="salta-al-contenuto" href="#contenuto">Vai al contenuto</a>
     <header class="navbar">
+        <span class="navbar-marchio" aria-hidden="true">SmashBroski<br>Pompei</span>
         <a class="navbar-logo" href="{{ url_for('pubblico.home') }}">
             <img src="{{ url_for('static', filename='img/logo-navbar.webp') }}" width="96" height="85" alt="SmashBroski Pompei, vai alla home">
         </a>
-        <nav aria-label="Principale">
-            <ul class="navbar-link">
+        <nav class="navbar-nav" aria-label="Principale">
+            <p class="navbar-ora" data-fuso="{{ impostazioni.fuso_orario if impostazioni else 'Europe/Rome' }}" hidden>
+                <svg class="icona-sole" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="4.2"/>
+                    <path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>
+                </svg>
+                <svg class="icona-luna" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                    <path d="M20 14.6A8.3 8.3 0 0 1 9.4 4a8.3 8.3 0 1 0 10.6 10.6z"/>
+                </svg>
+                <span class="visivamente-nascosto">Ora a Pompei:</span>
+                <span class="navbar-ora-valore"></span>
+            </p>
+            <button class="navbar-pulsante" type="button" aria-expanded="false" aria-controls="navbar-voci" aria-label="Navigazione">
+                <span class="navbar-linee" aria-hidden="true"><span></span><span></span><span></span></span>
+            </button>
+            <ul id="navbar-voci" class="navbar-link">
                 <li><a href="{{ url_for('pubblico.menu') }}"{% if request.endpoint == 'pubblico.menu' %} aria-current="page"{% endif %}>Menù</a></li>
-                <li><a href="{{ url_for('pubblico.home') }}#orari">Orari</a></li>
-                <li><a href="{{ url_for('pubblico.home') }}#contatti">Contatti</a></li>
+                <li><a href="{{ url_for('pubblico.info') }}"{% if request.endpoint == 'pubblico.info' %} aria-current="page"{% endif %}>Orari e contatti</a></li>
             </ul>
         </nav>
     </header>
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
 
     <main id="contenuto">
         {% block contenuto %}{% endblock %}
     </main>
 
+    {% if impostazioni %}
+    {# Prima fascia del footer: continua il blu notte in fondo all'hero, così la foto sfuma senza stacco. #}
+    <section class="footer-dove" aria-labelledby="titolo-dove">
+        <div class="footer-dove-contenuto">
+            <div>
+                <h2 id="titolo-dove" class="etichetta-footer">Dove siamo</h2>
+                <p class="footer-indirizzo">{{ impostazioni.indirizzo }}</p>
+            </div>
+            <a class="pulsante-footer" href="{{ impostazioni.link_maps() }}" rel="noopener">Come arrivare</a>
+        </div>
+    </section>
+    {% endif %}
+
     <footer class="footer">
-        {% if impostazioni %}
-        <p>{{ impostazioni.nome_locale }} · {{ impostazioni.indirizzo }}</p>
-        {% else %}
-        <p>SmashBroski Pompei</p>
-        {% endif %}
-        <p><a href="{{ url_for('pubblico.privacy') }}">Privacy e cookie</a> · © {{ anno }}</p>
-        {% block crediti %}{% endblock %}
+        <div class="footer-contenuto">
+            <div class="footer-marchio">
+                <img src="{{ url_for('static', filename='img/logo-hero.webp') }}" width="480" height="427" alt="SmashBroski Pompei" loading="lazy">
+                <p>Hamburgeria a Pompei</p>
+            </div>
+            <nav class="footer-colonne" aria-label="Piè di pagina">
+                <div>
+                    <h2 class="etichetta-footer">Il locale</h2>
+                    <ul>
+                        <li><a href="{{ url_for('pubblico.menu') }}">Menù</a></li>
+                        <li><a href="{{ url_for('pubblico.info') }}">Orari e contatti</a></li>
+                    </ul>
+                </div>
+                {% if impostazioni %}
+                <div>
+                    <h2 class="etichetta-footer">Seguici</h2>
+                    <ul>
+                        <li><a href="{{ impostazioni.url_facebook }}" rel="noopener">Facebook</a></li>
+                        <li><a href="{{ impostazioni.url_instagram }}" rel="noopener">Instagram</a></li>
+                    </ul>
+                </div>
+                {% endif %}
+                <div>
+                    <h2 class="etichetta-footer">Informazioni</h2>
+                    <ul>
+                        <li><a href="{{ url_for('pubblico.privacy') }}">Privacy e cookie</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="footer-fondo">
+            <p>© {{ anno }} {{ impostazioni.nome_locale if impostazioni else "SmashBroski Pompei" }}</p>
+            {% block crediti %}{% endblock %}
+        </div>
     </footer>
 </body>
 </html>

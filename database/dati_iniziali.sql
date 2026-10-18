@@ -51,10 +51,11 @@ INSERT INTO formati_prezzo (id, categoria_id, etichetta, posizione) VALUES
 
 -- Le 25 voci. I nomi sono in maiuscolo/minuscolo normale: il maiuscolo del PDF lo applica il CSS.
 INSERT INTO voci_menu (id, categoria_id, nome, descrizione, edizione, nota, posizione) VALUES
-    -- Starters
-    (1,  1, 'Patatine stick',                 NULL, NULL, NULL, 1),
-    (2,  1, 'Patatine stick bacon & cheese',  NULL, NULL, NULL, 2),
-    (3,  1, 'Straccetti di pollo',            'Pollo croccante ricetta bro', NULL, NULL, 3),
+    -- Starters: prima gli Straccetti, che hanno i formati 5 pz e 10 pz, così l'intestazione
+    -- delle colonne sta subito sopra di loro e non sembra riferita alle patatine (prezzo unico).
+    (1,  1, 'Patatine stick',                 NULL, NULL, NULL, 2),
+    (2,  1, 'Patatine stick bacon & cheese',  NULL, NULL, NULL, 3),
+    (3,  1, 'Straccetti di pollo',            'Pollo croccante ricetta bro', NULL, NULL, 1),
     -- Salad
     (4,  2, 'Italian salad', 'Insalata, rucola, pollo alla griglia, pomodorini, scaglie di Parmigiano, crostini', NULL, NULL, 1),
     (5,  2, 'Rocket Salad',  'Insalata, rucola, pollo alla griglia, noci, speck, crostini', NULL, NULL, 2),

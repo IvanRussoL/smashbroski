@@ -368,15 +368,41 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .blocco-info :focus-visible { outline-color: var(--blu-scuro); }
 .blocco-arrivare :focus-visible, .blocco-contatti :focus-visible { outline-color: var(--crema); }
 
-/* Riquadro dello stato come mini-hero (stile Habita79): foto a tutto riquadro, velo scuro dal basso,
-   nome, indirizzo e stato sopra. Da chiuso la foto si spegne: meno colori e più scura. */
-.blocco-stato { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: flex-end; min-height: 340px; padding: 1.25rem; color: var(--crema); background: var(--blu-scuro); }
-.stato-foto, .stato-foto img { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
-.stato-foto img { object-fit: cover; object-position: center; transition: filter 0.6s ease; }
-.locale-chiuso .stato-foto img { filter: grayscale(0.85) brightness(0.55); }
-.blocco-stato::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(18, 28, 40, 0.85) 0%, rgba(18, 28, 40, 0.45) 55%, rgba(18, 28, 40, 0.1) 100%); }
+/* Riquadro dello stato come insegna al neon: fondo blu scuro, APERTO / CHIUSO grande in alto,
+   nome, indirizzo e stato in basso. Da aperto l'insegna è accesa (bagliore rosso), da chiuso è spenta. */
+.blocco-stato {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 300px;
+    padding: 1.25rem;
+    color: var(--crema);
+    background: radial-gradient(ellipse at 50% 20%, #2A4F6E 0%, var(--blu-scuro) 70%);
+}
+.insegna {
+    margin: 0;
+    font-family: var(--titolo);
+    font-size: clamp(4.5rem, 24vw, 8.5rem);
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 250, 240, 0.3);
+}
+.locale-aperto .insegna {
+    color: #FFE6EC;
+    -webkit-text-stroke: 0;
+    text-shadow: 0 0 2px #fff, 0 0 8px #FF3D6E, 0 0 18px var(--rosso), 0 0 36px var(--rosso), 0 0 60px rgba(176, 12, 54, 0.8);
+    animation: accensione 1.4s ease-out 0.3s both;
+}
+/* Si accende una volta sola all'apertura della pagina, con due sfarfallii come un vero neon. */
+@keyframes accensione {
+    0%, 18%, 26%, 44% { opacity: 0.15; }
+    20%, 24%, 46%, 100% { opacity: 1; }
+}
 .stato-testo { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
-.info-locale { margin: 0; font-family: var(--titolo); font-size: clamp(2rem, 8vw, 3rem); line-height: 1; text-transform: uppercase; letter-spacing: 0.02em; }
+.info-locale { margin: 0; font-family: var(--titolo); font-size: clamp(1.6rem, 6vw, 2.2rem); line-height: 1; text-transform: uppercase; letter-spacing: 0.02em; }
 .info-indirizzo { margin: 0; font-weight: 600; }
 .blocco-stato .info-indirizzo { margin: 0 0 0.4rem; font-size: 1.05rem; letter-spacing: 0.04em; font-weight: 500; }
 
@@ -393,7 +419,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pagina-info .stato-apertura::before { background: var(--rosso); }
 .pagina-info .stato-apertura.aperto { background: #D9F2E2; }
 .pagina-info .stato-apertura.aperto::before { background: #17633A; }
-/* Nel mini-hero l'etichetta è chiara su foto scura. */
+/* Sull'insegna l'etichetta è chiara su fondo scuro. */
 .pagina-info .blocco-stato .stato-apertura { background: rgba(255, 250, 240, 0.14); border: 1px solid rgba(255, 250, 240, 0.45); color: var(--crema); }
 .pagina-info .blocco-stato .stato-apertura.aperto::before { background: #5DD37E; }
 .pagina-info .blocco-stato .stato-apertura.chiuso::before { background: #F2B33D; }
@@ -454,7 +480,24 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .orari-giorno:last-child { border-bottom: 0; }
 .orari dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
+/* Righe a strisce rosse e crema come la tenda del locale; oggi in blu scuro con il bollino "oggi". */
+.orari-giorno:nth-child(even) { background: var(--rosso); color: var(--crema); border-bottom-color: var(--rosso); }
+.orari-giorno:nth-child(odd) { background: var(--crema); }
 .orari-giorno.oggi { background: var(--blu-scuro); color: var(--crema); font-weight: 700; }
+.bollino-oggi {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0.1rem 0.5rem;
+    border: 2px solid var(--crema);
+    border-radius: 6px;
+    background: var(--rosso);
+    font-family: var(--titolo);
+    font-weight: 400;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transform: rotate(-4deg);
+}
 .info-indirizzo-esteso { margin: 0 0 1rem; font-size: 1.25rem; font-weight: 700; }
 
 /* Contatti: tessere crema sul blocco blu, una sotto l'altra su telefono. */
@@ -870,7 +913,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 @media (min-width: 768px) {
     .sezioni-info { grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .blocco-stato { min-height: 380px; padding: 2rem 2.25rem; }
+    .blocco-stato { min-height: 320px; padding: 2rem 2.25rem; }
     .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .azioni-info { max-width: 36rem; }
 }
@@ -978,5 +1021,5 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .navbar-linee span, .js .navbar-link, .js .navbar-link li { transition: none !important; }
     .fila-loghi { animation: none; }
     .azione-info { transition: none; }
-    .stato-foto img { transition: none; }
+    .locale-aperto .insegna { animation: none; }
 }

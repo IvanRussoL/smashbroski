@@ -278,3 +278,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Aperto / chiuso**: stessa classe `locale-aperto` / `locale-chiuso` di prima. Da chiuso la foto perde i colori e si scurisce (`filter`, transizione di 0,6 s, niente transizione con "riduci movimento").
 - **Foto provvisoria**: è la stessa foto di lavoro della hero (Mathias Reding, Pexels), versione verticale su telefono e orizzontale da 768 px, caricata in modo lazy. Una foto dell'esterno da Pexels non si è potuta scaricare (rete bloccata nell'ambiente di lavoro): da sostituire con una foto scelta da Ivan o scattata da lui, con il permesso di pubblicarla. Le foto di `foto_smash` restano solo riferimento.
 - **Test**: `test_info_mini_hero_segue_lo_stato` al posto del test sulla facciata. 189 test superati (MariaDB con schema adattato; da rilanciare su MySQL 8).
+
+## 2026-10-21 · Fase 2 – Insegna al neon e orari a strisce (in prova)
+
+- **Foto accantonata da Ivan**: niente foto né video per ora. Tolta la mini-hero e il credito della foto; si gioca con i colori del sito. Proposti 5 modi, Ivan ha scelto di provare l'insegna al neon e gli orari a strisce e deciderà se tenerli. Il giallo cheddar come quarto colore è scartato per ora (pagina troppo colorata), ma resta un'idea.
+- **Insegna al neon nel riquadro dello stato**: fondo blu scuro e APERTO / CHIUSO grande in Anton. Da aperto è accesa con bagliore rosso e si accende una volta con due sfarfallii (niente animazione con "riduci movimento"); da chiuso è spenta, solo il contorno. L'insegna è `aria-hidden`: lo stato vero resta nell'etichetta sotto.
+- **Orari a strisce come la tenda**: righe alternate rosse e crema, oggi in blu scuro con il bollino rosso "OGGI" ruotato al posto di "(oggi)".
+- **Test**: `test_info_insegna_segue_lo_stato` e il bollino in `test_info_oggi_evidenziato`. 189 test superati.

@@ -10,14 +10,10 @@
         <h1>Orari e contatti</h1>
     </div>
 
-    {# Mini-hero come Habita79: foto a tutto riquadro con velo scuro, indirizzo e stato sopra.
-       Da chiuso la foto si spegne (più scura e senza colori). Foto di lavoro: la stessa dell'hero,
-       da sostituire con una foto dell'esterno del locale con il permesso di pubblicarla. #}
+    {# Insegna al neon: fondo blu scuro e APERTO / CHIUSO grande. Da aperto è accesa in rosso,
+       da chiuso è spenta (solo il contorno). Il testo vero dello stato resta sotto, l'insegna è decorativa. #}
     <section class="blocco-info blocco-stato {{ 'locale-aperto' if stato.aperto else 'locale-chiuso' }}" aria-label="Dove siamo e stato del locale">
-        <picture class="stato-foto">
-            <source media="(min-width: 768px)" srcset="{{ url_for('static', filename='img/hero-orizzontale-piccola.webp') }}" width="1280" height="720">
-            <img src="{{ url_for('static', filename='img/hero-verticale.webp') }}" width="900" height="1600" alt="" loading="lazy">
-        </picture>
+        <p class="insegna" aria-hidden="true">{{ 'Aperto' if stato.aperto else 'Chiuso' }}</p>
         <div class="stato-testo">
             <p class="info-locale">{{ impostazioni.nome_locale }}</p>
             <p class="info-indirizzo">{{ impostazioni.indirizzo }}</p>
@@ -53,7 +49,7 @@
             <dl class="orari">
                 {% for giorno in orari %}
                 <div class="orari-giorno{% if giorno.numero == oggi %} oggi{% endif %}">
-                    <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} (oggi)</strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
+                    <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} <span class="bollino-oggi">oggi</span></strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
                     <dd>
                         {%- if giorno.turni -%}
                         {% for turno in giorno.turni %}<span class="turno">{{ turno.ora_inizio|ora }}–{{ turno.ora_fine|ora }}</span>{% if not loop.last %} · {% endif %}{% endfor %}
@@ -99,6 +95,3 @@
 </div>
 {% endblock %}
 
-{% block crediti %}
-<p class="crediti">Foto di lavoro: Mathias Reding, Pexels.</p>
-{% endblock %}

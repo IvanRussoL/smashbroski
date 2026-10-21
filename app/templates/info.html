@@ -10,13 +10,20 @@
         <h1>Orari e contatti</h1>
     </div>
 
-    <div class="blocco-info blocco-stato {{ 'locale-aperto' if stato.aperto else 'locale-chiuso' }}">
-        {% include "_facciata.html" %}
+    {# Mini-hero come Habita79: foto a tutto riquadro con velo scuro, indirizzo e stato sopra.
+       Da chiuso la foto si spegne (più scura e senza colori). Foto di lavoro: la stessa dell'hero,
+       da sostituire con una foto dell'esterno del locale con il permesso di pubblicarla. #}
+    <section class="blocco-info blocco-stato {{ 'locale-aperto' if stato.aperto else 'locale-chiuso' }}" aria-label="Dove siamo e stato del locale">
+        <picture class="stato-foto">
+            <source media="(min-width: 768px)" srcset="{{ url_for('static', filename='img/hero-orizzontale-piccola.webp') }}" width="1280" height="720">
+            <img src="{{ url_for('static', filename='img/hero-verticale.webp') }}" width="900" height="1600" alt="" loading="lazy">
+        </picture>
         <div class="stato-testo">
-            <p class="info-indirizzo">{{ impostazioni.nome_locale }} · {{ impostazioni.indirizzo }}</p>
+            <p class="info-locale">{{ impostazioni.nome_locale }}</p>
+            <p class="info-indirizzo">{{ impostazioni.indirizzo }}</p>
             <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
         </div>
-    </div>
+    </section>
 
     {# Le tre azioni più usate da telefono, grandi e subito sotto lo stato. #}
     <ul class="azioni-info">
@@ -90,4 +97,8 @@
         </dl>
     </section>
 </div>
+{% endblock %}
+
+{% block crediti %}
+<p class="crediti">Foto di lavoro: Mathias Reding, Pexels.</p>
 {% endblock %}

@@ -271,3 +271,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Persone fuori dall'SVG**: la prima versione le animava dentro l'SVG e lo scroll della pagina scendeva a 41-46 fps con la CPU rallentata 20 volte (52-57 senza facciata). Ora ogni persona è un `<div>` largo quanto il riquadro che si sposta solo con `transform` e `opacity` (`will-change`): 52-53 fps, come senza facciata. Si fermano durante lo scroll (classe `scorrendo`) e con "riduci movimento" non compaiono.
 - **Impaginazione**: su telefono facciata in alto e testo sotto; da 768 px facciata su tutto il riquadro e testo a sinistra, largo al massimo 15,5 rem per non coprire la vetrina.
 - **Test**: `test_info_facciata_segue_lo_stato` (martedì 10:00 chiuso, mercoledì 13:00 aperto). 189 test superati.
+
+## 2026-10-21 · Fase 2 – Mini-hero con foto al posto della facciata
+
+- **La facciata disegnata non è piaciuta a Ivan**: voleva uno sfondo realistico come Habita79. Il riquadro "indirizzo e stato" diventa una mini-hero: foto a tutto riquadro, velo scuro dal basso, nome del locale in Anton, indirizzo e stato in crema sopra. Tolti `_facciata.html` e le persone animate (e il CSS relativo).
+- **Aperto / chiuso**: stessa classe `locale-aperto` / `locale-chiuso` di prima. Da chiuso la foto perde i colori e si scurisce (`filter`, transizione di 0,6 s, niente transizione con "riduci movimento").
+- **Foto provvisoria**: è la stessa foto di lavoro della hero (Mathias Reding, Pexels), versione verticale su telefono e orizzontale da 768 px, caricata in modo lazy. Una foto dell'esterno da Pexels non si è potuta scaricare (rete bloccata nell'ambiente di lavoro): da sostituire con una foto scelta da Ivan o scattata da lui, con il permesso di pubblicarla. Le foto di `foto_smash` restano solo riferimento.
+- **Test**: `test_info_mini_hero_segue_lo_stato` al posto del test sulla facciata. 189 test superati (MariaDB con schema adattato; da rilanciare su MySQL 8).

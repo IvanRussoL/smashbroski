@@ -10,9 +10,12 @@
         <h1>Orari e contatti</h1>
     </div>
 
-    <div class="blocco-info blocco-stato">
-        <p class="info-indirizzo">{{ impostazioni.nome_locale }} · {{ impostazioni.indirizzo }}</p>
-        <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
+    <div class="blocco-info blocco-stato {{ 'locale-aperto' if stato.aperto else 'locale-chiuso' }}">
+        {% include "_facciata.html" %}
+        <div class="stato-testo">
+            <p class="info-indirizzo">{{ impostazioni.nome_locale }} · {{ impostazioni.indirizzo }}</p>
+            <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
+        </div>
     </div>
 
     {# Le tre azioni più usate da telefono, grandi e subito sotto lo stato. #}

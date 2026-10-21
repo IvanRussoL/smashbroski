@@ -368,7 +368,75 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .blocco-info :focus-visible { outline-color: var(--blu-scuro); }
 .blocco-arrivare :focus-visible, .blocco-contatti :focus-visible { outline-color: var(--crema); }
 
-.blocco-stato { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.25rem; }
+/* Riquadro dello stato con la facciata disegnata del locale come sfondo (_facciata.html).
+   Telefono: facciata in alto, testo sotto; da 768 px facciata su tutto il riquadro e testo a sinistra. */
+.blocco-stato {
+    position: relative;
+    overflow: hidden;
+    padding: 190px 0.75rem 0.75rem;
+    background: #CFE6F7;
+}
+.facciata { position: absolute; top: 0; left: 0; width: 100%; height: 210px; }
+.stato-testo {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
+    background: var(--crema);
+    border: 3px solid var(--blu-scuro);
+    border-radius: 12px;
+}
+.facciata-cielo { fill: #CFE6F7; }
+.facciata-marciapiede { fill: #D9CBB0; }
+.facciata-bordo-strada { stroke: var(--blu-scuro); stroke-width: 4; }
+.facciata-muro { fill: var(--crema-scura); stroke: var(--blu-scuro); stroke-width: 4; }
+.facciata-insegna { fill: var(--rosso); stroke: var(--blu-scuro); stroke-width: 4; }
+.facciata-scritta { fill: var(--crema); font-family: var(--titolo); font-size: 32px; letter-spacing: 3px; }
+.facciata-tenda rect { fill: var(--rosso); }
+.facciata-tenda .striscia-chiara { fill: var(--crema); }
+.facciata-vetrina, .facciata-interno { fill: #FFD27A; stroke: var(--blu-scuro); stroke-width: 4; transition: fill 0.6s ease; }
+.facciata-bancone { stroke: var(--blu-scuro); stroke-width: 6; opacity: 0.35; }
+.facciata-porta { fill: var(--blu); stroke: var(--blu-scuro); stroke-width: 4; }
+.facciata-vetro-porta { fill: #CFE6F7; stroke: var(--blu-scuro); stroke-width: 3; }
+.facciata-maniglia { fill: var(--crema); stroke: var(--blu-scuro); stroke-width: 2; }
+.facciata-telaio { fill: none; stroke: var(--blu-scuro); stroke-width: 5; }
+.facciata-cartello rect { fill: var(--crema); stroke: var(--blu-scuro); stroke-width: 2; }
+.facciata-cartello text { fill: var(--rosso); font-family: var(--titolo); font-size: 13px; letter-spacing: 1px; }
+/* L'anta gira sul cardine sinistro: aperta è quasi di taglio, chiusa copre l'ingresso. */
+.facciata-anta { transform-box: fill-box; transform-origin: left center; transition: transform 0.8s ease; }
+.locale-aperto .facciata-anta { transform: scaleX(0.18); }
+.locale-aperto .facciata-cartello { display: none; }
+.locale-chiuso .facciata-vetrina, .locale-chiuso .facciata-interno { fill: #2E4A63; }
+.locale-chiuso .facciata-vetro-porta { fill: #2E4A63; }
+.locale-chiuso .persone { display: none; }
+
+/* Persone che camminano fino alla porta (al centro della facciata) ed entrano. Ogni cammino è largo
+   quanto il riquadro e si sposta con transform: si muove solo un livello, la facciata non si ridisegna. */
+.persone { position: absolute; top: 0; left: 0; width: 100%; height: 210px; overflow: hidden; pointer-events: none; }
+.cammino { position: absolute; inset: 0; opacity: 0; will-change: transform, opacity; animation: entra-da-sinistra 9s linear infinite; }
+.persona { position: absolute; left: 50%; bottom: 27px; width: 20px; height: 39px; margin-left: -10px; stroke: var(--blu-scuro); stroke-width: 3; }
+.cammino-1 .persona { fill: var(--blu); }
+.cammino-2 { animation-name: entra-da-destra; animation-duration: 11s; animation-delay: 3s; }
+.cammino-2 .persona { fill: var(--rosso); }
+.cammino-3 { animation-duration: 10s; animation-delay: 6s; }
+.cammino-3 .persona { fill: #F2B33D; }
+@keyframes entra-da-sinistra {
+    0% { transform: translateX(-55%); opacity: 0; }
+    6% { opacity: 1; }
+    82% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(0); opacity: 0; }
+}
+@keyframes entra-da-destra {
+    0% { transform: translateX(55%); opacity: 0; }
+    6% { opacity: 1; }
+    82% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(0); opacity: 0; }
+}
+.scorrendo .cammino { animation-play-state: paused; }
+
+.info-indirizzo { margin: 0; font-weight: 600; }
 .info-indirizzo { margin: 0; font-weight: 600; }
 
 /* Stato come etichetta a bordo spesso: verde chiaro se aperto, rosa se chiuso, sempre con il testo. */
@@ -857,6 +925,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 @media (min-width: 768px) {
     .sezioni-info { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .blocco-stato { min-height: 260px; padding: 1.25rem; display: flex; align-items: center; }
+    .facciata, .persone { height: 100%; }
+    .persona { bottom: 34px; width: 26px; height: 50px; margin-left: -13px; }
+    .stato-testo { max-width: 15.5rem; }
     .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .azioni-info { max-width: 36rem; }
 }
@@ -964,4 +1036,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .navbar-linee span, .js .navbar-link, .js .navbar-link li { transition: none !important; }
     .fila-loghi { animation: none; }
     .azione-info { transition: none; }
+    .persone { display: none; }
+    .facciata-anta, .facciata-vetrina, .facciata-interno { transition: none; }
 }

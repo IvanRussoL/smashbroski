@@ -126,6 +126,15 @@ def test_info_oggi_evidenziato(client, ora_fissa):
     assert pagina.count('class="orari-giorno oggi"') == 1
 
 
+def test_info_facciata_segue_lo_stato(client, ora_fissa):
+    ora_fissa(2026, 10, 20, 10)  # martedì 10:00: chiuso
+    pagina = html(client.get("/info"))
+    assert "blocco-stato locale-chiuso" in pagina
+    assert '<svg class="facciata"' in pagina and 'aria-hidden="true"' in pagina
+    ora_fissa(2026, 10, 21, 13)  # mercoledì 13:00: aperto
+    assert "blocco-stato locale-aperto" in html(client.get("/info"))
+
+
 def test_info_azioni_rapide(client):
     pagina = html(client.get("/info"))
     azioni = re.search(r'<ul class="azioni-info">(.*?)</ul>', pagina, re.S).group(1)

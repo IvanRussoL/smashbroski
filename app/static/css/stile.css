@@ -567,7 +567,12 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     text-decoration: none;
     white-space: nowrap;
 }
-.indice a:hover { background: var(--rosso); color: var(--crema); }
+/* Categoria che si sta guardando (aria-current, da static/js/indice.js). L'hover solo con il mouse:
+   sui telefoni il tocco lascerebbe la pillola rossa anche dopo, come se fosse ancora quella attiva. */
+.indice a[aria-current] { background: var(--rosso); color: var(--crema); }
+@media (hover: hover) {
+    .indice a:hover { background: var(--rosso); color: var(--crema); }
+}
 
 /* Nastro decorativo inclinato. */
 .nastro {
@@ -625,8 +630,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--accento);
-    /* Il link dell'indice porta qui: il blocco resta visibile sotto navbar e indice. */
-    scroll-margin-top: calc(var(--ingombro-navbar) + 6rem);
+    /* Il link dell'indice porta qui. Lo spazio della navbar lo toglie già scroll-padding-top
+       dell'html: qui si aggiunge solo l'indice fisso, così il bordo del blocco arriva appena sotto le pillole
+       (prima navbar contata due volte: il blocco atterrava circa 85 px più in basso). */
+    scroll-margin-top: 6.25rem;
 }
 .cat-burger h2 { font-size: 4.2rem; text-shadow: 4px 4px 0 var(--blu-scuro); }
 

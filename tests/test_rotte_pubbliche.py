@@ -160,6 +160,13 @@ def test_menu_struttura(client):
     assert 'aria-current="page"' in pagina
 
 
+def test_menu_indice_senza_torna_indice(client):
+    pagina = html(client.get("/menu"))
+    assert 'src="/static/js/indice.js"' in pagina  # evidenzia la categoria al tocco e durante lo scroll
+    assert "Torna all'indice" not in pagina
+    assert 'href="#indice"' not in pagina
+
+
 def test_menu_prezzi_e_formati(client):
     pagina = html(client.get("/menu"))
     smash = pagina.split("Smash Burger</span>")[1].split("</article>")[0]

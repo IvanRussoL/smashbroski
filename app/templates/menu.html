@@ -18,6 +18,7 @@
             {% endfor %}
         </ul>
     </nav>
+    <script src="{{ url_for('static', filename='js/indice.js') }}" defer></script>
 
     {# Nastro decorativo come le strisce adesive dello street food: nascosto ai lettori di schermo. #}
     <div class="nastro" aria-hidden="true">{% for _ in range(8) %}<span>Smash ★ Bro ★ Pompei ★</span> {% endfor %}</div>

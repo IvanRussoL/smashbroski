@@ -8,6 +8,9 @@
 <div class="pagina-info">
     <div class="testata-info">
         <h1>Orari e contatti</h1>
+    </div>
+
+    <div class="blocco-info blocco-stato">
         <p class="info-indirizzo">{{ impostazioni.nome_locale }} · {{ impostazioni.indirizzo }}</p>
         <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
     </div>
@@ -35,7 +38,7 @@
     </ul>
 
     <div class="sezioni-info">
-        <section id="orari" class="sezione" aria-labelledby="titolo-orari">
+        <section id="orari" class="blocco-info blocco-orari" aria-labelledby="titolo-orari">
             <h2 id="titolo-orari">Orari</h2>
             <dl class="orari">
                 {% for giorno in orari %}
@@ -53,14 +56,14 @@
             </dl>
         </section>
 
-        <section id="come-arrivare" class="sezione" aria-labelledby="titolo-come-arrivare">
+        <section id="come-arrivare" class="blocco-info blocco-arrivare" aria-labelledby="titolo-come-arrivare">
             <h2 id="titolo-come-arrivare">Come arrivare</h2>
             <p class="info-indirizzo-esteso">{{ impostazioni.indirizzo }}</p>
             <a class="azione-info azione-mappa" href="{{ impostazioni.link_maps() }}" rel="noopener">Apri in Google Maps</a>
         </section>
     </div>
 
-    <section id="contatti" class="sezione-contatti" aria-labelledby="titolo-contatti">
+    <section id="contatti" class="blocco-info blocco-contatti" aria-labelledby="titolo-contatti">
         <h2 id="titolo-contatti">Contatti</h2>
         <dl class="contatti">
             <div class="contatto">

@@ -221,6 +221,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
    altrimenti il rosso schiarisce e diventa rosa. */
 .pagina-interna main { padding-top: var(--ingombro-navbar); }
 .pagina-interna .navbar { background: rgba(176, 12, 54, 0.94); }
+/* Al 94% la sfocatura del vetro non si vede, ma sopra lo sfondo animato andrebbe ricalcolata
+   a ogni fotogramma: sulle pagine interne si toglie. */
+.pagina-interna .navbar, .js .pagina-interna .navbar-link { -webkit-backdrop-filter: none; backdrop-filter: none; }
 
 /* ---------- Hero a tutto schermo con la foto del locale ---------- */
 
@@ -303,33 +306,78 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pulsante-secondario:hover { background: var(--crema); color: var(--blu-scuro); }
 .hero :focus-visible { outline-color: var(--crema); }
 
-/* ---------- Pagina Orari e contatti: "location page" con accenti brutal ---------- */
+/* ---------- Pagina Orari e contatti: blocchi-adesivo liberi sullo sfondo, come il menù ---------- */
 
-/* Bordi spessi blu notte e ombre piene senza sfocatura, come i blocchi-adesivo del menù. */
+/* Nessun pannello: titolo, stato, azioni e sezioni sono adesivi separati sopra i loghi,
+   con gli stessi bordi blu notte e le stesse ombre piene dei blocchi del menù. */
 .pagina-info {
     --titolo: "Anton", Impact, "Arial Narrow", sans-serif;
-    --bordo-info: 2px solid var(--blu-scuro);
-    --ombra-info: 4px 4px 0 var(--blu-scuro);
-    --larghezza-pannello: var(--larghezza-contenuto);
-    max-width: var(--larghezza-contenuto);
+    --bordo-info: 4px solid var(--blu-scuro);
+    --ombra-info: 7px 7px 0 var(--blu-scuro);
+    max-width: 1120px;
     margin-inline: auto;
-    padding: 1.5rem 1rem 2rem;
+    padding: 0 0.75rem 3rem;
     color: var(--blu-scuro);
 }
-.pagina-info h1, .pagina-info h2 { font-family: var(--titolo); font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; }
-.pagina-info h1 { margin: 0.5rem 0 0.5rem; font-size: clamp(2.3rem, 9vw, 4rem); line-height: 1.05; color: var(--blu-scuro); }
-.pagina-info h2 { margin: 0 0 0.75rem; font-size: 1.9rem; color: var(--rosso); }
-.testata-info { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-.info-indirizzo { margin: 0; }
+.pagina-info h2 {
+    margin: 0 0 0.75rem;
+    padding-top: 0.1em;
+    font-family: var(--titolo);
+    font-size: 2.6rem;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--accento);
+}
+
+/* Titolo su un'etichetta inclinata, come "Menù". */
+.testata-info {
+    display: inline-block;
+    margin: 1.5rem 0 1.25rem;
+    padding: 0.5rem 1rem 0.6rem;
+    background: var(--crema);
+    border: var(--bordo-info);
+    box-shadow: 6px 6px 0 var(--blu-scuro);
+    transform: rotate(-1.5deg);
+}
+.testata-info h1 {
+    margin: 0;
+    font-family: var(--titolo);
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--rosso);
+}
+
+/* Ogni sezione è un blocco-adesivo con un colore del marchio. */
+.blocco-info {
+    --fondo: var(--crema);
+    --accento: var(--rosso);
+    min-width: 0;
+    padding: 1.1rem 1rem 1.2rem;
+    background: var(--fondo);
+    color: var(--blu-scuro);
+    border: var(--bordo-info);
+    border-radius: 16px;
+    box-shadow: var(--ombra-info);
+}
+.blocco-arrivare { --fondo: var(--rosso); --accento: var(--crema); color: var(--crema); transform: rotate(0.5deg); }
+.blocco-contatti { --fondo: var(--blu); --accento: var(--crema); color: var(--crema); margin-top: 1.6rem; }
+.blocco-info :focus-visible { outline-color: var(--blu-scuro); }
+.blocco-arrivare :focus-visible, .blocco-contatti :focus-visible { outline-color: var(--crema); }
+
+.blocco-stato { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.25rem; }
+.info-indirizzo { margin: 0; font-weight: 600; }
 
 /* Stato come etichetta a bordo spesso: verde chiaro se aperto, rosa se chiuso, sempre con il testo. */
 .pagina-info .stato-apertura {
     margin: 0;
-    padding: 0.5rem 0.9rem;
-    border: var(--bordo-info);
-    border-radius: 10px;
+    padding: 0.45rem 0.9rem;
+    border: 3px solid var(--blu-scuro);
+    border-radius: 999px;
     background: #FBE1E7;
-    box-shadow: var(--ombra-info);
     color: var(--blu-scuro);
     font-weight: 700;
 }
@@ -337,12 +385,12 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pagina-info .stato-apertura.aperto { background: #D9F2E2; }
 .pagina-info .stato-apertura.aperto::before { background: #17633A; }
 
-/* Chiama, Indicazioni, Scrivi: tre pulsanti grandi che si "schiacciano" al tocco. */
+/* Chiama, Indicazioni, Scrivi: tre adesivi grandi che si "schiacciano" al tocco. */
 .azioni-info {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
-    margin: 1.75rem 0 2rem;
+    margin: 1.6rem 0;
     padding: 0;
     list-style: none;
 }
@@ -354,12 +402,12 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     gap: 0.25rem;
     min-height: 72px;
     padding: 0.6rem 0.4rem;
-    border: var(--bordo-info);
-    border-radius: 12px;
-    box-shadow: var(--ombra-info);
-    background: #fff;
+    border: 3px solid var(--blu-scuro);
+    border-radius: 14px;
+    box-shadow: 4px 4px 0 var(--blu-scuro);
+    background: var(--crema);
     color: var(--blu-scuro);
-    font-weight: 700;
+    font-weight: 800;
     text-align: center;
     text-decoration: none;
     transition: transform 0.1s ease, box-shadow 0.1s ease;
@@ -367,23 +415,21 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .azione-info svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .azione-info:hover { color: var(--blu-scuro); transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--blu-scuro); }
 .azione-info:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--blu-scuro); }
-.azione-chiama { background: var(--rosso); color: #fff; }
-.azione-chiama:hover { color: #fff; }
-.azione-indicazioni { background: var(--blu); color: #fff; }
-.azione-indicazioni:hover { color: #fff; }
-.azione-mappa { display: inline-flex; flex-direction: row; min-height: 48px; padding: 0.7rem 1.2rem; background: var(--crema); }
+.azione-chiama { background: var(--rosso); color: var(--crema); }
+.azione-chiama:hover { color: var(--crema); }
+.azione-indicazioni { background: var(--blu); color: var(--crema); }
+.azione-indicazioni:hover { color: var(--crema); }
+.azione-mappa { display: inline-flex; flex-direction: row; min-height: 48px; padding: 0.7rem 1.2rem; }
 
-.sezioni-info { display: grid; gap: 2rem; align-items: start; }
-.sezione { min-width: 0; }
+.sezioni-info { display: grid; gap: 1.6rem; align-items: start; }
 
 /* Orari come tabella a bordo spesso, con la riga di oggi in blu notte. */
 .orari {
     margin: 0;
     overflow: hidden;
-    border: var(--bordo-info);
+    border: 3px solid var(--blu-scuro);
     border-radius: 12px;
     background: #fff;
-    box-shadow: var(--ombra-info);
 }
 .orari-giorno {
     display: flex;
@@ -396,19 +442,20 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .orari dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
 .orari-giorno.oggi { background: var(--blu-scuro); color: var(--crema); font-weight: 700; }
-.info-indirizzo-esteso { margin: 0 0 1rem; font-size: 1.15rem; font-weight: 700; }
+.info-indirizzo-esteso { margin: 0 0 1rem; font-size: 1.25rem; font-weight: 700; }
 
-/* Contatti: un riquadro per voce, uno sotto l'altro su telefono. */
-.sezione-contatti { margin-top: 2rem; }
+/* Contatti: tessere crema sul blocco blu, una sotto l'altra su telefono. */
 .contatti { display: grid; gap: 0.75rem; margin: 0; }
 .contatto {
     padding: 0.85rem 1rem;
-    border: var(--bordo-info);
+    border: 3px solid var(--blu-scuro);
     border-radius: 12px;
-    background: #fff;
+    background: var(--crema);
+    color: var(--blu-scuro);
     overflow-wrap: anywhere;
 }
-.contatto dt { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.contatto :focus-visible { outline-color: var(--blu-scuro); }
+.contatto dt { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .contatto dd { margin: 0.2rem 0 0; }
 .contatti a { font-weight: 700; }
 .social { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
@@ -441,16 +488,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     from { transform: translateX(0); }
     to { transform: translateX(192px); }
 }
-
-/* Contenuto su un pannello crema pieno: i loghi non passano sotto orari e contatti. */
-.sfondo-loghi ~ .pagina-info {
-    width: min(100% - 1rem, var(--larghezza-pannello));
-    margin-top: 1rem;
-    margin-bottom: 2rem;
-    background: var(--crema);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(32, 62, 86, 0.12);
-}
+/* Mentre la pagina scorre i loghi si fermano (classe messa da static/js/sfondo.js): sedici file in
+   movimento più lo scroll appesantivano il browser e lo scorrimento del menù andava a scatti. */
+.scorrendo .fila-loghi { animation-play-state: paused; }
 
 /* ---------- Menù: blocchi-adesivo come i riquadri del PDF, stile street food ---------- */
 
@@ -671,8 +711,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     font-size: 1.15rem;
 }
 
-.torna-indice { margin: 0.6rem 0 0; text-align: right; }
-.torna-indice a { color: inherit; font-weight: 800; }
 
 /* ---------- Footer ---------- */
 
@@ -811,9 +849,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* ---------- Tablet e computer ---------- */
 
 @media (min-width: 768px) {
-    .sezioni-info { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    .sezioni-info { grid-template-columns: 1fr 1fr; gap: 2rem; }
     .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .azioni-info { max-width: 34rem; }
+    .azioni-info { max-width: 36rem; }
 }
 
 /* Computer: barra più alta e più staccata, come Habita79; voci sempre visibili. */

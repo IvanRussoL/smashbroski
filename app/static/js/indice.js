@@ -18,7 +18,7 @@
     }
     const movimentoRidotto = window.matchMedia("(prefers-reduced-motion: reduce)");
     let attiva = null;
-    let scelta = null; // ultima pillola toccata: vince sui blocchi alla stessa altezza (Starters e Salad su desktop)
+    let scelta = null; // ultima pillola toccata
     let inAttesa = false;
 
     function evidenzia(voce) {
@@ -40,8 +40,11 @@
 
     function aggiorna() {
         inAttesa = false;
-        // Linea appena sotto le pillole: è attivo il blocco più in basso che l'ha già raggiunta.
-        const linea = indice.getBoundingClientRect().bottom + 24;
+        // La categoria cambia quando la successiva arriva al 40% dello spazio sotto le pillole,
+        // cioè quando occupa già la parte alta dello schermo (con la linea subito sotto le pillole
+        // il cambio arrivava troppo tardi, a categoria nuova quasi tutta in vista).
+        const sottoPillole = indice.getBoundingClientRect().bottom;
+        const linea = sottoPillole + (window.innerHeight - sottoPillole) * 0.4;
         let migliore = voci[0];
         let altezzaMigliore = -Infinity;
         voci.forEach(function (voce) {
@@ -51,10 +54,15 @@
                 altezzaMigliore = alto;
             }
         });
-        if (scelta && Math.abs(scelta.blocco.getBoundingClientRect().top - altezzaMigliore) <= 4) {
-            migliore = scelta;
-        } else {
-            scelta = null;
+        // Dopo un tocco resta attiva la pillola toccata finché il suo blocco è dove è atterrato,
+        // subito sotto le pillole: un blocco corto non lascia il posto a quello che lo segue.
+        if (scelta) {
+            const altoScelta = scelta.blocco.getBoundingClientRect().top;
+            if (altoScelta >= sottoPillole - 8 && altoScelta <= sottoPillole + 48) {
+                migliore = scelta;
+            } else {
+                scelta = null;
+            }
         }
         evidenzia(migliore);
     }

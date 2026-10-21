@@ -6,12 +6,37 @@
 {% block contenuto %}
 {% include "_sfondo_loghi.html" %}
 <div class="pagina-info">
-    <h1>Orari e contatti</h1>
-    <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
+    <div class="testata-info">
+        <h1>Orari e contatti</h1>
+        <p class="info-indirizzo">{{ impostazioni.nome_locale }} · {{ impostazioni.indirizzo }}</p>
+        <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
+    </div>
+
+    {# Le tre azioni più usate da telefono, grandi e subito sotto lo stato. #}
+    <ul class="azioni-info">
+        <li>
+            <a class="azione-info azione-chiama" href="tel:{{ impostazioni.telefono }}">
+                <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+                Chiama
+            </a>
+        </li>
+        <li>
+            <a class="azione-info azione-indicazioni" href="{{ impostazioni.link_maps() }}" rel="noopener">
+                <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M3 11 22 2l-9 19-2-8z"/></svg>
+                Indicazioni
+            </a>
+        </li>
+        <li>
+            <a class="azione-info azione-scrivi" href="mailto:{{ impostazioni.email }}">
+                <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+                Scrivi
+            </a>
+        </li>
+    </ul>
 
     <div class="sezioni-info">
-        <section id="orari" class="sezione">
-            <h2>Orari</h2>
+        <section id="orari" class="sezione" aria-labelledby="titolo-orari">
+            <h2 id="titolo-orari">Orari</h2>
             <dl class="orari">
                 {% for giorno in orari %}
                 <div class="orari-giorno{% if giorno.numero == oggi %} oggi{% endif %}">
@@ -28,24 +53,35 @@
             </dl>
         </section>
 
-        <section id="contatti" class="sezione">
-            <h2>Contatti</h2>
-            <ul class="contatti">
-                <li>
-                    Telefono: <a href="tel:{{ impostazioni.telefono }}">{{ impostazioni.telefono|telefono_leggibile }}</a>
-                    {% if impostazioni.telefono_di_prova %}<span class="segnaposto">(numero di prova)</span>{% endif %}
-                </li>
-                <li>Email: <a href="mailto:{{ impostazioni.email }}">{{ impostazioni.email }}</a></li>
-                <li>
-                    Indirizzo: {{ impostazioni.indirizzo }}
-                    <a href="{{ impostazioni.link_maps() }}" rel="noopener">Apri in Google Maps</a>
-                </li>
-                <li class="social">
-                    <a href="{{ impostazioni.url_facebook }}" rel="noopener">Facebook</a>
-                    <a href="{{ impostazioni.url_instagram }}" rel="noopener">Instagram</a>
-                </li>
-            </ul>
+        <section id="come-arrivare" class="sezione" aria-labelledby="titolo-come-arrivare">
+            <h2 id="titolo-come-arrivare">Come arrivare</h2>
+            <p class="info-indirizzo-esteso">{{ impostazioni.indirizzo }}</p>
+            <a class="azione-info azione-mappa" href="{{ impostazioni.link_maps() }}" rel="noopener">Apri in Google Maps</a>
         </section>
     </div>
+
+    <section id="contatti" class="sezione-contatti" aria-labelledby="titolo-contatti">
+        <h2 id="titolo-contatti">Contatti</h2>
+        <dl class="contatti">
+            <div class="contatto">
+                <dt>Telefono</dt>
+                <dd>
+                    <a href="tel:{{ impostazioni.telefono }}">{{ impostazioni.telefono|telefono_leggibile }}</a>
+                    {% if impostazioni.telefono_di_prova %}<span class="segnaposto">(numero di prova)</span>{% endif %}
+                </dd>
+            </div>
+            <div class="contatto">
+                <dt>Email</dt>
+                <dd><a href="mailto:{{ impostazioni.email }}">{{ impostazioni.email }}</a></dd>
+            </div>
+            <div class="contatto">
+                <dt>Social</dt>
+                <dd class="social">
+                    <a href="{{ impostazioni.url_facebook }}" rel="noopener">Facebook</a>
+                    <a href="{{ impostazioni.url_instagram }}" rel="noopener">Instagram</a>
+                </dd>
+            </div>
+        </dl>
+    </section>
 </div>
 {% endblock %}

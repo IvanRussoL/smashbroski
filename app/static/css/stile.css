@@ -303,43 +303,116 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pulsante-secondario:hover { background: var(--crema); color: var(--blu-scuro); }
 .hero :focus-visible { outline-color: var(--crema); }
 
-/* ---------- Pagina Orari e contatti ---------- */
+/* ---------- Pagina Orari e contatti: "location page" con accenti brutal ---------- */
 
-.pagina-info { --larghezza-pannello: var(--larghezza-contenuto); max-width: var(--larghezza-contenuto); margin-inline: auto; padding: 1.5rem 1rem 2rem; }
-.pagina-info h1 { margin: 0.5rem 0 0.75rem; font-size: 2rem; color: var(--blu-scuro); }
-.pagina-info .stato-apertura { background: #fff; border-color: var(--bordo); color: var(--testo); }
-.sezioni-info { display: grid; gap: 1.5rem; margin-top: 0.5rem; }
-.sezione {
-    padding: 1.5rem 1.25rem;
-    background: #fff;
-    border: 1px solid var(--bordo);
-    border-radius: 10px;
+/* Bordi spessi blu notte e ombre piene senza sfocatura, come i blocchi-adesivo del menù. */
+.pagina-info {
+    --titolo: "Anton", Impact, "Arial Narrow", sans-serif;
+    --bordo-info: 2px solid var(--blu-scuro);
+    --ombra-info: 4px 4px 0 var(--blu-scuro);
+    --larghezza-pannello: var(--larghezza-contenuto);
+    max-width: var(--larghezza-contenuto);
+    margin-inline: auto;
+    padding: 1.5rem 1rem 2rem;
+    color: var(--blu-scuro);
 }
-.orari { margin: 0; }
+.pagina-info h1, .pagina-info h2 { font-family: var(--titolo); font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; }
+.pagina-info h1 { margin: 0.5rem 0 0.5rem; font-size: clamp(2.3rem, 9vw, 4rem); line-height: 1.05; color: var(--blu-scuro); }
+.pagina-info h2 { margin: 0 0 0.75rem; font-size: 1.9rem; color: var(--rosso); }
+.testata-info { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+.info-indirizzo { margin: 0; }
+
+/* Stato come etichetta a bordo spesso: verde chiaro se aperto, rosa se chiuso, sempre con il testo. */
+.pagina-info .stato-apertura {
+    margin: 0;
+    padding: 0.5rem 0.9rem;
+    border: var(--bordo-info);
+    border-radius: 10px;
+    background: #FBE1E7;
+    box-shadow: var(--ombra-info);
+    color: var(--blu-scuro);
+    font-weight: 700;
+}
+.pagina-info .stato-apertura::before { background: var(--rosso); }
+.pagina-info .stato-apertura.aperto { background: #D9F2E2; }
+.pagina-info .stato-apertura.aperto::before { background: #17633A; }
+
+/* Chiama, Indicazioni, Scrivi: tre pulsanti grandi che si "schiacciano" al tocco. */
+.azioni-info {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1.75rem 0 2rem;
+    padding: 0;
+    list-style: none;
+}
+.azione-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: 72px;
+    padding: 0.6rem 0.4rem;
+    border: var(--bordo-info);
+    border-radius: 12px;
+    box-shadow: var(--ombra-info);
+    background: #fff;
+    color: var(--blu-scuro);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.azione-info svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.azione-info:hover { color: var(--blu-scuro); transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--blu-scuro); }
+.azione-info:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--blu-scuro); }
+.azione-chiama { background: var(--rosso); color: #fff; }
+.azione-chiama:hover { color: #fff; }
+.azione-indicazioni { background: var(--blu); color: #fff; }
+.azione-indicazioni:hover { color: #fff; }
+.azione-mappa { display: inline-flex; flex-direction: row; min-height: 48px; padding: 0.7rem 1.2rem; background: var(--crema); }
+
+.sezioni-info { display: grid; gap: 2rem; align-items: start; }
+.sezione { min-width: 0; }
+
+/* Orari come tabella a bordo spesso, con la riga di oggi in blu notte. */
+.orari {
+    margin: 0;
+    overflow: hidden;
+    border: var(--bordo-info);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--ombra-info);
+}
 .orari-giorno {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.55rem 0;
-    border-bottom: 1px solid var(--bordo);
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid #C9D3DC;
 }
 .orari-giorno:last-child { border-bottom: 0; }
 .orari dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
-.orari-giorno.oggi { color: var(--rosso); }
-.contatti { margin: 0; padding: 0; list-style: none; }
-.contatti li { padding: 0.55rem 0; border-bottom: 1px solid var(--bordo); overflow-wrap: anywhere; }
-.contatti li:last-child { border-bottom: 0; }
-.contatti a { font-weight: 600; }
-.social { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.social a {
-    display: inline-block;
-    min-height: 48px;
-    padding: 0.7rem 1.1rem;
-    border: 2px solid var(--blu);
-    border-radius: var(--raggio);
-    text-decoration: none;
+.orari-giorno.oggi { background: var(--blu-scuro); color: var(--crema); font-weight: 700; }
+.info-indirizzo-esteso { margin: 0 0 1rem; font-size: 1.15rem; font-weight: 700; }
+
+/* Contatti: un riquadro per voce, uno sotto l'altro su telefono. */
+.sezione-contatti { margin-top: 2rem; }
+.contatti { display: grid; gap: 0.75rem; margin: 0; }
+.contatto {
+    padding: 0.85rem 1rem;
+    border: var(--bordo-info);
+    border-radius: 12px;
+    background: #fff;
+    overflow-wrap: anywhere;
 }
+.contatto dt { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.contatto dd { margin: 0.2rem 0 0; }
+.contatti a { font-weight: 700; }
+.social { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+.social a { display: inline-block; padding: 0.6rem 0; min-height: 44px; }
 .segnaposto { font-style: italic; color: var(--testo-secondario); }
 
 /* ---------- Sfondo animato di Menù e Orari e contatti ---------- */
@@ -738,7 +811,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* ---------- Tablet e computer ---------- */
 
 @media (min-width: 768px) {
-    .sezioni-info { grid-template-columns: 1fr 1fr; }
+    .sezioni-info { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .azioni-info { max-width: 34rem; }
 }
 
 /* Computer: barra più alta e più staccata, come Habita79; voci sempre visibili. */
@@ -843,4 +918,5 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     html { scroll-behavior: auto; }
     .navbar-linee span, .js .navbar-link, .js .navbar-link li { transition: none !important; }
     .fila-loghi { animation: none; }
+    .azione-info { transition: none; }
 }

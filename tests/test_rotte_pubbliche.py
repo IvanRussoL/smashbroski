@@ -123,6 +123,24 @@ def test_info_oggi_evidenziato(client, ora_fissa):
     pagina = html(client.get("/info"))
     assert "<strong>Martedì (oggi)</strong>" in pagina
     assert "Chiuso · apre domani alle 12:00" in pagina
+    assert pagina.count('class="orari-giorno oggi"') == 1
+
+
+def test_info_azioni_rapide(client):
+    pagina = html(client.get("/info"))
+    azioni = re.search(r'<ul class="azioni-info">(.*?)</ul>', pagina, re.S).group(1)
+    assert 'href="tel:+390810000000"' in azioni
+    assert "https://www.google.com/maps/search/?api=1&amp;query=Vico+dei+Paninari" in azioni
+    assert 'href="mailto:info@example.com"' in azioni
+    for etichetta in ("Chiama", "Indicazioni", "Scrivi"):
+        assert etichetta in azioni
+
+
+def test_info_sezioni_e_ancore(client):
+    pagina = html(client.get("/info"))
+    for ancora in ('id="orari"', 'id="come-arrivare"', 'id="contatti"'):
+        assert ancora in pagina
+    assert "<iframe" not in pagina  # niente mappa incorporata: cookie di terze parti (RNF-11)
 
 
 # --- Menù ---

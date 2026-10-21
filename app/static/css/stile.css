@@ -368,8 +368,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .blocco-info :focus-visible { outline-color: var(--blu-scuro); }
 .blocco-arrivare :focus-visible, .blocco-contatti :focus-visible { outline-color: var(--crema); }
 
-/* Riquadro dello stato come insegna al neon: fondo blu scuro, APERTO / CHIUSO grande in alto,
-   nome, indirizzo e stato in basso. Da aperto l'insegna è accesa (bagliore rosso), da chiuso è spenta. */
+/* Riquadro dello stato come insegna al neon: fondo blu scuro, nome del locale grande in alto,
+   indirizzo e stato in basso. Da aperto l'insegna è accesa (bagliore rosso), da chiuso è spenta. */
 .blocco-stato {
     display: flex;
     flex-direction: column;
@@ -383,7 +383,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .insegna {
     margin: 0;
     font-family: var(--titolo);
-    font-size: clamp(4.5rem, 24vw, 8.5rem);
+    font-size: clamp(3.4rem, 17vw, 7rem);
     line-height: 0.9;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -402,7 +402,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     20%, 24%, 46%, 100% { opacity: 1; }
 }
 .stato-testo { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
-.info-locale { margin: 0; font-family: var(--titolo); font-size: clamp(1.6rem, 6vw, 2.2rem); line-height: 1; text-transform: uppercase; letter-spacing: 0.02em; }
 .info-indirizzo { margin: 0; font-weight: 600; }
 .blocco-stato .info-indirizzo { margin: 0 0 0.4rem; font-size: 1.05rem; letter-spacing: 0.04em; font-weight: 500; }
 

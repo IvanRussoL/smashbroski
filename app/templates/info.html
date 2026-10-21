@@ -10,12 +10,11 @@
         <h1>Orari e contatti</h1>
     </div>
 
-    {# Insegna al neon: fondo blu scuro e APERTO / CHIUSO grande. Da aperto è accesa in rosso,
-       da chiuso è spenta (solo il contorno). Il testo vero dello stato resta sotto, l'insegna è decorativa. #}
+    {# Insegna al neon con il nome del locale: accesa in rosso se è aperto, spenta (solo il contorno)
+       se è chiuso. Lo stato a parole lo dice solo l'etichetta sotto, così non si ripete. #}
     <section class="blocco-info blocco-stato {{ 'locale-aperto' if stato.aperto else 'locale-chiuso' }}" aria-label="Dove siamo e stato del locale">
-        <p class="insegna" aria-hidden="true">{{ 'Aperto' if stato.aperto else 'Chiuso' }}</p>
+        <p class="insegna">{{ impostazioni.nome_locale }}</p>
         <div class="stato-testo">
-            <p class="info-locale">{{ impostazioni.nome_locale }}</p>
             <p class="info-indirizzo">{{ impostazioni.indirizzo }}</p>
             <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
         </div>

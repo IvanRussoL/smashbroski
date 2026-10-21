@@ -130,7 +130,7 @@ def test_info_insegna_segue_lo_stato(client, ora_fissa):
     ora_fissa(2026, 10, 20, 10)  # martedì 10:00: chiuso
     pagina = html(client.get("/info"))
     assert "blocco-stato locale-chiuso" in pagina
-    assert '<p class="insegna" aria-hidden="true">Chiuso</p>' in pagina
+    assert '<p class="insegna">SmashBroski Pompei</p>' in pagina
     ora_fissa(2026, 10, 21, 13)  # mercoledì 13:00: aperto
     assert "blocco-stato locale-aperto" in html(client.get("/info"))
 

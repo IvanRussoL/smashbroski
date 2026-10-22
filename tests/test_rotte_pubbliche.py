@@ -222,6 +222,17 @@ def test_privacy(client):
     assert "Privacy e cookie" in html(risposta)
 
 
+def test_favicon(client):
+    for indirizzo in ("/", "/menu", "/info", "/privacy"):
+        pagina = html(client.get(indirizzo))
+        assert 'rel="icon" href="/static/img/favicon.ico"' in pagina
+        assert 'rel="apple-touch-icon" href="/static/img/apple-touch-icon.png"' in pagina
+    risposta = client.get("/favicon.ico")
+    assert risposta.status_code == 200
+    assert risposta.mimetype in ("image/vnd.microsoft.icon", "image/x-icon")
+    risposta.close()
+
+
 def test_nessun_generator(client):
     for indirizzo in ("/", "/menu", "/info", "/privacy"):
         assert 'name="generator"' not in html(client.get(indirizzo))

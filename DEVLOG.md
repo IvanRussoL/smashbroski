@@ -295,3 +295,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Effetto**: su telefono i pulsanti finiscono a 421 px dall'alto invece che a 589, gli orari si vedono già all'apertura; pagina più corta di circa 300 px su telefono e 220 su desktop.
 - **Scartato**: turni degli orari su due righe su telefono (raddoppia l'altezza della tabella); testo degli orari sotto i 14 px.
 - **Test**: nessun test nuovo (solo CSS). 189 test superati.
+
+## 2026-10-22 · Fase 2 – Favicon con la mascotte del logo
+
+- **Icona nella scheda del browser** (richiesta di Ivan, come Habita79): la mascotte del logo SmashBroski, blu su quadrato crema arrotondato, in tutte le pagine (`base.html`). Senza la scritta "SmashBroski": a 16-32 px non si leggerebbe.
+- **File** in `static/img/`: `favicon.ico` (16, 32 e 48 px), `favicon-32.png` e `apple-touch-icon.png` (180 px, quadrato pieno, per l'icona sulla schermata home del telefono). Ricavati da `logo-hero.webp`; nelle versioni piccole i contorni blu sono ingrossati, altrimenti spariscono.
+- **Rotta `/favicon.ico`**: i browser la chiedono alla radice anche senza il `<link>`; prima dava 404 (l'unico errore in Console).
+- **Test**: `test_favicon`. 190 test superati.

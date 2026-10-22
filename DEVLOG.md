@@ -337,3 +337,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Test**: 191 test superati (markup decorativo e CSS).
 - **Tempi rivisti da Ivan dopo la prova**: disegno da 3 a 2 s, pausa invariata di 2 s; ciclo di 4 s con arrivo alla X al 50%.
 - **Seconda prova di Ivan**: disegno a 1,5 s, pausa 2 s; ciclo di 3,5 s con arrivo alla X al 43%.
+
+## 2026-10-22 · Fase 2 – Indice del menù su desktop: pillole accese per riga
+
+- **Segnalazione di Ivan (screenshot da desktop)**: scorrendo il menù la pillola "Salad" non si accendeva mai. Su desktop Starters e Salad stanno sulla stessa riga e iniziano alla stessa altezza, quindi l'indice sceglieva sempre la prima; lo stesso per The Originals, accanto a Kids Menù, Soft Drinks e Beers.
+- **Scelta di Ivan: accendere insieme le categorie affiancate**. `indice.js` sceglie la categoria principale come prima (linea al 40%) e accende anche quelle in un'altra colonna che le stanno accanto in altezza: Starters + Salad, poi Kids Menù / Soft Drinks / Beers ciascuna con The Originals. Dopo un tocco su una pillola si accende solo quella. Alternative scartate: lasciare com'era (Salad raggiungibile solo col tocco) e una categoria per riga anche su desktop (pagina molto più lunga, impaginazione del PDF persa).
+- **Telefono invariato**: lì le categorie sono in una sola colonna, quindi non ci sono categorie affiancate. Verificato con Playwright a 360×800: la sequenza delle pillole accese scorrendo è identica a prima del cambio.
+- **Test**: 191 test superati (solo JavaScript); prova nel browser a 1440×900 e 360×800.

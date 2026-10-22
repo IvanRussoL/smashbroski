@@ -1,5 +1,6 @@
 // Indice delle categorie del menù: evidenzia (aria-current) la categoria che si sta guardando,
 // sia dopo un tocco sulla pillola sia scorrendo la pagina. All'apertura è attiva la prima.
+// Su desktop, scorrendo, si accendono insieme le categorie affiancate (es. Starters e Salad).
 // Senza JavaScript l'indice funziona lo stesso, solo senza evidenziazione.
 (function () {
     const indice = document.getElementById("indice");
@@ -17,25 +18,44 @@
         return;
     }
     const movimentoRidotto = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let attiva = null;
+    let attive = [];
     let scelta = null; // ultima pillola toccata
     let inAttesa = false;
 
-    function evidenzia(voce) {
-        if (voce === attiva) {
+    // gruppo: la categoria principale per prima, poi quelle affiancate.
+    function evidenzia(gruppo) {
+        if (gruppo.length === attive.length && gruppo.every(function (v, i) { return v === attive[i]; })) {
             return;
         }
-        if (attiva) {
-            attiva.link.removeAttribute("aria-current");
-        }
-        attiva = voce;
-        voce.link.setAttribute("aria-current", "location");
+        attive.forEach(function (v) {
+            v.link.removeAttribute("aria-current");
+        });
+        attive = gruppo;
+        gruppo.forEach(function (v) {
+            v.link.setAttribute("aria-current", "location");
+        });
         // Su telefono l'indice scorre in orizzontale: la pillola attiva resta in vista.
+        const voce = gruppo[0];
         const sinistra = voce.link.offsetLeft;
         const destra = sinistra + voce.link.offsetWidth;
         if (sinistra < indice.scrollLeft || destra > indice.scrollLeft + indice.clientWidth) {
             indice.scrollTo({ left: sinistra - 12, behavior: movimentoRidotto.matches ? "auto" : "smooth" });
         }
+    }
+
+    // Categorie in un'altra colonna accanto alla principale (Salad accanto a Starters, The Originals
+    // accanto a Kids, Soft Drinks e Beers): su telefono c'è una colonna sola e il gruppo resta di una.
+    function affiancate(principale, linea) {
+        const r = principale.blocco.getBoundingClientRect();
+        return voci.filter(function (voce) {
+            if (voce === principale) {
+                return false;
+            }
+            const altro = voce.blocco.getBoundingClientRect();
+            const altraColonna = altro.left >= r.right || altro.right <= r.left;
+            const stessaAltezza = altro.top < r.bottom && altro.bottom > r.top;
+            return altraColonna && stessaAltezza && altro.top <= linea;
+        });
     }
 
     function aggiorna() {
@@ -59,12 +79,12 @@
         if (scelta) {
             const altoScelta = scelta.blocco.getBoundingClientRect().top;
             if (altoScelta >= sottoPillole - 8 && altoScelta <= sottoPillole + 48) {
-                migliore = scelta;
-            } else {
-                scelta = null;
+                evidenzia([scelta]); // dopo un tocco si accende solo la pillola toccata
+                return;
             }
+            scelta = null;
         }
-        evidenzia(migliore);
+        evidenzia([migliore].concat(affiancate(migliore, linea)));
     }
 
     function programma() {
@@ -77,7 +97,7 @@
     voci.forEach(function (voce) {
         voce.link.addEventListener("click", function () {
             scelta = voce;
-            evidenzia(voce);
+            evidenzia([voce]);
         });
     });
     window.addEventListener("scroll", programma, { passive: true });

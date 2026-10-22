@@ -471,11 +471,11 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .orari-giorno.oggi {
     color: var(--gesso-rosso);
     border-bottom-color: transparent; /* l'onda prende il posto dei puntini, alla stessa altezza */
-    background: url("../img/onda-gesso.svg") repeat-x 0 100% / 24px 10px;
+    background: url("../img/onda-gesso.svg") no-repeat -24px 100% / 1200px 10px; /* un'unica onda lunga: nessuna giunzione */
     animation: onda-gesso 3s linear infinite;
 }
-/* L'onda scorre piano verso destra di un'onda intera per ciclo, quindi il loop non ha salti. */
-@keyframes onda-gesso { to { background-position-x: 24px; } }
+/* L'onda scorre piano verso destra di un'onda intera (24 px) per ciclo, quindi il loop non ha salti. */
+@keyframes onda-gesso { to { background-position-x: 0; } }
 
 /* Contatti: icona disegnata col gesso a sinistra, etichetta e valore a destra. */
 .contatti { display: grid; gap: 0.75rem; margin: 0; }

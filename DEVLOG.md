@@ -375,7 +375,8 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 ## 2026-10-22 · Fase 2 – Giorno di oggi sottolineato da un'onda di gesso
 
 - **Segnalazione di Ivan**: il riquadro rosso intorno al giorno di oggi aveva un bordo di 2 px contro l'1 px dei puntini tra i giorni, e su telefono il bollino OGGI mandava a capo il nome: la riga diventava più alta delle altre e i puntini sopra e sotto restavano scoperti.
-- **Scelta di Ivan su tre anteprime** (sottolineatura a gessetto, cerchio a mano sul nome, freccia a lato): sottolineatura, ma spessa, ondulata e in movimento lento. Il giorno e i suoi orari diventano rosa gesso e al posto dei puntini sotto la riga c'è un'onda di 3 px (`static/img/onda-gesso.svg`, ripetuta in orizzontale).
+- **Scelta di Ivan su tre anteprime** (sottolineatura a gessetto, cerchio a mano sul nome, freccia a lato): sottolineatura, ma spessa, ondulata e in movimento lento. Il giorno e i suoi orari diventano rosa gesso e al posto dei puntini sotto la riga c'è un'onda di 3 px (`static/img/onda-gesso.svg`).
+- **Una sola onda lunga, non ripetuta**: la prima versione ripeteva in orizzontale un SVG di una sola onda, e Ivan vedeva dei tagli tra una copia e l'altra (con zoom non interi i bordi delle copie cadono a metà pixel). Ora l'SVG è un unico tracciato di 50 onde (1200 px, più largo della tabella orari) e non si ripete.
 - **Animazione**: l'onda scorre di una lunghezza d'onda (24 px) ogni 3 secondi, così il loop non ha salti. Ferma con `prefers-reduced-motion: reduce`. SVG come file e non come `data:` URI perché la CSP ha `img-src 'self'`.
 - **Bollino OGGI tolto alla vista**: la parola "oggi" resta nel `<dt>` con la classe `visivamente-nascosto`, quindi i lettori di schermo la leggono ancora. Tutte le righe hanno la stessa altezza.
 - **Test**: aggiornati i due controlli sulla parola "oggi"; 192 test superati; nessuno scorrimento orizzontale a 360 e 1366 px.

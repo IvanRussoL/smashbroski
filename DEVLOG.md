@@ -380,3 +380,9 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Animazione**: l'onda scorre di una lunghezza d'onda (24 px) ogni 3 secondi, così il loop non ha salti. Ferma con `prefers-reduced-motion: reduce`. SVG come file e non come `data:` URI perché la CSP ha `img-src 'self'`.
 - **Bollino OGGI tolto alla vista**: la parola "oggi" resta nel `<dt>` con la classe `visivamente-nascosto`, quindi i lettori di schermo la leggono ancora. Tutte le righe hanno la stessa altezza.
 - **Test**: aggiornati i due controlli sulla parola "oggi"; 192 test superati; nessuno scorrimento orizzontale a 360 e 1366 px.
+
+## 2026-10-22 · Fase 2 – Tolto "Come arrivare" dalla fascia "Dove siamo" di Orari e contatti
+
+- **Richiesta di Ivan**: nella fascia blu "Dove siamo" in fondo alla pagina il pulsante "Come arrivare" era superfluo, perché in cima alla lavagna c'è già "Indicazioni" con lo stesso link a Google Maps.
+- **Stesso meccanismo della home**: `info.html` svuota il blocco `footer_come_arrivare` di `base.html`; la fascia resta con l'etichetta e l'indirizzo. Sulla pagina Menù il pulsante resta finché Ivan non decide.
+- **Test**: `test_home_come_arrivare_una_volta` controlla anche che `/info` non abbia `pulsante-footer`; 192 test superati.

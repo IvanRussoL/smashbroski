@@ -258,6 +258,11 @@ def test_favicon(client):
     risposta.close()
 
 
+def test_fondo_rosso_al_footer(client):
+    for indirizzo in ("/", "/menu", "/info", "/privacy"):
+        assert "/static/js/fondo-pagina.js" in html(client.get(indirizzo))
+
+
 def test_nessun_generator(client):
     for indirizzo in ("/", "/menu", "/info", "/privacy"):
         assert 'name="generator"' not in html(client.get(indirizzo))

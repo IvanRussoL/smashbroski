@@ -21,15 +21,18 @@
     --ingombro-navbar: calc(var(--altezza-navbar) + var(--margine-navbar));
     --larghezza-contenuto: 1100px;
     --raggio: 6px;
+    /* Titoli: Archivo largo e nero, lettere "schiacciate" come uno smash burger. */
+    --titolo: "Archivo", "Arial Black", sans-serif;
     --font: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Carattere del testo normale, uguale su ogni dispositivo (licenza SIL OFL in static/fonts).
-   Un solo file variabile copre tutti i pesi usati nel sito, da 400 a 800. */
+/* Archivo, salvato nel sito (licenza SIL OFL in static/fonts): un solo file variabile per il testo
+   (larghezza normale) e per i titoli (larghezza 125%, nero), così è uguale su ogni dispositivo. */
 @font-face {
     font-family: "Archivo";
     src: url("../fonts/archivo-latin-variabile.woff2") format("woff2");
     font-weight: 100 900;
+    font-stretch: 62% 125%;
     font-display: swap;
 }
 
@@ -97,7 +100,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     width: min(100% - 2 * var(--margine-navbar), 1240px);
     height: var(--altezza-navbar);
     margin: 0 auto;
-    padding: 0 0.75rem 0 1rem;
+    padding: 0 1rem; /* stesso spazio a sinistra (scritta) e a destra (linee o ultima voce) */
     color: var(--crema);
     background: var(--navbar-sfondo);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -139,7 +142,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .navbar-nav { gap: 0.3rem; }
     .navbar-ora { gap: 0.25rem; font-size: 0.85rem; letter-spacing: 0.02em; }
     .navbar-ora svg { width: 16px; height: 16px; }
-    .navbar-pulsante { width: 42px; }
+    .navbar-pulsante { width: 42px; margin-right: calc((30px - 42px) / 2); }
     .navbar-linee { width: 30px; }
 }
 .navbar-link { display: flex; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
@@ -171,6 +174,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     background: none;
     color: var(--crema);
     cursor: pointer;
+    /* Il pulsante è più largo delle linee: sporge nel bordo della barra, così le linee
+       finiscono alla stessa distanza dal bordo destro della scritta dal sinistro. */
+    margin-right: calc((34px - 52px) / 2);
 }
 .navbar-linee { position: relative; display: block; width: 34px; height: 16px; }
 .navbar-linee span {
@@ -331,7 +337,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     font-display: swap;
 }
 .pagina-info {
-    --titolo: "Anton", Impact, "Arial Narrow", sans-serif;
     --gessetto: "Cabin Sketch", "Comic Sans MS", cursive;
     --gesso: #F4F1EA;
     --gesso-rosso: #FF9AAE;
@@ -356,8 +361,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .testata-info h1 {
     margin: 0;
     font-family: var(--titolo);
-    font-size: 2rem; /* 32 px su telefono, 44 px da 768 px */
-    font-weight: 400;
+    font-size: min(1.5rem, calc((100vw - 60px) / 12.4)); /* su una riga anche a 320 px; 32 px da 768 px */
+    font-weight: 900;
+    font-stretch: 125%;
     line-height: 1;
     text-transform: uppercase;
     color: var(--rosso);
@@ -371,6 +377,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     border: 4px solid var(--blu-scuro);
     border-radius: 18px;
     box-shadow: 7px 7px 0 var(--blu-scuro);
+    margin-right: 7px; /* posto per l'ombra: a destra resta lo stesso spazio che a sinistra */
     color: var(--gesso);
     background:
         radial-gradient(ellipse 60% 40% at 15% 20%, rgba(255, 255, 255, 0.07), transparent 70%),
@@ -400,11 +407,12 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .insegna {
     margin: 0 0 0.35rem;
     font-family: var(--titolo);
-    font-size: clamp(2rem, 9.5vw, 2.5rem); /* il nome sta su una riga anche a 360 px */
+    font-size: min(1.85rem, calc((100vw - 76px) / 13.3)); /* il nome largo sta su una riga anche a 320 px */
+    font-weight: 900;
+    font-stretch: 125%;
     line-height: 1;
     white-space: nowrap;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
     color: transparent;
     -webkit-text-stroke: 2px rgba(255, 250, 240, 0.3);
 }
@@ -478,6 +486,13 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .orari dd { margin: 0; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
+/* Telefoni stretti (320 px): meno spazio interno e testo più piccolo, così pulsanti e orari
+   restano dentro la lavagna. */
+@media (max-width: 379.98px) {
+    .lavagna { padding-inline: 0.75rem; }
+    .azione-info { font-size: 0.8rem; padding-inline: 0.25rem; }
+    .orari-giorno { padding-inline: 0.5rem; font-size: 0.85rem; }
+}
 .orari-giorno.oggi {
     color: var(--gesso-rosso);
     border-bottom-color: transparent; /* l'onda prende il posto dei puntini, alla stessa altezza */
@@ -562,13 +577,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 /* ---------- Menù: blocchi-adesivo come i riquadri del PDF, stile street food ---------- */
 
-/* Caratteri del menù, salvati nel sito (licenza SIL OFL in static/fonts): Anton per i titoli,
-   Archivo Black per nomi delle voci e prezzi. Finché non sono caricati si vede il carattere di sistema. */
-@font-face {
-    font-family: "Anton";
-    src: url("../fonts/anton-latin-400.woff2") format("woff2");
-    font-display: swap;
-}
+/* Carattere di nomi delle voci e prezzi, salvato nel sito (licenza SIL OFL in static/fonts).
+   Finché non è caricato si vede il carattere di sistema. */
 @font-face {
     font-family: "Archivo Black";
     src: url("../fonts/archivo-black-latin-400.woff2") format("woff2");
@@ -578,7 +588,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pagina-testo { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .pagina-testo h1 { margin: 0.5rem 0; font-size: 2rem; color: var(--blu-scuro); }
 .pagina-menu {
-    --titolo: "Anton", Impact, "Arial Narrow", sans-serif;
     --insegna: "Archivo Black", "Arial Black", var(--font);
     --ombra-adesivo: 7px 7px 0 var(--blu-scuro);
     max-width: 1120px;
@@ -598,10 +607,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .testata-menu h1 {
     margin: 0;
-    padding-top: 0.15em; /* spazio per l'accento della Ù, alto in Anton */
     font-family: var(--titolo);
-    font-size: 3.6rem;
-    font-weight: 400;
+    font-size: 2.7rem;
+    font-weight: 900;
+    font-stretch: 125%;
     line-height: 1;
     text-transform: uppercase;
     color: var(--rosso);
@@ -618,7 +627,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     overflow-x: auto;
     scrollbar-width: none;
 }
-.indice ul { display: flex; gap: 0.55rem; width: max-content; margin: 0; padding: 0 0.4rem 0.4rem 0; list-style: none; }
+.indice ul { display: flex; gap: 0.55rem; width: max-content; margin: 0; padding: 0 3px 0.4rem 0; list-style: none; } /* 3px: l'ombra dell'ultima pillola */
 .indice a {
     display: block;
     min-height: 44px;
@@ -653,8 +662,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     color: var(--crema);
     border-block: 3px solid var(--blu-scuro);
     font-family: var(--titolo);
-    font-size: 1.4rem;
-    letter-spacing: 0.06em;
+    font-size: 1.05rem;
+    font-weight: 900;
+    font-stretch: 125%;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     transform: rotate(-1.5deg);
 }
@@ -675,6 +686,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     border: 4px solid var(--blu-scuro);
     border-radius: 16px;
     box-shadow: var(--ombra-adesivo);
+    margin-right: 7px; /* posto per l'ombra: a destra resta lo stesso spazio che a sinistra */
 }
 .cat-starters, .cat-salad, .cat-kids-menu {
     --fondo: var(--rosso); --testo-blocco: var(--crema); --accento: var(--crema);
@@ -693,10 +705,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     margin: 0 0 0.4rem;
     padding-top: 0.1em;
     font-family: var(--titolo);
-    font-size: 3rem;
-    font-weight: 400;
+    font-size: min(2.25rem, 10.4vw); /* "ORIGINALS" entra anche a 320 px */
+    font-weight: 900;
+    font-stretch: 125%;
     line-height: 1;
-    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--accento);
     /* Il link dell'indice porta qui. Lo spazio della navbar lo toglie già scroll-padding-top
@@ -704,7 +716,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
        (prima navbar contata due volte: il blocco atterrava circa 85 px più in basso). */
     scroll-margin-top: 6.25rem;
 }
-.cat-burger h2 { font-size: 4.2rem; text-shadow: 4px 4px 0 var(--blu-scuro); }
+.cat-burger h2 { font-size: min(3.1rem, 13.6vw); text-shadow: 4px 4px 0 var(--blu-scuro); }
 
 .nota-categoria {
     display: inline-block;
@@ -718,7 +730,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* La nota del Burger ("Brooo, prova il menù…") è un'etichetta rossa, come sul cartellone. */
 .cat-burger .nota-categoria {
     display: block;
-    margin: 0.2rem 0 0.8rem;
+    margin: 0.2rem 3px 0.8rem 0; /* 3px a destra: posto per l'ombra, come i blocchi */
     padding: 0.6rem 0.8rem;
     background: var(--rosso);
     color: var(--crema);
@@ -925,10 +937,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* ---------- Tablet e computer ---------- */
 
 @media (min-width: 768px) {
-    .testata-info h1 { font-size: 2.75rem; }
+    .testata-info h1 { font-size: 2rem; }
     .lavagna { padding: 2rem 2.5rem 2.5rem; }
     .lavagna-sezione h2 { font-size: 2.4rem; }
-    .insegna { font-size: 4rem; }
+    .insegna { font-size: 3rem; }
     .info-indirizzo { font-size: 1rem; }
     .azione-info { min-height: 64px; }
     .azioni-info { max-width: 36rem; }
@@ -939,12 +951,21 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* Computer: barra più alta e più staccata, come Habita79; voci sempre visibili. */
 @media (min-width: 900px) {
     :root { --altezza-navbar: 84px; --margine-navbar: 1.5rem; }
-    .navbar { width: min(100% - 6rem, 1240px); padding: 0 1.25rem 0 1.75rem; border-radius: 14px; }
+    .navbar { width: min(100% - 6rem, 1240px); padding: 0 1.75rem; border-radius: 14px; }
+    /* L'ultima voce sporge di quanto è il suo spazio interno: il testo finisce a 1.75rem dal bordo. */
+    .navbar-link li:last-child a { margin-right: -0.9rem; }
     .navbar-marchio { font-size: 0.85rem; }
     .navbar-logo img { height: 58px; }
     .navbar-link a { padding: 0.6rem 0.9rem; }
     .navbar-nav { gap: 1.25rem; }
     .navbar-ora { font-size: 1.05rem; }
+    .navbar-link a { white-space: nowrap; }
+}
+/* Computer piccoli: voci più vicine, così "Orari e contatti" resta su una riga accanto all'ora. */
+@media (min-width: 900px) and (max-width: 1099.98px) {
+    .navbar-nav { gap: 0.6rem; }
+    .navbar-link a { padding-inline: 0.6rem; }
+    .navbar-link li:last-child a { margin-right: -0.6rem; }
 }
 
 @media (min-width: 900px) and (orientation: landscape) {
@@ -984,7 +1005,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .cat-soft-drinks { grid-area: soft; }
     .cat-beers { grid-area: beers; }
     .cat-the-originals { grid-area: originals; align-self: stretch; }
-    .cat-burger h2 { font-size: 5.5rem; }
+    .cat-burger h2 { font-size: 4.1rem; }
 
     .colonne-2, .colonne-4 { --prezzi: 2; }
     .colonne-4 { --prezzi: 4; }

@@ -13,8 +13,7 @@ Salvati nel sito (`app/static/fonts/`), senza servizi esterni; la licenza di ogn
 
 | File nel sito | Carattere | Autori | Licenza | Uso |
 |---|---|---|---|---|
-| `anton-latin-400.woff2` | Anton | The Anton Project Authors (https://github.com/googlefonts/AntonFont) | SIL Open Font License 1.1 (`OFL-Anton.txt`) | Titoli della pagina del menù |
 | `archivo-black-latin-400.woff2` | Archivo Black | The Archivo Black Project Authors (https://github.com/Omnibus-Type/ArchivoBlack) | SIL Open Font License 1.1 (`OFL-Archivo-Black.txt`) | Nomi delle voci, prezzi e indice del menù |
-| `archivo-latin-variabile.woff2` | Archivo (variabile, pesi 100–900) | The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo) | SIL Open Font License 1.1 (`OFL-Archivo.txt`) | Testo normale di tutto il sito |
+| `archivo-latin-variabile.woff2` | Archivo (variabile: pesi 100–900, larghezze 62–125%) | The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo) | SIL Open Font License 1.1 (`OFL-Archivo.txt`) | Testo normale e titoli (larghezza 125%, peso 900) di tutto il sito |
 
-File WebFont del sottoinsieme latino presi dai pacchetti npm `@fontsource/anton`, `@fontsource/archivo-black` e `@fontsource-variable/archivo` (versione 5).
+File WebFont del sottoinsieme latino presi dai pacchetti npm `@fontsource/archivo-black` e `@fontsource-variable/archivo` (versione 5, file con gli assi peso e larghezza).

@@ -2,7 +2,9 @@
 <html lang="it">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {# viewport-fit=cover: la pagina arriva fino al bordo in basso dello schermo, sotto la barra dei gesti.
+       Senza, alcuni browser per Android (es. "Browser" di Oppo) lasciano lì una striscia di colore pieno. #}
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     {# Il sito ha solo i colori chiari del marchio: chiede ai browser di non scurire la pagina da soli. #}
     <meta name="color-scheme" content="only light">
     <title>{% block titolo %}SmashBroski Pompei – Hamburgeria a Pompei{% endblock %}</title>

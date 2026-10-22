@@ -35,10 +35,6 @@ body {
     line-height: 1.55;
     color: var(--testo);
     background: var(--crema);
-    /* Con viewport-fit=cover (base.html) l'iPhone in orizzontale mette la tacca sopra la pagina:
-       qui il contenuto si sposta quanto serve. Altrove i valori sono 0. */
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
 }
 /* Safari 26 su iPhone colora lo spazio sotto la sua barra "a vetro" con il fondo della pagina.
    In home in cima c'è l'hero blu; quando si arriva al footer fondo-pagina.js mette la classe
@@ -89,7 +85,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     grid-template-columns: 1fr auto 1fr; /* il logo resta al centro esatto */
     align-items: center;
     gap: 0.75rem;
-    width: min(100% - 2 * var(--margine-navbar) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px), 1240px);
+    width: min(100% - 2 * var(--margine-navbar), 1240px);
     height: var(--altezza-navbar);
     margin: 0 auto;
     padding: 0 0.75rem 0 1rem;
@@ -845,8 +841,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     max-width: var(--larghezza-contenuto);
     margin: 0 auto;
     padding: 1.1rem 1.25rem 1.5rem;
-    /* Con viewport-fit=cover la riga finale non deve finire sotto la barra dei gesti del telefono. */
-    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid rgba(255, 250, 240, 0.3);
     font-size: 0.85rem;
 }

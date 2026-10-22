@@ -453,7 +453,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .azione-chiama, .azione-chiama:hover { border-color: var(--gesso-rosso); color: var(--gesso-rosso); }
 .azione-indicazioni, .azione-indicazioni:hover { border-color: var(--gesso-blu); color: var(--gesso-blu); }
 
-/* Orari: un giorno per riga, separati da puntini; oggi cerchiato in rosso con il bollino "oggi". */
+/* Orari: un giorno per riga, separati da puntini; oggi in rosso, sottolineato da un'onda di gesso. */
 .orari { margin: 0; }
 .orari-giorno {
     display: flex;
@@ -468,20 +468,14 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .orari dd { margin: 0; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
-.orari-giorno.oggi { color: var(--gesso-rosso); border: 2px solid var(--gesso-rosso); border-radius: 18px 12px 16px 10px; }
-.bollino-oggi {
-    display: inline-block;
-    margin-left: 0.3rem;
-    padding: 0 0.35rem;
-    border: 2px solid var(--gesso-rosso);
-    border-radius: 6px;
-    font-family: var(--titolo);
-    font-weight: 400;
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    transform: rotate(-4deg);
+.orari-giorno.oggi {
+    color: var(--gesso-rosso);
+    border-bottom-color: transparent; /* l'onda prende il posto dei puntini, alla stessa altezza */
+    background: url("../img/onda-gesso.svg") repeat-x 0 100% / 24px 10px;
+    animation: onda-gesso 3s linear infinite;
 }
+/* L'onda scorre piano verso destra di un'onda intera per ciclo, quindi il loop non ha salti. */
+@keyframes onda-gesso { to { background-position-x: 24px; } }
 
 /* Contatti: icona disegnata col gesso a sinistra, etichetta e valore a destra. */
 .contatti { display: grid; gap: 0.75rem; margin: 0; }
@@ -1043,5 +1037,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .fila-loghi { animation: none; }
     .azione-info { transition: none; }
     .locale-aperto .insegna { animation: none; }
+    .orari-giorno.oggi { animation: none; }
 }
 

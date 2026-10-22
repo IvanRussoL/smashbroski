@@ -121,14 +121,14 @@ def test_info_contenuti(client):
 
 def test_info_orari_martedi_chiuso(client):
     pagina = html(client.get("/info"))
-    assert re.search(r"<dt>(?:<strong>)?Martedì(?: <span class=.bollino-oggi.>oggi</span></strong>)?</dt>\s*<dd>Chiuso</dd>", pagina)
+    assert re.search(r"<dt>(?:<strong>)?Martedì(?: <span class=.visivamente-nascosto.>oggi</span></strong>)?</dt>\s*<dd>Chiuso</dd>", pagina)
     assert '<span class="turno">12:00–15:00</span> · <span class="turno">18:00–01:00</span>' in pagina
 
 
 def test_info_oggi_evidenziato(client, ora_fissa):
     ora_fissa(2026, 10, 20, 10)  # martedì 10:00
     pagina = html(client.get("/info"))
-    assert '<strong>Martedì <span class="bollino-oggi">oggi</span></strong>' in pagina
+    assert '<strong>Martedì <span class="visivamente-nascosto">oggi</span></strong>' in pagina
     assert "Chiuso · apre domani alle 12:00" in pagina
     assert pagina.count('class="orari-giorno oggi"') == 1
 

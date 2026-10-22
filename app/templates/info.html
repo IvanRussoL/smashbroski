@@ -48,7 +48,7 @@
         <dl class="orari">
             {% for giorno in orari %}
             <div class="orari-giorno{% if giorno.numero == oggi %} oggi{% endif %}">
-                <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} <span class="bollino-oggi">oggi</span></strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
+                <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} <span class="visivamente-nascosto">oggi</span></strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
                 <dd>
                     {%- if giorno.turni -%}
                     {% for turno in giorno.turni %}<span class="turno">{{ turno.ora_inizio|ora }}–{{ turno.ora_fine|ora }}</span>{% if not loop.last %} · {% endif %}{% endfor %}

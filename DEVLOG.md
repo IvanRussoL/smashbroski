@@ -371,3 +371,11 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Link `https://wa.me/<cifre>`** costruito da `Impostazioni.link_whatsapp()`: è il formato ufficiale di WhatsApp e vuole solo le cifre, senza "+" né spazi. Da ricontrollare su smartphone reale con TC-H03, anche per l'avviso di Chrome sul redirect (AU-CON02).
 - **L'email non sparisce**: resta come link `mailto:` nei contatti sotto gli orari (RF-05). Il pulsante WhatsApp resta color gesso come era "Scrivi"; il verde WhatsApp non è nella palette del menù.
 - **Database da ricreare in locale**: `schema.sql` e `dati_iniziali.sql` hanno le nuove colonne.
+
+## 2026-10-22 · Fase 2 – Giorno di oggi sottolineato da un'onda di gesso
+
+- **Segnalazione di Ivan**: il riquadro rosso intorno al giorno di oggi aveva un bordo di 2 px contro l'1 px dei puntini tra i giorni, e su telefono il bollino OGGI mandava a capo il nome: la riga diventava più alta delle altre e i puntini sopra e sotto restavano scoperti.
+- **Scelta di Ivan su tre anteprime** (sottolineatura a gessetto, cerchio a mano sul nome, freccia a lato): sottolineatura, ma spessa, ondulata e in movimento lento. Il giorno e i suoi orari diventano rosa gesso e al posto dei puntini sotto la riga c'è un'onda di 3 px (`static/img/onda-gesso.svg`, ripetuta in orizzontale).
+- **Animazione**: l'onda scorre di una lunghezza d'onda (24 px) ogni 3 secondi, così il loop non ha salti. Ferma con `prefers-reduced-motion: reduce`. SVG come file e non come `data:` URI perché la CSP ha `img-src 'self'`.
+- **Bollino OGGI tolto alla vista**: la parola "oggi" resta nel `<dt>` con la classe `visivamente-nascosto`, quindi i lettori di schermo la leggono ancora. Tutte le righe hanno la stessa altezza.
+- **Test**: aggiornati i due controlli sulla parola "oggi"; 192 test superati; nessuno scorrimento orizzontale a 360 e 1366 px.

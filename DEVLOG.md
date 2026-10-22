@@ -314,3 +314,11 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Zoom con Ctrl +/- su computer**: oltre il 150% circa la pagina scende sotto i 900 px e la navbar passa al pulsante a tre linee; il passaggio partiva con le animazioni del pannello (voci che "volavano"). Ora `navbar.js` mette per 400 ms la classe `senza-animazioni` al cambio di larghezza e il CSS spegne le transizioni della navbar.
 - **Scartato**: bloccare lo zoom (`user-scalable=no`, `maximum-scale=1`): serve a chi vede male (WCAG 1.4.4).
 - **Test**: nessun test nuovo (solo JavaScript e CSS); controllato con Playwright che le classi si mettono e si tolgono al cambio di dimensione, senza errori in Console. 191 test superati.
+
+## 2026-10-22 · Fase 2 – Icone nei contatti e nei titoli della pagina Orari e contatti
+
+- **Richiesta di Ivan**: rendere più moderna la parte sotto l'insegna senza togliere nulla. Una prima proposta (orari in tabella Pranzo/Cena, contatti come lista di azioni al posto dei pulsanti, niente fascia "Dove siamo") è stata scartata: i pulsanti Chiama/Indicazioni/Scrivi, il riquadro Come arrivare, i contatti e il doppio footer blu e rosso restano.
+- **Contatti con icona**: ogni riquadro ha a sinistra un quadratino rosso (blu per i social) con bordo e ombra piena come gli adesivi, con cornetta, busta e cuore. L'icona sta dentro il `<dt>` e si posiziona con `position: absolute` rispetto al riquadro, perché in una `<dl>` il `<div>` può contenere solo `dt` e `dd`. Icone SVG nel codice, `aria-hidden`.
+- **Social come pillole** con il logo di Facebook e Instagram, alte 44 px (area di tocco).
+- **Icone nei titoli**: orologio per Orari, segnaposto per Come arrivare, fumetto per Contatti (`.titolo-icona`, grandi 0,9 em del titolo).
+- **Test**: nessun test nuovo (markup e CSS); 191 test superati.

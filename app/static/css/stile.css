@@ -506,7 +506,11 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* Contatti: tessere crema sul blocco blu, una sotto l'altra su telefono. */
 .contatti { display: grid; gap: 0.75rem; margin: 0; }
 .contatto {
-    padding: 0.85rem 1rem;
+    position: relative; /* l'icona nel <dt> si posiziona rispetto al riquadro */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.85rem 1rem 0.85rem 4.25rem;
     border: 3px solid var(--blu-scuro);
     border-radius: 12px;
     background: var(--crema);
@@ -517,8 +521,42 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .contatto dt { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .contatto dd { margin: 0.2rem 0 0; }
 .contatti a { font-weight: 700; }
-.social { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
-.social a { display: inline-block; padding: 0.6rem 0; min-height: 44px; }
+/* Icona del contatto: quadratino rosso (o blu) con ombra piena, come gli adesivi del sito. */
+.contatto-icona {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--blu-scuro);
+    border-radius: 12px;
+    background: var(--rosso);
+    color: var(--crema);
+    box-shadow: 2px 2px 0 var(--blu-scuro);
+    transform: translateY(-50%);
+}
+.contatto-icona-blu { background: var(--blu); }
+.contatto-icona svg, .titolo-icona svg, .social svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.titolo-icona { display: flex; align-items: center; gap: 0.5rem; }
+.titolo-icona svg { flex: none; width: 0.9em; height: 0.9em; stroke-width: 2.4; }
+/* Social come pillole con il loro logo. */
+.social { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem; }
+.social a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0.3rem 0.85rem 0.3rem 0.4rem;
+    border: 2px solid var(--blu-scuro);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--blu-scuro);
+    text-decoration: none;
+}
+.social a:hover { background: var(--crema-scura); }
+.social svg { width: 26px; height: 26px; padding: 4px; border-radius: 50%; background: var(--blu); color: var(--crema); }
 .segnaposto { font-style: italic; color: var(--testo-secondario); }
 
 /* ---------- Sfondo animato di Menù e Orari e contatti ---------- */

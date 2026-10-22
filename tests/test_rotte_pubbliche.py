@@ -48,10 +48,10 @@ def test_home_contenuti(client):
 
 
 def test_home_come_arrivare_una_volta(client):
-    # Nell'hero sì, nella fascia "Dove siamo" subito sotto no; Info ha già Indicazioni in cima.
+    # Nell'hero sì, nella fascia "Dove siamo" subito sotto no; nelle altre pagine la fascia lo tiene.
     assert html(client.get("/")).count("Come arrivare</a>") == 1
     assert 'class="pulsante-footer"' not in html(client.get("/"))
-    assert 'class="pulsante-footer"' not in html(client.get("/info"))
+    assert 'class="pulsante-footer"' in html(client.get("/info"))
     assert 'class="pulsante-footer"' in html(client.get("/menu"))
 
 

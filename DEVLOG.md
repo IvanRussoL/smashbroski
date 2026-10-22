@@ -395,3 +395,8 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Tutta la riga si tocca** (area di almeno 68 px di altezza); su computer la freccia si sposta di 3 px al passaggio del mouse, ferma con "riduci movimento". Le righe sono larghe al massimo 34rem come gli orari: su computer i contatti non si allargano più in tre colonne.
 - **Alternative scartate**: tessere (più ingombranti su telefono), pillole in fila (perdono l'etichetta), biglietto centrato (contro l'allineamento a sinistra di tutta la lavagna), lista allineata (resta il blocco social diverso dagli altri).
 - **Test**: nuovo `test_info_contatti_righe_intere`; 193 test superati; nessuno scorrimento orizzontale a 360 e 1366 px, icone tutte sulla stessa verticale.
+
+## 2026-10-22 · Fase 2 – "Come arrivare" di nuovo nella fascia di Orari e contatti
+
+- **Ripensamento di Ivan**: il pulsante nella fascia "Dove siamo" di `/info` torna, perché lì in fondo alla pagina è comodo. È superfluo solo nella home, dove "Come arrivare" è già nell'hero subito sopra (la home continua a svuotare il blocco `footer_come_arrivare`). Menù e Orari e contatti tengono il pulsante nella fascia.
+- **Test**: `test_home_come_arrivare_una_volta` ora controlla che `/info` abbia `pulsante-footer`.

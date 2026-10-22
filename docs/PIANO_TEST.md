@@ -279,8 +279,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV08 (BLOCKED), AU-CON02 · RF-04 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | `/info` aperta su desktop; smartphone reale per il passo 3. |
-| **Passi** | 1) In Elements leggere l'`href` del telefono.<br>2) Cercare `wa.me` e `whatsapp` nel sorgente (Ctrl+U) di `/` e `/info`.<br>3) Su smartphone reale toccare il numero. |
-| **Atteso** | `href="tel:+390810000000"`, numero mostrato come "+39 081 000 0000"; accanto al numero la scritta "numero di prova". Nessun link WhatsApp. Sul telefono si apre il compositore con il numero già scritto, senza chiamare. Per la pubblicazione: numero reale, senza la scritta. |
+| **Passi** | 1) In Elements leggere l'`href` del telefono.<br>2) Cercare `wa.me` nel sorgente (Ctrl+U) di `/` e `/info`.<br>3) Su smartphone reale toccare il numero. |
+| **Atteso** | `href="tel:+390810000000"`, numero mostrato come "+39 081 000 0000"; accanto al numero la scritta "numero di prova". Il numero fisso non porta mai a WhatsApp: nessun `wa.me` in `/`; in `/info` un solo `wa.me`, quello del pulsante WhatsApp (`https://wa.me/393000000000`, numero di prova). Sul telefono si apre il compositore con il numero già scritto, senza chiamare. Per la pubblicazione: numero reale, senza la scritta. |
 
 #### TC-H04 — Link dell'email con e senza JavaScript
 
@@ -798,6 +798,7 @@ File: `tests/test_filtri.py`, `tests/test_modelli.py`
 | test_euro | 700 → "7,00 €"; 750 → "7,50 €"; 1 → "0,01 €"; 99999 → "999,99 €" |
 | test_ha_prezzo_unico | Voce con un prezzo senza formato → sì; voce con formati → no |
 | test_link_maps | `Impostazioni.link_maps()` → URL di Google Maps con l'indirizzo codificato, non `maps.app.goo.gl` |
+| test_link_whatsapp | `Impostazioni.link_whatsapp()` → `https://wa.me/` con le sole cifre del numero (senza "+" né spazi) |
 
 ### 3.5 AuthService
 
@@ -826,6 +827,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | test_home_json_ld, test_home_json_ld_con_telefono_reale | JSON-LD leggibile, `@type` Restaurant, indirizzo, orari, link al menù; nessun `telephone` con `telefono_di_prova` = sì; `telephone` presente con `telefono_di_prova` = no, e allora nessun "numero di prova" in `/info` |
 | test_json_ld_escape | Nome del locale con `</script>` → il JSON-LD non chiude lo script |
 | test_info_contenuti | GET `/info` → 200; un solo `<h1>`; `<title>` con "Orari e contatti"; `tel:+390810000000` mostrato come "+39 081 000 0000" con "numero di prova"; `mailto:info@example.com`; link a Google Maps; voce della navbar con `aria-current="page"` |
+| test_info_azioni_rapide | Pulsanti in cima alla lavagna: Chiama (`tel:`), Indicazioni (Google Maps), WhatsApp (`https://wa.me/393000000000`); nessun `mailto:` e nessuno "Scrivi" tra i pulsanti (l'email resta nei contatti) |
 | test_info_orari_martedi_chiuso | Martedì "Chiuso"; turni "12:00–15:00 · 18:00–01:00", ogni turno in uno `<span class="turno">` (non va a capo sul trattino) |
 | test_info_oggi_evidenziato | Con l'ora sostituita: martedì 10:00 → "Martedì (oggi)" in grassetto e stato "Chiuso · apre domani alle 12:00" |
 | test_menu_struttura | GET `/menu` → 200; nel contenuto di `<main>` (il footer ha altri `<h2>`) 7 `<h2>` con `id` uguale allo slug, nell'ordine del PDF; 25 `<h3>`; "Smash Cheeseburger" scritto così nell'HTML |
@@ -881,7 +883,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | AU-NAV05 | FAIL | RF-14 | TC-M07 | test_menu_struttura |
 | AU-NAV06 | FAIL | RF-11, RF-12, RF-15 | TC-M03, TC-M04, TC-M08 | test_menu_prezzi_e_formati |
 | AU-NAV07 | FAIL | RF-07 | TC-H06, TC-H08 | — |
-| AU-NAV08 | BLOCKED | RF-04 | TC-H03 | test_info_contenuti |
+| AU-NAV08 | BLOCKED | RF-04 | TC-H03 | test_info_contenuti, test_info_azioni_rapide, test_link_whatsapp |
 | AU-NAV09 | PASS | RF-05 | TC-H04 | test_info_contenuti |
 | AU-NAV10 | BLOCKED | RF-06 | TC-H05 | test_link_maps |
 | AU-NAV11 | FAIL | RF-02, RF-03, RF-18 | TC-H01, TC-H02, TC-P10 | sezioni 3.1 e 3.2, test_home_stato_apertura_*, test_info_orari_martedi_chiuso, test_info_oggi_evidenziato |
@@ -891,7 +893,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | AU-SEO03 | FAIL | RNF-09 | TC-NS07 | test_nessun_generator |
 | AU-SEO04 | FAIL | RNF-10 | TC-NS08 | test_home_json_ld |
 
-Parti dell'audit lasciate fuori perimetro (sezione 2 di `PROGETTAZIONE.md`): allergeni e servizi offerti (AU-NAV06, AU-NAV11), WhatsApp (AU-NAV08).
+Parti dell'audit lasciate fuori perimetro (sezione 2 di `PROGETTAZIONE.md`): allergeni e servizi offerti (AU-NAV06, AU-NAV11). WhatsApp (AU-NAV08) è rientrato il 22/10 come pulsante con un numero suo (TC-H03).
 
 ### 4.2 Requisiti senza un caso dell'audit
 

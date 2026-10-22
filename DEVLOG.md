@@ -362,3 +362,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Contatti sotto gli orari** (scelta di Ivan); su computer gli orari restano larghi al massimo 34rem, così le ore non finiscono lontane dai giorni.
 - **Pulizia del CSS**: la sezione della pagina è riscritta per la lavagna (variabili `--gesso*`, classi `lavagna`, `lavagna-testata`, `lavagna-sezione`); tolte le regole di blocchi-adesivo, righe a strisce, sentiero e Come arrivare.
 - **Test**: aggiornati i controlli della pagina (lavagna presente, niente `#come-arrivare`); 191 test superati; nessuno scorrimento orizzontale da 360 a 1920 px.
+
+## 2026-10-22 · Fase 2 – Pulsante WhatsApp al posto di "Scrivi"
+
+- **Richiesta di Ivan**: nella riga di pulsanti in cima alla lavagna, WhatsApp sostituisce "Scrivi" (email). WhatsApp era fuori perimetro dalla progettazione (16/10); ora rientra perché lo chiede Ivan, limitato a questo pulsante.
+- **Numero WhatsApp separato dal telefono** (colonne `whatsapp` e `whatsapp_di_prova` in `impostazioni`): il sito attuale manda il numero fisso a `wa.me` (AU-NAV08), che su un fisso di solito non ha WhatsApp. Il telefono resta un link `tel:` e non porta mai a WhatsApp (RF-04). Alternativa scartata: riusare il telefono.
+- **Segnaposto dichiarato** `+39 300 000 0000`: il prefisso cellulare 300 non è assegnato, quindi il link non apre la chat di una persona vera. `whatsapp_di_prova` vale sì e il pulsante mostra il suggerimento "Numero di prova". Quando i titolari danno il numero si cambiano le due colonne nei dati iniziali, senza toccare template e CSS.
+- **Link `https://wa.me/<cifre>`** costruito da `Impostazioni.link_whatsapp()`: è il formato ufficiale di WhatsApp e vuole solo le cifre, senza "+" né spazi. Da ricontrollare su smartphone reale con TC-H03, anche per l'avviso di Chrome sul redirect (AU-CON02).
+- **L'email non sparisce**: resta come link `mailto:` nei contatti sotto gli orari (RF-05). Il pulsante WhatsApp resta color gesso come era "Scrivi"; il verde WhatsApp non è nella palette del menù.
+- **Database da ricreare in locale**: `schema.sql` e `dati_iniziali.sql` hanno le nuove colonne.

@@ -41,3 +41,12 @@ def test_link_maps():
         "Vico+dei+Paninari%2C+7+-+80045+Pompei+%28NA%29"
     )
     assert "maps.app.goo.gl" not in link
+
+
+def test_link_whatsapp():
+    impostazioni = Impostazioni(
+        "SmashBroski Pompei", "Vico dei Paninari, 7 - 80045 Pompei (NA)", "+390810000000",
+        "info@example.com", "https://example.com/facebook-segnaposto", "https://example.com/instagram-segnaposto",
+        whatsapp="+39 300 000 0000",
+    )
+    assert impostazioni.link_whatsapp() == "https://wa.me/393000000000"

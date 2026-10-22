@@ -93,6 +93,8 @@ CREATE TABLE impostazioni (
     indirizzo         VARCHAR(255) NOT NULL,
     telefono          VARCHAR(20)  NOT NULL,
     telefono_di_prova BOOLEAN      NOT NULL DEFAULT TRUE,
+    whatsapp          VARCHAR(20)  NOT NULL,
+    whatsapp_di_prova BOOLEAN      NOT NULL DEFAULT TRUE,
     email             VARCHAR(255) NOT NULL,
     url_facebook      VARCHAR(255) NOT NULL,
     url_instagram     VARCHAR(255) NOT NULL,

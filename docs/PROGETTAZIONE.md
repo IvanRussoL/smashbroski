@@ -35,7 +35,7 @@ Dal 18/10 (grafica 2) la home è solo l'hero; orari e contatti sono nella pagina
 | RF-01 | La home mostra logo, stato di apertura, pulsante per il menù e "Come arrivare"; la pagina Orari e contatti mostra telefono, email, indirizzo e link Facebook e Instagram; indirizzo e social sono anche nel footer. Tutto visibile e senza sovrapposizioni su qualsiasi dimensione di schermo, in verticale e in orizzontale, e con lo zoom al 200% | AU-UI01, AU-UI02, AU-UI05, AU-UI06 |
 | RF-02 | La pagina Orari e contatti mostra gli orari della settimana, con il giorno di oggi evidenziato e con il giorno di chiusura scritto in modo esplicito ("Martedì: chiuso") | AU-NAV11 |
 | RF-03 | La home e la pagina Orari e contatti mostrano se il locale è aperto o chiuso in questo momento e, se è chiuso, quando riapre (es. "Chiuso · apre domani alle 12:00"; "oggi" e "domani" quando la riapertura è vicina, altrimenti il nome del giorno, es. "apre venerdì alle 12:00") | AU-NAV11 |
-| RF-04 | Il telefono è un link `tel:` che avvia la chiamata; nessun link WhatsApp | AU-CON02, AU-NAV08 (BLOCKED) |
+| RF-04 | Il telefono è un link `tel:` che avvia la chiamata; il numero fisso non porta mai a WhatsApp. Dal 22/10 la pagina Orari e contatti ha un pulsante WhatsApp con un numero suo (`whatsapp`, link `wa.me`), segnaposto finché i titolari non lo danno (DEVLOG) | AU-CON02, AU-NAV08 (BLOCKED) |
 | RF-05 | L'email è un link `mailto:` scritto in chiaro nell'HTML, che funziona anche senza JavaScript | AU-NAV09 (PASS, da mantenere) |
 | RF-06 | L'indirizzo apre Google Maps sulla posizione del locale, con un link costruito dall'indirizzo al posto del link breve attuale | AU-NAV10 (BLOCKED) |
 | RF-07 | I link social (per ora testuali) portano agli indirizzi stabili delle pagine Facebook e Instagram del locale, non a link di condivisione temporanei | AU-NAV07 |
@@ -226,6 +226,8 @@ Contiene i dati del locale mostrati nelle pagine. Ha una sola riga, creata dai d
 | `indirizzo` | VARCHAR(255), obbligatoria | Indirizzo mostrato e usato per costruire il link a Google Maps |
 | `telefono` | VARCHAR(20), obbligatoria | Telefono con prefisso internazionale, senza spazi (es. `+390810000000`), come serve al link `tel:`; sul sito si mostra con gli spazi |
 | `telefono_di_prova` | BOOLEAN, obbligatoria, predefinito sì | Se vale sì il sito mostra "numero di prova" accanto al numero e lo esclude dal JSON-LD |
+| `whatsapp` | VARCHAR(20), obbligatoria | Numero WhatsApp, stesso formato del telefono; il link `wa.me` usa solo le cifre. Separato dal telefono perché può essere un cellulare |
+| `whatsapp_di_prova` | BOOLEAN, obbligatoria, predefinito sì | Se vale sì il numero WhatsApp è un segnaposto (il pulsante lo dice nel suggerimento "Numero di prova") |
 | `email` | VARCHAR(255), obbligatoria | Email del locale |
 | `url_facebook` | VARCHAR(255), obbligatoria | Indirizzo della pagina Facebook |
 | `url_instagram` | VARCHAR(255), obbligatoria | Indirizzo del profilo Instagram |
@@ -242,6 +244,7 @@ Li carica lo script dei dati iniziali dopo `schema.sql`. I prezzi sono stati let
 | `nome_locale` | SmashBroski Pompei |
 | `indirizzo` | Vico dei Paninari, 7 - 80045 Pompei (NA) |
 | `telefono` | +39 081 000 0000 (FITTIZIO), `telefono_di_prova` = sì |
+| `whatsapp` | +39 300 000 0000 (FITTIZIO, prefisso non assegnato), `whatsapp_di_prova` = sì |
 | `email` | info@example.com (FITTIZIO) |
 | `url_facebook` | https://example.com/facebook-segnaposto (FITTIZIO) |
 | `url_instagram` | https://example.com/instagram-segnaposto (FITTIZIO) |

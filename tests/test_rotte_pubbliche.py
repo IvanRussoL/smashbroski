@@ -147,9 +147,11 @@ def test_info_azioni_rapide(client):
     azioni = re.search(r'<ul class="azioni-info">(.*?)</ul>', pagina, re.S).group(1)
     assert 'href="tel:+390810000000"' in azioni
     assert "https://www.google.com/maps/search/?api=1&amp;query=Vico+dei+Paninari" in azioni
-    assert 'href="mailto:info@example.com"' in azioni
-    for etichetta in ("Chiama", "Indicazioni", "Scrivi"):
+    assert 'href="https://wa.me/393000000000"' in azioni
+    assert "mailto:" not in azioni  # l'email resta solo nei contatti
+    for etichetta in ("Chiama", "Indicazioni", "WhatsApp"):
         assert etichetta in azioni
+    assert "Scrivi" not in azioni
 
 
 def test_info_sezioni_e_ancore(client):

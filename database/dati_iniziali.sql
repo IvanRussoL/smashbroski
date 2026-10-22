@@ -7,12 +7,14 @@
 
 START TRANSACTION;
 
--- Dati del locale. FITTIZI (segnaposto): telefono, email, Facebook e Instagram.
+-- Dati del locale. FITTIZI (segnaposto): telefono, WhatsApp, email, Facebook e Instagram.
 -- telefono_di_prova = TRUE: il sito mostra "numero di prova" e lo esclude dal JSON-LD.
+-- WhatsApp di prova: +39 300 000 0000, prefisso cellulare non assegnato, quindi non è il numero di nessuno.
 INSERT INTO impostazioni
-    (id, nome_locale, indirizzo, telefono, telefono_di_prova, email, url_facebook, url_instagram, fuso_orario)
+    (id, nome_locale, indirizzo, telefono, telefono_di_prova, whatsapp, whatsapp_di_prova, email, url_facebook, url_instagram, fuso_orario)
 VALUES
     (1, 'SmashBroski Pompei', 'Vico dei Paninari, 7 - 80045 Pompei (NA)', '+390810000000', TRUE,
+     '+393000000000', TRUE,
      'info@example.com', 'https://example.com/facebook-segnaposto', 'https://example.com/instagram-segnaposto',
      'Europe/Rome');
 

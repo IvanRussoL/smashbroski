@@ -36,6 +36,10 @@ body {
     color: var(--testo);
     background: var(--crema);
 }
+/* Home: i browser con la barra in basso "galleggiante" (Safari 26 e simili) colorano lo spazio sotto
+   la barra con il fondo della pagina. In home sotto l'hero c'è la fascia blu "Dove siamo": con il
+   fondo crema restava una striscia chiara in fondo allo schermo. */
+body.pagina-home { background: var(--blu); }
 
 img { max-width: 100%; height: auto; }
 

@@ -322,3 +322,9 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Social come pillole** con il logo di Facebook e Instagram, alte 44 px (area di tocco).
 - **Icone nei titoli**: orologio per Orari, segnaposto per Come arrivare, fumetto per Contatti (`.titolo-icona`, grandi 0,9 em del titolo).
 - **Test**: nessun test nuovo (markup e CSS); 191 test superati.
+
+## 2026-10-22 · Fase 2 – Striscia chiara in fondo alla home su browser con barra galleggiante
+
+- **Segnalazione di Ivan (screenshot dal telefono)**: in home, in fondo allo schermo, sotto l'hero e dietro la barra del browser "galleggiante" in basso, compariva una fascia color crema. Questi browser (Safari 26 e altri con la barra a pillola) colorano lo spazio sotto la barra con il fondo della pagina, che era crema, mentre subito sotto l'hero c'è la fascia blu "Dove siamo".
+- **Rimedio**: fondo del `<body>` della home nel blu della fascia (`body.pagina-home`), lo stesso colore in cui sfuma il velo dell'hero. Le pagine interne restano crema, che è già il loro fondo. Non verificabile da qui con quel browser: da confermare da Ivan.
+- **Test**: 191 test superati (solo CSS).

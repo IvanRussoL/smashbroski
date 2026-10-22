@@ -477,49 +477,37 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* L'onda scorre piano verso destra di un'onda intera (24 px) per ciclo, quindi il loop non ha salti. */
 @keyframes onda-gesso { to { background-position-x: 0; } }
 
-/* Contatti: icona disegnata col gesso a sinistra, etichetta e valore a destra. */
-.contatti { display: grid; gap: 0.75rem; margin: 0; }
+/* Contatti: una riga intera da toccare per contatto, puntinata come gli orari.
+   Griglia icona | etichetta e valore | freccia: tutte le righe hanno la stessa struttura e restano allineate. */
+.contatti { max-width: 34rem; margin: 0; padding: 0; list-style: none; }
 .contatto {
-    position: relative; /* l'icona nel <dt> si posiziona rispetto al contatto */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0.35rem 0 0.35rem 3.75rem;
-    overflow-wrap: anywhere;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 20px;
+    grid-template-areas: "icona etichetta freccia" "icona valore freccia";
+    column-gap: 1rem;
+    align-items: center;
+    padding: 0.7rem 0;
+    border-bottom: 1px dotted var(--gesso-traccia);
+    color: var(--gesso);
+    text-decoration: none;
 }
-.contatto dt { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-.contatto dd { margin: 0.2rem 0 0; }
-.contatti a { font-weight: 700; color: var(--gesso); }
 .contatto-icona {
-    position: absolute;
-    top: 50%;
-    left: 0;
+    grid-area: icona;
     display: grid;
     place-items: center;
     width: 44px;
     height: 44px;
     border: 2px solid var(--gesso-traccia);
     border-radius: 12px;
-    transform: translateY(-50%);
 }
-.contatto-icona svg, .titolo-icona svg, .social svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.contatto-etichetta { grid-area: etichetta; align-self: end; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.contatto-valore { grid-area: valore; align-self: start; margin-top: 0.1rem; font-weight: 700; overflow-wrap: anywhere; }
+.contatto-freccia { grid-area: freccia; color: var(--gesso-traccia); transition: transform 0.15s ease; }
+.contatto-icona svg, .titolo-icona svg, .contatto-freccia { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.contatto-freccia { stroke-width: 2.5; }
 .titolo-icona { display: flex; align-items: center; gap: 0.5rem; }
 .titolo-icona svg { flex: none; width: 0.9em; height: 0.9em; stroke-width: 2.4; }
-/* Social come pillole cerchiate col gesso, con il loro logo. */
-.social { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem; }
-.social a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 44px;
-    padding: 0.3rem 0.85rem 0.3rem 0.4rem;
-    border: 2px solid var(--gesso-traccia);
-    border-radius: 999px;
-    text-decoration: none;
-}
-.social a:hover { background: rgba(255, 255, 255, 0.08); }
-.social svg { width: 26px; height: 26px; padding: 4px; color: var(--gesso-blu); }
-.lavagna .segnaposto { color: var(--gesso-traccia); }
+.lavagna .segnaposto { color: var(--gesso-traccia); font-weight: 400; }
 .segnaposto { font-style: italic; color: var(--testo-secondario); }
 
 /* ---------- Sfondo animato di Menù e Orari e contatti ---------- */
@@ -636,6 +624,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
    sui telefoni il tocco lascerebbe la pillola rossa anche dopo, come se fosse ancora quella attiva. */
 .indice a[aria-current] { background: var(--rosso); color: var(--crema); }
 @media (hover: hover) {
+    .contatto:hover .contatto-freccia { color: var(--gesso); transform: translateX(3px); }
     .indice a:hover { background: var(--rosso); color: var(--crema); }
 }
 
@@ -930,7 +919,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .azioni-info { max-width: 36rem; }
     /* Gli orari restano larghi quanto serve: a tutta lavagna i giorni finirebbero lontani dalle ore. */
     .orari { max-width: 34rem; }
-    .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* Computer: barra più alta e più staccata, come Habita79; voci sempre visibili. */
@@ -1038,5 +1026,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .azione-info { transition: none; }
     .locale-aperto .insegna { animation: none; }
     .orari-giorno.oggi { animation: none; }
+    .contatto-freccia { transition: none; }
 }
 

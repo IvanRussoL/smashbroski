@@ -309,7 +309,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV07 · RF-07 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | `/info` aperta. |
-| **Passi** | 1) Leggere l'`href` dei link Facebook e Instagram nei contatti e nella colonna "Seguici" del footer.<br>2) Controllare che ogni link abbia un testo visibile (per ora non ci sono icone).<br>3) Solo per la pubblicazione: aprire i due link senza essere loggati a Facebook o Instagram. |
+| **Passi** | 1) Leggere l'`href` dei link Facebook e Instagram nei contatti e nella colonna "Seguici" del footer.<br>2) Controllare che ogni link abbia un testo visibile; nei contatti di `/info` ogni social è una riga intera (icona, nome, "Pagina/Profilo del locale", freccia) allineata alle righe di telefono ed email.<br>3) Solo per la pubblicazione: aprire i due link senza essere loggati a Facebook o Instagram. |
 | **Atteso** | Demo: `https://example.com/facebook-segnaposto` e `https://example.com/instagram-segnaposto`, uguali nei due punti. Nessun link di condivisione temporaneo (`/share/`). Pubblicazione: si aprono le pagine corrette di SmashBroski Pompei anche senza login. |
 
 #### TC-H07 — Doppio footer, pagina Privacy e nessun link all'area riservata
@@ -828,6 +828,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | test_json_ld_escape | Nome del locale con `</script>` → il JSON-LD non chiude lo script |
 | test_info_contenuti | GET `/info` → 200; un solo `<h1>`; `<title>` con "Orari e contatti"; `tel:+390810000000` mostrato come "+39 081 000 0000" con "numero di prova"; `mailto:info@example.com`; link a Google Maps; voce della navbar con `aria-current="page"` |
 | test_info_azioni_rapide | Pulsanti in cima alla lavagna: Chiama (`tel:`), Indicazioni (Google Maps), WhatsApp (`https://wa.me/393000000000`); nessun `mailto:` e nessuno "Scrivi" tra i pulsanti (l'email resta nei contatti) |
+| test_info_contatti_righe_intere | Contatti di `/info` come quattro righe-link (`tel:`, `mailto:`, Facebook, Instagram), ognuna con etichetta e freccia |
 | test_info_orari_martedi_chiuso | Martedì "Chiuso"; turni "12:00–15:00 · 18:00–01:00", ogni turno in uno `<span class="turno">` (non va a capo sul trattino) |
 | test_info_oggi_evidenziato | Con l'ora sostituita: martedì 10:00 → "Martedì (oggi)" in grassetto e stato "Chiuso · apre domani alle 12:00" |
 | test_menu_struttura | GET `/menu` → 200; nel contenuto di `<main>` (il footer ha altri `<h2>`) 7 `<h2>` con `id` uguale allo slug, nell'ordine del PDF; 25 `<h3>`; "Smash Cheeseburger" scritto così nell'HTML |

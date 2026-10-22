@@ -155,6 +155,18 @@ def test_info_azioni_rapide(client):
     assert "Scrivi" not in azioni
 
 
+def test_info_contatti_righe_intere(client):
+    # Ogni contatto è un'unica riga-link: icona, etichetta, valore e freccia nello stesso <a>.
+    pagina = html(client.get("/info"))
+    contatti = re.search(r'<ul class="contatti">(.*?)</ul>', pagina, re.S).group(1)
+    righe = re.findall(r'<a class="contatto" href="([^"]+)"', contatti)
+    assert righe[:2] == ["tel:+390810000000", "mailto:info@example.com"]
+    assert len(righe) == 4  # telefono, email, Facebook, Instagram
+    assert contatti.count('class="contatto-freccia"') == 4
+    for etichetta in ("Telefono", "Email", "Facebook", "Instagram"):
+        assert f'<span class="contatto-etichetta">{etichetta}</span>' in contatti
+
+
 def test_info_sezioni_e_ancore(client):
     pagina = html(client.get("/info"))
     assert '<div class="lavagna">' in pagina  # tutto il contenuto sta sulla lavagna

@@ -386,3 +386,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Richiesta di Ivan**: nella fascia blu "Dove siamo" in fondo alla pagina il pulsante "Come arrivare" era superfluo, perché in cima alla lavagna c'è già "Indicazioni" con lo stesso link a Google Maps.
 - **Stesso meccanismo della home**: `info.html` svuota il blocco `footer_come_arrivare` di `base.html`; la fascia resta con l'etichetta e l'indirizzo. Sulla pagina Menù il pulsante resta finché Ivan non decide.
 - **Test**: `test_home_come_arrivare_una_volta` controlla anche che `/info` non abbia `pulsante-footer`; 192 test superati.
+
+## 2026-10-22 · Fase 2 – Contatti di Orari e contatti come righe da toccare
+
+- **Segnalazione di Ivan**: icone e pulsanti dei contatti non erano centrati né distanziati bene. Due cause: l'icona di "Social" era centrata in verticale su un blocco più alto (etichetta + due pillole), quindi scendeva rispetto alle altre; su computer le tre colonne erano larghe uguali anche se le pillole social occupavano più spazio.
+- **Scelta di Ivan su cinque anteprime** (lista allineata, tessere, righe come gli orari, pillole in fila, biglietto centrato): righe come gli orari. Ogni contatto è un'unica riga-link (`<ul class="contatti">` con un `<a class="contatto">` per riga) divisa in una griglia icona | etichetta e valore | freccia ›, con la linea puntinata degli orari sotto ogni riga. Telefono, email, Facebook e Instagram hanno la stessa struttura, quindi non possono disallinearsi.
+- **Facebook e Instagram diventano due righe** al posto del blocco "Social" con pillole: il valore è "Pagina del locale" / "Profilo del locale", perché i nomi reali delle pagine non sono ancora noti (nessun dato inventato).
+- **Tutta la riga si tocca** (area di almeno 68 px di altezza); su computer la freccia si sposta di 3 px al passaggio del mouse, ferma con "riduci movimento". Le righe sono larghe al massimo 34rem come gli orari: su computer i contatti non si allargano più in tre colonne.
+- **Alternative scartate**: tessere (più ingombranti su telefono), pillole in fila (perdono l'etichetta), biglietto centrato (contro l'allineamento a sinistra di tutta la lavagna), lista allineata (resta il blocco social diverso dagli altri).
+- **Test**: nuovo `test_info_contatti_righe_intere`; 193 test superati; nessuno scorrimento orizzontale a 360 e 1366 px, icone tutte sulla stessa verticale.

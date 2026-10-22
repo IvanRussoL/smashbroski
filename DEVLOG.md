@@ -432,3 +432,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
   - **Pillole dell'indice**: in fondo allo scorrimento l'ultima pillola finiva a 15 px dal bordo invece di 12: spazio finale ridotto a 3 px, quanto la sua ombra.
   - **Navbar tra 900 e 1100 px**: "Orari e contatti" andava a capo (il testo in Archivo è un po' più largo del carattere di sistema). Voci su una riga (`white-space: nowrap`) e un po' più vicine in quella fascia.
   - **Orari e contatti a 320 px**: le scritte "Indicazioni" e "WhatsApp" uscivano dai pulsanti e le ore della sera uscivano dalla lavagna (fino a 19 px). Sotto i 380 px lavagna con meno spazio interno e testo di pulsanti e orari più piccolo: ora tutto resta dentro. Ricontrollato su 90 combinazioni pagina × larghezza: nessuna pagina più larga dello schermo e nessun testo fuori dal suo riquadro.
+
+## 2026-10-22 · Fase 2 – Regole di leggibilità e ombra di THE ORIGINALS
+
+- **Ricerca sulle regole di un buon sito** (grandezze, lunghezza delle righe, interlinea, scala dei titoli, Core Web Vitals, contrasto): il confronto con il sito ha dato tre correzioni piccole.
+  - **Nessun testo sotto i 12 px**: marchio "SmashBroski Pompei" nella navbar da 0,72 a 0,75rem; etichette sopra le colonne dei prezzi nel menù su computer da 0,68 a 0,75rem (ora tutte e quattro su tre righe uguali).
+  - **Righe di circa 65 caratteri** nelle pagine di testo (Privacy): `max-width: 65ch` su paragrafi ed elenchi; prima arrivavano a circa 110 caratteri.
+  - **Descrizioni del menù** con interlinea 1,5 invece di 1,4.
+- **Errore trovato durante le prove**: nelle pagine brevi (Privacy, accesso, errori) il footer è subito sullo schermo, quindi `al-footer` rendeva rosso tutto il fondo e titoli e testo blu non si leggevano. Ora il `main` di quelle pagine (`main:has(> .pagina-testo)`) ha il suo fondo crema.
+- **Ombra di THE ORIGINALS** (segnalazione di Ivan): il titolo BURGER aveva l'ombra piena blu scuro, THE ORIGINALS, anche lui su fondo chiaro, no. Stessa ombra di 4 px anche lì. Provato a 320, 390 e 1366 px: nessuno scroll orizzontale, il titolo resta nel blocco.

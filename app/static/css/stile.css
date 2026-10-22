@@ -550,6 +550,11 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* Mentre la pagina scorre i loghi si fermano (classe messa da static/js/sfondo.js): sedici file in
    movimento più lo scroll appesantivano il browser e lo scorrimento del menù andava a scatti. */
 .scorrendo .fila-loghi { animation-play-state: paused; }
+/* Durante lo zoom con due dita e finché la pagina è ingrandita le file sono ferme e senza livello
+   proprio (classe messa da sfondo.js): il telefono ridisegna la pagina senza lasciare zone vuote. */
+.zoom .fila-loghi { animation: none; will-change: auto; }
+/* Passaggio tra navbar larga e pulsante a tre linee (classe messa da navbar.js): niente animazioni. */
+.senza-animazioni .navbar-linee span, .senza-animazioni .navbar-link, .senza-animazioni .navbar-link li { transition: none !important; }
 
 /* ---------- Menù: blocchi-adesivo come i riquadri del PDF, stile street food ---------- */
 

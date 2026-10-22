@@ -307,3 +307,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 
 - **Tolto il pulsante "Come arrivare" dalla fascia "Dove siamo" della home** (segnalazione di Ivan): ripeteva quello accanto a "Guarda il menù", visibile subito sopra nella stessa schermata. Il pulsante sta in un blocco Jinja (`footer_come_arrivare` in `base.html`) che la home svuota; in Menù e Orari e contatti la fascia lo tiene, perché lì non c'è l'hero. L'indirizzo resta nella fascia.
 - **Test**: `test_home_come_arrivare_una_volta`. 191 test superati.
+
+## 2026-10-22 · Fase 2 – Zoom più pulito su telefono e computer
+
+- **Zone vuote per un attimo durante lo zoom con due dita** (segnalazione di Ivan, Oppo Reno 12 Pro con Chrome, pagine Menù e Orari e contatti, screenshot): rimpicciolendo veloce si vedeva solo un pezzo della pagina e il resto color crema. È Chrome che non fa in tempo a ridisegnare le zone appena entrate nello schermo; i sedici livelli animati dello sfondo di loghi gli tolgono memoria e tempo. Ora `sfondo.js` ascolta il `resize` di `visualViewport` (lo zoom con due dita) e mette la classe `zoom` sull'`<html>`: le file si fermano e perdono il livello proprio (`animation: none; will-change: auto`) finché la pagina resta ingrandita, e ripartono 400 ms dopo il ritorno a grandezza normale. Non verificabile sul telefono vero da qui: da confermare da Ivan. Limite noto: un minimo di ridisegno durante zoom molto rapidi è normale in Chrome.
+- **Zoom con Ctrl +/- su computer**: oltre il 150% circa la pagina scende sotto i 900 px e la navbar passa al pulsante a tre linee; il passaggio partiva con le animazioni del pannello (voci che "volavano"). Ora `navbar.js` mette per 400 ms la classe `senza-animazioni` al cambio di larghezza e il CSS spegne le transizioni della navbar.
+- **Scartato**: bloccare lo zoom (`user-scalable=no`, `maximum-scale=1`): serve a chi vede male (WCAG 1.4.4).
+- **Test**: nessun test nuovo (solo JavaScript e CSS); controllato con Playwright che le classi si mettono e si tolgono al cambio di dimensione, senza errori in Console. 191 test superati.

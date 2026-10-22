@@ -21,7 +21,16 @@
     --ingombro-navbar: calc(var(--altezza-navbar) + var(--margine-navbar));
     --larghezza-contenuto: 1100px;
     --raggio: 6px;
-    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Carattere del testo normale, uguale su ogni dispositivo (licenza SIL OFL in static/fonts).
+   Un solo file variabile copre tutti i pesi usati nel sito, da 400 a 800. */
+@font-face {
+    font-family: "Archivo";
+    src: url("../fonts/archivo-latin-variabile.woff2") format("woff2");
+    font-weight: 100 900;
+    font-display: swap;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

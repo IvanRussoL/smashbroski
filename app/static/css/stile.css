@@ -526,6 +526,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     background: var(--crema);
     pointer-events: none;
 }
+/* Alcuni browser (es. "Browser" di Oppo) non disegnano gli elementi fissi sotto la loro barra in basso
+   e lì mostrano solo il fondo della pagina: le stesse file di loghi, ferme, anche sul fondo. */
+body:has(.sfondo-loghi) { background: var(--crema) url("../img/motivo-loghi-fondo.webp") 0 0 / 192px 168px; }
+.al-footer body:has(.sfondo-loghi) { background: var(--rosso); }
 /* Con il footer sullo schermo lo sfondo finisce sopra le fasce del footer (vedi fondo-pagina.js). */
 .al-footer .sfondo-loghi { bottom: var(--taglio-sfondo, -20vh); }
 .fila-loghi {

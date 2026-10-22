@@ -323,7 +323,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     margin: 0 0 0.75rem;
     padding-top: 0.1em;
     font-family: var(--titolo);
-    font-size: 2.6rem;
+    font-size: 1.75rem; /* 28 px su telefono, 32 px da 768 px */
     font-weight: 400;
     line-height: 1;
     letter-spacing: 0.02em;
@@ -334,17 +334,17 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* Titolo su un'etichetta inclinata, come "Menù". */
 .testata-info {
     display: inline-block;
-    margin: 1.5rem 0 1.25rem;
-    padding: 0.5rem 1rem 0.6rem;
+    margin: 1rem 0;
+    padding: 0.35rem 0.75rem 0.45rem;
     background: var(--crema);
     border: var(--bordo-info);
-    box-shadow: 6px 6px 0 var(--blu-scuro);
+    box-shadow: 4px 4px 0 var(--blu-scuro);
     transform: rotate(-1.5deg);
 }
 .testata-info h1 {
     margin: 0;
     font-family: var(--titolo);
-    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    font-size: 2rem; /* 32 px su telefono, 44 px da 768 px */
     font-weight: 400;
     line-height: 1;
     text-transform: uppercase;
@@ -364,7 +364,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     box-shadow: var(--ombra-info);
 }
 .blocco-arrivare { --fondo: var(--rosso); --accento: var(--crema); color: var(--crema); transform: rotate(0.5deg); }
-.blocco-contatti { --fondo: var(--blu); --accento: var(--crema); color: var(--crema); margin-top: 1.6rem; }
+.blocco-contatti { --fondo: var(--blu); --accento: var(--crema); color: var(--crema); margin-top: 1.5rem; }
 .blocco-info :focus-visible { outline-color: var(--blu-scuro); }
 .blocco-arrivare :focus-visible, .blocco-contatti :focus-visible { outline-color: var(--crema); }
 
@@ -374,17 +374,17 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 1.5rem;
-    min-height: 300px;
-    padding: 1.25rem;
+    gap: 0.75rem;
+    padding: 1rem;
     color: var(--crema);
     background: radial-gradient(ellipse at 50% 20%, #2A4F6E 0%, var(--blu-scuro) 70%);
 }
 .insegna {
     margin: 0;
     font-family: var(--titolo);
-    font-size: clamp(3.4rem, 17vw, 7rem);
-    line-height: 0.9;
+    font-size: clamp(2rem, 9.5vw, 2.5rem); /* il nome sta su una riga anche a 360 px */
+    line-height: 1;
+    white-space: nowrap;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     color: transparent;
@@ -403,7 +403,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .stato-testo { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
 .info-indirizzo { margin: 0; font-weight: 600; }
-.blocco-stato .info-indirizzo { margin: 0 0 0.4rem; font-size: 1.05rem; letter-spacing: 0.04em; font-weight: 500; }
+.blocco-stato .info-indirizzo { margin: 0 0 0.25rem; font-size: 0.95rem; letter-spacing: 0.04em; font-weight: 500; }
 
 /* Stato come etichetta a bordo spesso: verde chiaro se aperto, rosa se chiuso, sempre con il testo. */
 .pagina-info .stato-apertura {
@@ -419,7 +419,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pagina-info .stato-apertura.aperto { background: #D9F2E2; }
 .pagina-info .stato-apertura.aperto::before { background: #17633A; }
 /* Sull'insegna l'etichetta è chiara su fondo scuro. */
-.pagina-info .blocco-stato .stato-apertura { background: rgba(255, 250, 240, 0.14); border: 1px solid rgba(255, 250, 240, 0.45); color: var(--crema); }
+.pagina-info .blocco-stato .stato-apertura { padding: 0.3rem 0.75rem; font-size: 0.9rem; background: rgba(255, 250, 240, 0.14); border: 1px solid rgba(255, 250, 240, 0.45); color: var(--crema); }
 .pagina-info .blocco-stato .stato-apertura.aperto::before { background: #5DD37E; }
 .pagina-info .blocco-stato .stato-apertura.chiuso::before { background: #F2B33D; }
 
@@ -427,8 +427,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .azioni-info {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
-    margin: 1.6rem 0;
+    gap: 0.5rem;
+    margin: 1rem 0 1.5rem;
     padding: 0;
     list-style: none;
 }
@@ -438,8 +438,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     align-items: center;
     justify-content: center;
     gap: 0.25rem;
-    min-height: 72px;
-    padding: 0.6rem 0.4rem;
+    min-height: 60px; /* sopra i 44-48 px consigliati per il tocco */
+    padding: 0.4rem;
+    font-size: 0.95rem;
     border: 3px solid var(--blu-scuro);
     border-radius: 14px;
     box-shadow: 4px 4px 0 var(--blu-scuro);
@@ -450,7 +451,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     text-decoration: none;
     transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
-.azione-info svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.azione-info svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .azione-info:hover { color: var(--blu-scuro); transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--blu-scuro); }
 .azione-info:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--blu-scuro); }
 .azione-chiama { background: var(--rosso); color: var(--crema); }
@@ -459,7 +460,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .azione-indicazioni:hover { color: var(--crema); }
 .azione-mappa { display: inline-flex; flex-direction: row; min-height: 48px; padding: 0.7rem 1.2rem; }
 
-.sezioni-info { display: grid; gap: 1.6rem; align-items: start; }
+.sezioni-info { display: grid; gap: 1.5rem; align-items: start; }
 
 /* Orari come tabella a bordo spesso, con la riga di oggi in blu notte. */
 .orari {
@@ -471,13 +472,16 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .orari-giorno {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 0.65rem 0.9rem;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem; /* su telefono i due turni stanno su una riga */
     border-bottom: 1px solid #C9D3DC;
 }
 .orari-giorno:last-child { border-bottom: 0; }
-.orari dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.orari dd { margin: 0; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
 /* Righe a strisce rosse e crema come la tenda del locale; oggi in blu scuro con il bollino "oggi". */
 .orari-giorno:nth-child(even) { background: var(--rosso); color: var(--crema); border-bottom-color: var(--rosso); }
@@ -485,14 +489,14 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .orari-giorno.oggi { background: var(--blu-scuro); color: var(--crema); font-weight: 700; }
 .bollino-oggi {
     display: inline-block;
-    margin-left: 0.4rem;
-    padding: 0.1rem 0.5rem;
+    margin-left: 0.3rem;
+    padding: 0 0.35rem;
     border: 2px solid var(--crema);
     border-radius: 6px;
     background: var(--rosso);
     font-family: var(--titolo);
     font-weight: 400;
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     transform: rotate(-4deg);
@@ -912,7 +916,13 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 @media (min-width: 768px) {
     .sezioni-info { grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .blocco-stato { min-height: 320px; padding: 2rem 2.25rem; }
+    .testata-info h1 { font-size: 2.75rem; }
+    .pagina-info h2 { font-size: 2rem; }
+    .blocco-stato { padding: 1.5rem 2rem; }
+    .insegna { font-size: 4rem; }
+    .blocco-stato .info-indirizzo { font-size: 1rem; }
+    .azione-info { min-height: 64px; }
+    .orari-giorno { font-size: 0.95rem; }
     .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .azioni-info { max-width: 36rem; }
 }

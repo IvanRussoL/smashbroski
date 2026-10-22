@@ -286,3 +286,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Orari a strisce come la tenda**: righe alternate rosse e crema, oggi in blu scuro con il bollino rosso "OGGI" ruotato al posto di "(oggi)".
 - **Test**: `test_info_insegna_segue_lo_stato` e il bollino in `test_info_oggi_evidenziato`. 189 test superati.
 - **Insegna con il nome invece di APERTO / CHIUSO** (Ivan: l'insegna e l'etichetta col pallino dicevano la stessa cosa due volte). Sul neon ora c'è il nome del locale, acceso se aperto e spento se chiuso; lo stato a parole resta solo nell'etichetta. L'insegna prende il posto del vecchio nome in piccolo (`info-locale`, tolto) e non è più `aria-hidden`. Gli orari a strisce piacciono a Ivan e restano.
+
+## 2026-10-22 · Fase 2 – Grandezze della pagina Orari e contatti ridotte
+
+- **Perché**: per Ivan sezioni troppo grandi su telefono e desktop, soprattutto l'insegna al neon (300 px di altezza su un telefono da 800). Proposta mostrata prima come anteprima prima/dopo, approvata da Ivan.
+- **Riferimenti**: testo a 16 px; titoli principali 28-36 px su telefono e 40-56 su desktop (scala 1,2-1,25, Cloud Four e Design Shack); aree di tocco di almeno 44 px (Apple, WCAG 2.5.5) o 48 (Material).
+- **Nuovi valori (telefono / da 768 px)**: titolo pagina 32 / 44 px (prima 40 / 58); insegna 32-40 / 64 px su una riga (prima 61 / 112), riquadro alto 178 / 200 px (prima 300 / 320) senza altezza minima; titoli di sezione 28 / 32 px (prima 42); pulsanti Chiama, Indicazioni e Scrivi 60 / 64 px (prima 78); righe degli orari alte 44 px con i due turni su una riga (14 px su telefono, 15 da 768 px), prima 71 px su due righe. Spazi tra i blocchi a 8-16-24 px.
+- **Effetto**: su telefono i pulsanti finiscono a 421 px dall'alto invece che a 589, gli orari si vedono già all'apertura; pagina più corta di circa 300 px su telefono e 220 su desktop.
+- **Scartato**: turni degli orari su due righe su telefono (raddoppia l'altezza della tabella); testo degli orari sotto i 14 px.
+- **Test**: nessun test nuovo (solo CSS). 189 test superati.

@@ -350,3 +350,15 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Richiesta di Ivan**: il pulsante "Apri in Google Maps" nel riquadro Come arrivare era ridondante, perché apre lo stesso link del pulsante "Indicazioni". Tolti il link da `info.html` e la regola `.azione-mappa` da `stile.css`; il riquadro mostra solo titolo, sentiero e indirizzo.
 - **Indicazioni resta nella riga in alto** (Chiama · Indicazioni · Scrivi) finché non si sceglie dove spostarlo: la prova con la pillola al neon accanto alla X del sentiero è stata scartata su telefono (troppe scritte in poco spazio).
 - **TC-H05** aggiornato: il terzo link da controllare è "Indicazioni" di `/info`.
+
+## 2026-10-22 · Fase 2 – Pagina Orari e contatti come una lavagna
+
+- **Idea di Ivan** (con la foto di una lavagnetta da esterno di una hamburgeria): tutto il contenuto della pagina su un'unica lavagna, senza cornice di legno. Prima c'erano blocchi-adesivo separati (insegna, azioni, orari, Come arrivare, contatti).
+- **Prove scartate prima della lavagna**: pulsante Indicazioni come pillola al neon accanto alla X del sentiero (sul telefono troppe scritte in poco spazio) e poi sotto l'indirizzo (non convinceva).
+- **Fondo blu scuro del marchio** (#203E56) con macchie chiare sfumate fatte di soli gradienti, come una lavagna cancellata più volte. Scartato il nero ardesia: meno "nostro". Niente disegnini a gesso per ora.
+- **Titoli a gessetto, resto in grassetto normale** (Cabin Sketch, licenza SIL OFL, salvato in `static/fonts`): su due anteprime Ivan ha scelto questa contro "tutto in Anton grassetto" per una pagina più semplice ed elegante. Il gessetto resta solo nei titoli: un carattere decorativo su testi lunghi, numeri e pulsanti piccoli si legge peggio.
+- **Insegna al neon in cima, a sinistra**: centrata andava bene da sola, ma sotto è tutto allineato a sinistra (indirizzo, stato, pulsanti, orari); con il neon a sinistra la lavagna ha un solo margine.
+- **Tolto il riquadro Come arrivare** con il suo indirizzo e il sentiero animato: l'indirizzo è già sotto l'insegna e il pulsante Indicazioni nella riga in alto. Le guide sui siti dei ristoranti chiedono indirizzo, orari, telefono e indicazioni subito in vista, non ripetuti.
+- **Contatti sotto gli orari** (scelta di Ivan); su computer gli orari restano larghi al massimo 34rem, così le ore non finiscono lontane dai giorni.
+- **Pulizia del CSS**: la sezione della pagina è riscritta per la lavagna (variabili `--gesso*`, classi `lavagna`, `lavagna-testata`, `lavagna-sezione`); tolte le regole di blocchi-adesivo, righe a strisce, sentiero e Come arrivare.
+- **Test**: aggiornati i controlli della pagina (lavagna presente, niente `#come-arrivare`); 191 test superati; nessuno scorrimento orizzontale da 360 a 1920 px.

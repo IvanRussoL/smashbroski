@@ -310,38 +310,36 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pulsante-secondario:hover { background: var(--crema); color: var(--blu-scuro); }
 .hero :focus-visible { outline-color: var(--crema); }
 
-/* ---------- Pagina Orari e contatti: blocchi-adesivo liberi sullo sfondo, come il menù ---------- */
+/* ---------- Pagina Orari e contatti: una lavagna come quella fuori dal locale ---------- */
 
-/* Nessun pannello: titolo, stato, azioni e sezioni sono adesivi separati sopra i loghi,
-   con gli stessi bordi blu notte e le stesse ombre piene dei blocchi del menù. */
+/* Carattere "a gesso" dei titoli della lavagna, salvato nel sito (licenza SIL OFL in static/fonts).
+   Solo per i titoli: su testi lunghi e numeri un carattere decorativo si legge peggio. */
+@font-face {
+    font-family: "Cabin Sketch";
+    src: url("../fonts/cabin-sketch-latin-700.woff2") format("woff2");
+    font-weight: 700;
+    font-display: swap;
+}
 .pagina-info {
     --titolo: "Anton", Impact, "Arial Narrow", sans-serif;
-    --bordo-info: 4px solid var(--blu-scuro);
-    --ombra-info: 7px 7px 0 var(--blu-scuro);
+    --gessetto: "Cabin Sketch", "Comic Sans MS", cursive;
+    --gesso: #F4F1EA;
+    --gesso-rosso: #FF9AAE;
+    --gesso-blu: #9CCBF5;
+    --gesso-traccia: rgba(244, 241, 234, 0.55);
     max-width: 1120px;
     margin-inline: auto;
     padding: 0 0.75rem 3rem;
     color: var(--blu-scuro);
 }
-.pagina-info h2 {
-    margin: 0 0 0.75rem;
-    padding-top: 0.1em;
-    font-family: var(--titolo);
-    font-size: 1.75rem; /* 28 px su telefono, 32 px da 768 px */
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--accento);
-}
 
-/* Titolo su un'etichetta inclinata, come "Menù". */
+/* Titolo su un'etichetta inclinata, come "Menù", fuori dalla lavagna. */
 .testata-info {
     display: inline-block;
     margin: 1rem 0;
     padding: 0.35rem 0.75rem 0.45rem;
     background: var(--crema);
-    border: var(--bordo-info);
+    border: 4px solid var(--blu-scuro);
     box-shadow: 4px 4px 0 var(--blu-scuro);
     transform: rotate(-1.5deg);
 }
@@ -355,36 +353,42 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     color: var(--rosso);
 }
 
-/* Ogni sezione è un blocco-adesivo con un colore del marchio. */
-.blocco-info {
-    --fondo: var(--crema);
-    --accento: var(--rosso);
-    min-width: 0;
-    padding: 1.1rem 1rem 1.2rem;
-    background: var(--fondo);
-    color: var(--blu-scuro);
-    border: var(--bordo-info);
-    border-radius: 16px;
-    box-shadow: var(--ombra-info);
+/* La lavagna: fondo blu scuro con macchie chiare sfumate, come una lavagna cancellata più volte.
+   Niente cornice di legno: bordo e ombra piena sono quelli degli adesivi del sito. */
+.lavagna {
+    margin-top: 0.5rem;
+    padding: 1.25rem 1rem 1.5rem;
+    border: 4px solid var(--blu-scuro);
+    border-radius: 18px;
+    box-shadow: 7px 7px 0 var(--blu-scuro);
+    color: var(--gesso);
+    background:
+        radial-gradient(ellipse 60% 40% at 15% 20%, rgba(255, 255, 255, 0.07), transparent 70%),
+        radial-gradient(ellipse 50% 35% at 85% 45%, rgba(255, 255, 255, 0.05), transparent 70%),
+        radial-gradient(ellipse 70% 30% at 40% 85%, rgba(255, 255, 255, 0.06), transparent 70%),
+        linear-gradient(170deg, #26496A 0%, var(--blu-scuro) 55%, #1A3348 100%);
 }
-.blocco-arrivare { --fondo: var(--rosso); --accento: var(--crema); color: var(--crema); transform: rotate(0.5deg); }
-.blocco-contatti { --fondo: var(--blu); --accento: var(--crema); color: var(--crema); margin-top: 1.5rem; }
-.blocco-info :focus-visible { outline-color: var(--blu-scuro); }
-.blocco-arrivare :focus-visible, .blocco-contatti :focus-visible { outline-color: var(--crema); }
+.lavagna :focus-visible { outline-color: var(--gesso); }
+/* Le sezioni sono separate da una riga tratteggiata, come tirata col gesso. */
+.lavagna-sezione { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 2px dashed var(--gesso-traccia); }
+.lavagna-sezione h2 {
+    margin: 0 0 0.75rem;
+    font-family: var(--gessetto);
+    font-size: 2rem; /* 32 px su telefono, 38 px da 768 px */
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--gesso);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.6);
+}
+#contatti h2 { color: var(--gesso-blu); }
 
-/* Riquadro dello stato come insegna al neon: fondo blu scuro, nome del locale grande in alto,
-   indirizzo e stato in basso. Da aperto l'insegna è accesa (bagliore rosso), da chiuso è spenta. */
-.blocco-stato {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 1rem;
-    color: var(--crema);
-    background: radial-gradient(ellipse at 50% 20%, #2A4F6E 0%, var(--blu-scuro) 70%);
-}
+/* In cima l'insegna al neon, allineata a sinistra come tutto il resto, poi indirizzo e stato.
+   Da aperto l'insegna è accesa (bagliore rosso), da chiuso è spenta (solo il contorno). */
+.lavagna-testata { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
 .insegna {
-    margin: 0;
+    margin: 0 0 0.35rem;
     font-family: var(--titolo);
     font-size: clamp(2rem, 9.5vw, 2.5rem); /* il nome sta su una riga anche a 360 px */
     line-height: 1;
@@ -405,34 +409,24 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     0%, 18%, 26%, 44% { opacity: 0.15; }
     20%, 24%, 46%, 100% { opacity: 1; }
 }
-.stato-testo { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
-.info-indirizzo { margin: 0; font-weight: 600; }
-.blocco-stato .info-indirizzo { margin: 0 0 0.25rem; font-size: 0.95rem; letter-spacing: 0.04em; font-weight: 500; }
-
-/* Stato come etichetta a bordo spesso: verde chiaro se aperto, rosa se chiuso, sempre con il testo. */
+.info-indirizzo { margin: 0 0 0.25rem; font-size: 0.95rem; font-weight: 500; letter-spacing: 0.04em; }
+/* Stato come etichetta chiara sul fondo scuro, con il pallino verde (aperto) o giallo (chiuso). */
 .pagina-info .stato-apertura {
     margin: 0;
-    padding: 0.45rem 0.9rem;
-    border: 3px solid var(--blu-scuro);
-    border-radius: 999px;
-    background: #FBE1E7;
-    color: var(--blu-scuro);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.9rem;
     font-weight: 700;
+    background: rgba(255, 250, 240, 0.14);
+    border: 1px solid rgba(255, 250, 240, 0.45);
+    color: var(--crema);
 }
-.pagina-info .stato-apertura::before { background: var(--rosso); }
-.pagina-info .stato-apertura.aperto { background: #D9F2E2; }
-.pagina-info .stato-apertura.aperto::before { background: #17633A; }
-/* Sull'insegna l'etichetta è chiara su fondo scuro. */
-.pagina-info .blocco-stato .stato-apertura { padding: 0.3rem 0.75rem; font-size: 0.9rem; background: rgba(255, 250, 240, 0.14); border: 1px solid rgba(255, 250, 240, 0.45); color: var(--crema); }
-.pagina-info .blocco-stato .stato-apertura.aperto::before { background: #5DD37E; }
-.pagina-info .blocco-stato .stato-apertura.chiuso::before { background: #F2B33D; }
 
-/* Chiama, Indicazioni, Scrivi: tre adesivi grandi che si "schiacciano" al tocco. */
+/* Chiama, Indicazioni, Scrivi: scritte cerchiate col gesso, con un bordo un po' irregolare. */
 .azioni-info {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.5rem;
-    margin: 1rem 0 1.5rem;
+    margin: 1.25rem 0 0;
     padding: 0;
     list-style: none;
 }
@@ -445,34 +439,22 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     min-height: 60px; /* sopra i 44-48 px consigliati per il tocco */
     padding: 0.4rem;
     font-size: 0.95rem;
-    border: 3px solid var(--blu-scuro);
-    border-radius: 14px;
-    box-shadow: 4px 4px 0 var(--blu-scuro);
-    background: var(--crema);
-    color: var(--blu-scuro);
     font-weight: 800;
     text-align: center;
     text-decoration: none;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    border: 2px solid var(--gesso);
+    border-radius: 14px 18px 12px 16px;
+    color: var(--gesso);
+    transition: background-color 0.1s ease, transform 0.1s ease;
 }
 .azione-info svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.azione-info:hover { color: var(--blu-scuro); transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--blu-scuro); }
-.azione-info:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--blu-scuro); }
-.azione-chiama { background: var(--rosso); color: var(--crema); }
-.azione-chiama:hover { color: var(--crema); }
-.azione-indicazioni { background: var(--blu); color: var(--crema); }
-.azione-indicazioni:hover { color: var(--crema); }
+.azione-info:hover { background: rgba(255, 255, 255, 0.08); color: var(--gesso); }
+.azione-info:active { transform: scale(0.97); }
+.azione-chiama, .azione-chiama:hover { border-color: var(--gesso-rosso); color: var(--gesso-rosso); }
+.azione-indicazioni, .azione-indicazioni:hover { border-color: var(--gesso-blu); color: var(--gesso-blu); }
 
-.sezioni-info { display: grid; gap: 1.5rem; align-items: start; }
-
-/* Orari come tabella a bordo spesso, con la riga di oggi in blu notte. */
-.orari {
-    margin: 0;
-    overflow: hidden;
-    border: 3px solid var(--blu-scuro);
-    border-radius: 12px;
-    background: #fff;
-}
+/* Orari: un giorno per riga, separati da puntini; oggi cerchiato in rosso con il bollino "oggi". */
+.orari { margin: 0; }
 .orari-giorno {
     display: flex;
     align-items: center;
@@ -480,23 +462,19 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     gap: 0.5rem;
     min-height: 44px;
     padding: 0.55rem 0.75rem;
-    font-size: 0.875rem; /* su telefono i due turni stanno su una riga */
-    border-bottom: 1px solid #C9D3DC;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-bottom: 1px dotted var(--gesso-traccia);
 }
-.orari-giorno:last-child { border-bottom: 0; }
 .orari dd { margin: 0; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
-/* Righe a strisce rosse e crema come la tenda del locale; oggi in blu scuro con il bollino "oggi". */
-.orari-giorno:nth-child(even) { background: var(--rosso); color: var(--crema); border-bottom-color: var(--rosso); }
-.orari-giorno:nth-child(odd) { background: var(--crema); }
-.orari-giorno.oggi { background: var(--blu-scuro); color: var(--crema); font-weight: 700; }
+.orari-giorno.oggi { color: var(--gesso-rosso); border: 2px solid var(--gesso-rosso); border-radius: 18px 12px 16px 10px; }
 .bollino-oggi {
     display: inline-block;
     margin-left: 0.3rem;
     padding: 0 0.35rem;
-    border: 2px solid var(--crema);
+    border: 2px solid var(--gesso-rosso);
     border-radius: 6px;
-    background: var(--rosso);
     font-family: var(--titolo);
     font-weight: 400;
     font-size: 0.7rem;
@@ -504,64 +482,36 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     text-transform: uppercase;
     transform: rotate(-4deg);
 }
-.info-indirizzo-esteso { margin: 0 0 1rem; font-size: 1.25rem; font-weight: 700; }
 
-/* Contatti: tessere crema sul blocco blu, una sotto l'altra su telefono. */
+/* Contatti: icona disegnata col gesso a sinistra, etichetta e valore a destra. */
 .contatti { display: grid; gap: 0.75rem; margin: 0; }
 .contatto {
-    position: relative; /* l'icona nel <dt> si posiziona rispetto al riquadro */
+    position: relative; /* l'icona nel <dt> si posiziona rispetto al contatto */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0.85rem 1rem 0.85rem 4.25rem;
-    border: 3px solid var(--blu-scuro);
-    border-radius: 12px;
-    background: var(--crema);
-    color: var(--blu-scuro);
+    padding: 0.35rem 0 0.35rem 3.75rem;
     overflow-wrap: anywhere;
 }
-.contatto :focus-visible { outline-color: var(--blu-scuro); }
 .contatto dt { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .contatto dd { margin: 0.2rem 0 0; }
-.contatti a { font-weight: 700; }
-/* Icona del contatto: quadratino rosso (o blu) con ombra piena, come gli adesivi del sito. */
+.contatti a { font-weight: 700; color: var(--gesso); }
 .contatto-icona {
     position: absolute;
     top: 50%;
-    left: 1rem;
+    left: 0;
     display: grid;
     place-items: center;
     width: 44px;
     height: 44px;
-    border: 2px solid var(--blu-scuro);
+    border: 2px solid var(--gesso-traccia);
     border-radius: 12px;
-    background: var(--rosso);
-    color: var(--crema);
-    box-shadow: 2px 2px 0 var(--blu-scuro);
     transform: translateY(-50%);
 }
-.contatto-icona-blu { background: var(--blu); }
 .contatto-icona svg, .titolo-icona svg, .social svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .titolo-icona { display: flex; align-items: center; gap: 0.5rem; }
 .titolo-icona svg { flex: none; width: 0.9em; height: 0.9em; stroke-width: 2.4; }
-/* Sentiero "mappa del tesoro" dopo "Come arrivare": la maschera scopre il tratteggio poco alla volta
-   (1,5 s), la X compare all'arrivo, pausa di 2 s e si riparte. Con "riduci movimento" è fermo e completo. */
-.blocco-arrivare h2 { white-space: nowrap; } /* il sentiero si stringe, il titolo non va a capo */
-.titolo-icona .sentiero { flex: 1 1 0; width: 0; min-width: 2.5rem; height: 1.1em; overflow: visible; }
-.sentiero-linea { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-dasharray: 4 5; stroke-linecap: round; }
-.sentiero-traccia { fill: none; stroke: #fff; stroke-width: 8; stroke-dasharray: 100; stroke-dashoffset: 100; animation: sentiero-disegna 3.5s linear infinite; }
-.sentiero-x { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round; opacity: 0; animation: sentiero-x 3.5s linear infinite; }
-@keyframes sentiero-disegna {
-    0% { stroke-dashoffset: 100; }
-    43%, 100% { stroke-dashoffset: 0; } /* 1,5 s su 3,5 */
-}
-@keyframes sentiero-x {
-    0%, 42% { opacity: 0; transform: scale(0.4); }
-    47% { opacity: 1; transform: scale(1.2); }
-    51%, 100% { opacity: 1; transform: scale(1); }
-}
-.sentiero-x { transform-box: fill-box; transform-origin: center; }
-/* Social come pillole con il loro logo. */
+/* Social come pillole cerchiate col gesso, con il loro logo. */
 .social { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem; }
 .social a {
     display: inline-flex;
@@ -569,14 +519,13 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     gap: 0.4rem;
     min-height: 44px;
     padding: 0.3rem 0.85rem 0.3rem 0.4rem;
-    border: 2px solid var(--blu-scuro);
+    border: 2px solid var(--gesso-traccia);
     border-radius: 999px;
-    background: #fff;
-    color: var(--blu-scuro);
     text-decoration: none;
 }
-.social a:hover { background: var(--crema-scura); }
-.social svg { width: 26px; height: 26px; padding: 4px; border-radius: 50%; background: var(--blu); color: var(--crema); }
+.social a:hover { background: rgba(255, 255, 255, 0.08); }
+.social svg { width: 26px; height: 26px; padding: 4px; color: var(--gesso-blu); }
+.lavagna .segnaposto { color: var(--gesso-traccia); }
 .segnaposto { font-style: italic; color: var(--testo-secondario); }
 
 /* ---------- Sfondo animato di Menù e Orari e contatti ---------- */
@@ -978,16 +927,16 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* ---------- Tablet e computer ---------- */
 
 @media (min-width: 768px) {
-    .sezioni-info { grid-template-columns: 1fr 1fr; gap: 2rem; }
     .testata-info h1 { font-size: 2.75rem; }
-    .pagina-info h2 { font-size: 2rem; }
-    .blocco-stato { padding: 1.5rem 2rem; }
+    .lavagna { padding: 2rem 2.5rem 2.5rem; }
+    .lavagna-sezione h2 { font-size: 2.4rem; }
     .insegna { font-size: 4rem; }
-    .blocco-stato .info-indirizzo { font-size: 1rem; }
+    .info-indirizzo { font-size: 1rem; }
     .azione-info { min-height: 64px; }
-    .orari-giorno { font-size: 0.95rem; }
-    .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .azioni-info { max-width: 36rem; }
+    /* Gli orari restano larghi quanto serve: a tutta lavagna i giorni finirebbero lontani dalle ore. */
+    .orari { max-width: 34rem; }
+    .contatti { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* Computer: barra più alta e più staccata, come Habita79; voci sempre visibili. */
@@ -1094,6 +1043,5 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .fila-loghi { animation: none; }
     .azione-info { transition: none; }
     .locale-aperto .insegna { animation: none; }
-    .sentiero-traccia { animation: none; stroke-dashoffset: 0; }
-    .sentiero-x { animation: none; opacity: 1; }
 }
+

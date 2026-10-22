@@ -136,10 +136,10 @@ def test_info_oggi_evidenziato(client, ora_fissa):
 def test_info_insegna_segue_lo_stato(client, ora_fissa):
     ora_fissa(2026, 10, 20, 10)  # martedì 10:00: chiuso
     pagina = html(client.get("/info"))
-    assert "blocco-stato locale-chiuso" in pagina
+    assert "lavagna-testata locale-chiuso" in pagina
     assert '<p class="insegna">SmashBroski Pompei</p>' in pagina
     ora_fissa(2026, 10, 21, 13)  # mercoledì 13:00: aperto
-    assert "blocco-stato locale-aperto" in html(client.get("/info"))
+    assert "lavagna-testata locale-aperto" in html(client.get("/info"))
 
 
 def test_info_azioni_rapide(client):
@@ -154,8 +154,11 @@ def test_info_azioni_rapide(client):
 
 def test_info_sezioni_e_ancore(client):
     pagina = html(client.get("/info"))
-    for ancora in ('id="orari"', 'id="come-arrivare"', 'id="contatti"'):
+    assert '<div class="lavagna">' in pagina  # tutto il contenuto sta sulla lavagna
+    for ancora in ('id="orari"', 'id="contatti"'):
         assert ancora in pagina
+    # Come arrivare tolto: indirizzo sotto l'insegna e pulsante Indicazioni bastano
+    assert 'id="come-arrivare"' not in pagina
     assert "<iframe" not in pagina  # niente mappa incorporata: cookie di terze parti (RNF-11)
 
 

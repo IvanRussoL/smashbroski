@@ -10,14 +10,14 @@
         <h1>Orari e contatti</h1>
     </div>
 
-    {# Insegna al neon con il nome del locale: accesa in rosso se è aperto, spenta (solo il contorno)
-       se è chiuso. Lo stato a parole lo dice solo l'etichetta sotto, così non si ripete. #}
-    <section class="blocco-info blocco-stato {{ 'locale-aperto' if stato.aperto else 'locale-chiuso' }}" aria-label="Dove siamo e stato del locale">
+    {# Tutta la pagina è una lavagna blu scuro, come quella fuori dal locale: in cima l'insegna al neon
+       (accesa se è aperto, spenta se è chiuso), poi azioni, orari e contatti con i titoli "a gesso".
+       Lo stato a parole lo dice solo l'etichetta sotto l'insegna, così non si ripete. #}
+    <div class="lavagna">
+    <section class="lavagna-testata {{ 'locale-aperto' if stato.aperto else 'locale-chiuso' }}" aria-label="Dove siamo e stato del locale">
         <p class="insegna">{{ impostazioni.nome_locale }}</p>
-        <div class="stato-testo">
-            <p class="info-indirizzo">{{ impostazioni.indirizzo }}</p>
-            <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
-        </div>
+        <p class="info-indirizzo">{{ impostazioni.indirizzo }}</p>
+        <p class="stato-apertura {{ 'aperto' if stato.aperto else 'chiuso' }}">{{ descrivi_stato_apertura(stato, adesso) }}</p>
     </section>
 
     {# Le tre azioni più usate da telefono, grandi e subito sotto lo stato. #}
@@ -42,41 +42,25 @@
         </li>
     </ul>
 
-    <div class="sezioni-info">
-        <section id="orari" class="blocco-info blocco-orari" aria-labelledby="titolo-orari">
-            <h2 id="titolo-orari" class="titolo-icona"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Orari</h2>
-            <dl class="orari">
-                {% for giorno in orari %}
-                <div class="orari-giorno{% if giorno.numero == oggi %} oggi{% endif %}">
-                    <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} <span class="bollino-oggi">oggi</span></strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
-                    <dd>
-                        {%- if giorno.turni -%}
-                        {% for turno in giorno.turni %}<span class="turno">{{ turno.ora_inizio|ora }}–{{ turno.ora_fine|ora }}</span>{% if not loop.last %} · {% endif %}{% endfor %}
-                        {%- else -%}
-                        Chiuso
-                        {%- endif -%}
-                    </dd>
-                </div>
-                {% endfor %}
-            </dl>
-        </section>
+    <section id="orari" class="lavagna-sezione" aria-labelledby="titolo-orari">
+        <h2 id="titolo-orari" class="titolo-icona"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Orari</h2>
+        <dl class="orari">
+            {% for giorno in orari %}
+            <div class="orari-giorno{% if giorno.numero == oggi %} oggi{% endif %}">
+                <dt>{% if giorno.numero == oggi %}<strong>{{ giorno.nome }} <span class="bollino-oggi">oggi</span></strong>{% else %}{{ giorno.nome }}{% endif %}</dt>
+                <dd>
+                    {%- if giorno.turni -%}
+                    {% for turno in giorno.turni %}<span class="turno">{{ turno.ora_inizio|ora }}–{{ turno.ora_fine|ora }}</span>{% if not loop.last %} · {% endif %}{% endfor %}
+                    {%- else -%}
+                    Chiuso
+                    {%- endif -%}
+                </dd>
+            </div>
+            {% endfor %}
+        </dl>
+    </section>
 
-        <section id="come-arrivare" class="blocco-info blocco-arrivare" aria-labelledby="titolo-come-arrivare">
-            <h2 id="titolo-come-arrivare" class="titolo-icona"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Come arrivare
-                {# Sentiero della mappa del tesoro: tratteggio che si disegna fino alla X, poi riparte (CSS). #}
-                <svg class="sentiero" viewBox="0 0 120 40" width="120" height="40" preserveAspectRatio="xMinYMid meet" aria-hidden="true" focusable="false">
-                    <mask id="sentiero-maschera" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="40">
-                        <path class="sentiero-traccia" d="M3 22 C 14 8, 26 34, 40 22 S 62 6, 76 16 S 92 30, 100 20" pathLength="100"/>
-                    </mask>
-                    <path class="sentiero-linea" d="M3 22 C 14 8, 26 34, 40 22 S 62 6, 76 16 S 92 30, 100 20" mask="url(#sentiero-maschera)"/>
-                    <path class="sentiero-x" d="M103 13 l12 12 M115 13 l-12 12"/>
-                </svg>
-            </h2>
-            <p class="info-indirizzo-esteso">{{ impostazioni.indirizzo }}</p>
-        </section>
-    </div>
-
-    <section id="contatti" class="blocco-info blocco-contatti" aria-labelledby="titolo-contatti">
+    <section id="contatti" class="lavagna-sezione" aria-labelledby="titolo-contatti">
         {# Ogni contatto ha la sua icona dentro il <dt> (in una <dl> il <div> può contenere solo dt e dd). #}
         <h2 id="titolo-contatti" class="titolo-icona"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Contatti</h2>
         <dl class="contatti">
@@ -92,7 +76,7 @@
                 <dd><a href="mailto:{{ impostazioni.email }}">{{ impostazioni.email }}</a></dd>
             </div>
             <div class="contatto">
-                <dt><span class="contatto-icona contatto-icona-blu"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></span>Social</dt>
+                <dt><span class="contatto-icona"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></span>Social</dt>
                 <dd class="social">
                     <a href="{{ impostazioni.url_facebook }}" rel="noopener"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V9H7v3h2v9h3v-9h2.5l.5-3h-3V7a1 1 0 0 1 1-1h2z"/></svg>Facebook</a>
                     <a href="{{ impostazioni.url_instagram }}" rel="noopener"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6"/></svg>Instagram</a>
@@ -100,6 +84,7 @@
             </div>
         </dl>
     </section>
+    </div>
 </div>
 {% endblock %}
 

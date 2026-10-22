@@ -56,7 +56,10 @@
                 <h2 id="titolo-dove" class="etichetta-footer">Dove siamo</h2>
                 <p class="footer-indirizzo">{{ impostazioni.indirizzo }}</p>
             </div>
+            {# La home ha già "Come arrivare" nell'hero, subito sopra: lì il pulsante non si ripete. #}
+            {% block footer_come_arrivare %}
             <a class="pulsante-footer" href="{{ impostazioni.link_maps() }}" rel="noopener">Come arrivare</a>
+            {% endblock %}
         </div>
     </section>
     {% endif %}

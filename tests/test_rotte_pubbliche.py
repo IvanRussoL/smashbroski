@@ -47,6 +47,13 @@ def test_home_contenuti(client):
     assert "wa.me" not in pagina
 
 
+def test_home_come_arrivare_una_volta(client):
+    # Nell'hero sì, nella fascia "Dove siamo" subito sotto no; nelle altre pagine la fascia lo tiene.
+    assert html(client.get("/")).count("Come arrivare</a>") == 1
+    assert 'class="pulsante-footer"' not in html(client.get("/"))
+    assert 'class="pulsante-footer"' in html(client.get("/menu"))
+
+
 def test_home_nessun_link_area_riservata(client):
     for indirizzo in ("/", "/menu", "/info", "/privacy"):
         pagina = html(client.get(indirizzo))

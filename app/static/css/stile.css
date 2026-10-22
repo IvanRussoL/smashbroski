@@ -514,9 +514,12 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 /* Fisso dietro la pagina; ogni fila è più larga dello schermo di una mattonella (192 px) e scorre
    di una mattonella per ciclo, quindi il movimento non ha salti. Si muove solo transform. */
+/* Il fondo scende di un quinto dello schermo oltre il bordo: sui browser con la barra in basso
+   galleggiante (o che si nasconde) lo spazio sotto la barra resta coperto di loghi, invece di una
+   striscia crema senza disegno. */
 .sfondo-loghi {
     position: fixed;
-    inset: 0;
+    inset: 0 0 -20vh;
     z-index: -1;
     overflow: hidden;
     background: var(--crema);

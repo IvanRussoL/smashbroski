@@ -336,3 +336,4 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Spazio**: il titolo non va più a capo; il sentiero prende lo spazio rimasto (su telefono è più corto, la X resta in vista). Con "riduci movimento" sentiero e X sono fermi e completi.
 - **Test**: 191 test superati (markup decorativo e CSS).
 - **Tempi rivisti da Ivan dopo la prova**: disegno da 3 a 2 s, pausa invariata di 2 s; ciclo di 4 s con arrivo alla X al 50%.
+- **Seconda prova di Ivan**: disegno a 1,5 s, pausa 2 s; ciclo di 3,5 s con arrivo alla X al 43%.

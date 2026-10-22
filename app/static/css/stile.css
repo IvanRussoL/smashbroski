@@ -526,6 +526,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     background: var(--crema);
     pointer-events: none;
 }
+/* Con il footer sullo schermo lo sfondo finisce sopra le fasce del footer (vedi fondo-pagina.js). */
+.al-footer .sfondo-loghi { bottom: var(--taglio-sfondo, -20vh); }
 .fila-loghi {
     width: calc(100% + 192px);
     height: 84px;

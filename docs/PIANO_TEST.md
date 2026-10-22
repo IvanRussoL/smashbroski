@@ -299,7 +299,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV10 (BLOCKED) · RF-06 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | `/` e `/info` aperte su desktop; smartphone reale per il passo 3. |
-| **Passi** | 1) Leggere l'`href` dei pulsanti "Come arrivare" (hero della home e fascia "Dove siamo" in fondo alle pagine) e del link "Apri in Google Maps" di `/info`.<br>2) Fare clic su ognuno da desktop.<br>3) Toccarli su smartphone reale. |
+| **Passi** | 1) Leggere l'`href` dei pulsanti "Come arrivare" (hero della home e fascia "Dove siamo" in fondo alle pagine) e del pulsante "Indicazioni" di `/info`.<br>2) Fare clic su ognuno da desktop.<br>3) Toccarli su smartphone reale. |
 | **Atteso** | I tre link sono uguali, costruiti dall'indirizzo "Vico dei Paninari, 7 - 80045 Pompei (NA)", non link brevi `maps.app.goo.gl`. Google Maps (sito o app) si apre sulla posizione del locale. |
 
 #### TC-H06 — Link ai social

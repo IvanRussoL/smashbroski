@@ -344,3 +344,9 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Scelta di Ivan: accendere insieme le categorie affiancate**. `indice.js` sceglie la categoria principale come prima (linea al 40%) e accende anche quelle in un'altra colonna che le stanno accanto in altezza: Starters + Salad, poi Kids Menù / Soft Drinks / Beers ciascuna con The Originals. Dopo un tocco su una pillola si accende solo quella. Alternative scartate: lasciare com'era (Salad raggiungibile solo col tocco) e una categoria per riga anche su desktop (pagina molto più lunga, impaginazione del PDF persa).
 - **Telefono invariato**: lì le categorie sono in una sola colonna, quindi non ci sono categorie affiancate. Verificato con Playwright a 360×800: la sequenza delle pillole accese scorrendo è identica a prima del cambio.
 - **Test**: 191 test superati (solo JavaScript); prova nel browser a 1440×900 e 360×800.
+
+## 2026-10-22 · Fase 2 – Tolto "Apri in Google Maps" dalla pagina Orari e contatti
+
+- **Richiesta di Ivan**: il pulsante "Apri in Google Maps" nel riquadro Come arrivare era ridondante, perché apre lo stesso link del pulsante "Indicazioni". Tolti il link da `info.html` e la regola `.azione-mappa` da `stile.css`; il riquadro mostra solo titolo, sentiero e indirizzo.
+- **Indicazioni resta nella riga in alto** (Chiama · Indicazioni · Scrivi) finché non si sceglie dove spostarlo: la prova con la pillola al neon accanto alla X del sentiero è stata scartata su telefono (troppe scritte in poco spazio).
+- **TC-H05** aggiornato: il terzo link da controllare è "Indicazioni" di `/info`.

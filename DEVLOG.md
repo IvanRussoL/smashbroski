@@ -405,4 +405,4 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 
 - **Segnalazione di Ivan**: su `/info` da telefono, tornando in cima alla pagina, in fondo allo schermo ricompariva una striscia chiara (come quella già tolta dalla home). Lo sfondo di loghi è `position: fixed` grande quanto lo schermo "piccolo"; con la barra del browser galleggiante o che si nasconde, lo spazio sotto la barra restava crema senza loghi.
 - **Rimedio**: lo sfondo scende del 20% dell'altezza dello schermo oltre il bordo inferiore (`inset: 0 0 -20vh`); le 16 file di loghi (1344 px) bastano a coprirlo. Vale anche per il Menù, che usa lo stesso sfondo. Da confermare da Ivan sul telefono.
-- **Test**: test superati (solo CSS).
+- **Test**: 193 test superati (solo CSS).

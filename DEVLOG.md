@@ -328,3 +328,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Segnalazione di Ivan (screenshot dal telefono)**: in home, in fondo allo schermo, sotto l'hero e dietro la barra del browser "galleggiante" in basso, compariva una fascia color crema. Questi browser (Safari 26 e altri con la barra a pillola) colorano lo spazio sotto la barra con il fondo della pagina, che era crema, mentre subito sotto l'hero c'è la fascia blu "Dove siamo".
 - **Rimedio**: fondo del `<body>` della home nel blu della fascia (`body.pagina-home`), lo stesso colore in cui sfuma il velo dell'hero. Le pagine interne restano crema, che è già il loro fondo. Non verificabile da qui con quel browser: da confermare da Ivan.
 - **Test**: 191 test superati (solo CSS).
+
+## 2026-10-22 · Fase 2 – Sentiero "mappa del tesoro" nel titolo Come arrivare
+
+- **Richiesta di Ivan** (con un'immagine di riferimento di una mappa del tesoro): dopo "Come arrivare" un piccolo sentiero tratteggiato che si disegna lentamente fino a una X, in loop.
+- **Come funziona**: SVG nel titolo (`aria-hidden`). Il tratteggio (`stroke-dasharray: 4 5`) è coperto da una maschera: un tratto pieno con `pathLength="100"` la cui `stroke-dashoffset` va da 100 a 0, così il tratteggio compare poco alla volta. Ciclo di 5 s: 3 s di disegno, la X compare con un piccolo rimbalzo, 2 s di pausa e si riparte. Solo CSS, niente JavaScript. I tempi si cambiano in `sentiero-disegna` e `sentiero-x` (durata 5 s, arrivo al 60%).
+- **Spazio**: il titolo non va più a capo; il sentiero prende lo spazio rimasto (su telefono è più corto, la X resta in vista). Con "riduci movimento" sentiero e X sono fermi e completi.
+- **Test**: 191 test superati (markup decorativo e CSS).

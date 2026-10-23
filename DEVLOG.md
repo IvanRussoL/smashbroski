@@ -454,3 +454,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
   - **Privacy ed errori**: colonna di 900 px centrata ma righe di 65 caratteri, quindi testo tutto a sinistra; ora la colonna è larga quanto le righe (`calc(65ch + 2rem)`) e resta centrata. Accesso: colonna di 30rem, quanto i campi.
   - **Area proprietario**: l'indice non aveva spazio sotto la barra e il titolo era 8 px più a destra che nelle altre pagine dell'area; ora stesso spazio. Schede delle categorie staccate di 1,5rem (prima si toccavano). Tabelle con colonne di larghezza fissa: Prezzi, Stato e Azioni partono alla stessa x in tutte le categorie. "Annulla" staccato da "Salva".
 - **Prove**: 194 test superati; nessuna pagina più larga dello schermo a 320, 768, 900, 1000 e 1366 px. Anteprime prima/dopo fuori da Git.
+
+## 2026-10-23 · Fase 2 – Hero della home senza balzi quando si risale
+
+- **Segnalazione di Ivan** (video dal telefono, browser "Internet" di Oppo): solo in home, risalendo verso l'alto, l'hero sembrava fare un balzo o ingrandirsi all'improvviso. Menù e Orari e contatti scorrevano normali.
+- **Causa**: l'hero era alto `100dvh`. Mentre si scorre la barra dell'indirizzo si nasconde e ricompare, e con `dvh` l'altezza dell'hero cambiava ogni volta: la foto (`object-fit: cover`) si riadattava e la pagina si ridimensionava durante lo scroll. Le altre pagine non usano unità legate allo schermo per l'altezza. Esclusi scroll-snap e scroll fluido (non usati) e i due script del fondo, che cambiano solo colori e animazioni.
+- **Rimedio**: `min-height: 100svh`, l'altezza dello schermo con la barra visibile, che non cambia durante lo scroll; `100vh` resta come riserva per i browser vecchi. Con la barra nascosta sotto l'hero si vede l'inizio di "Dove siamo", blu come il fondo dell'hero. Alternativa scartata: `100lvh`, che in cima farebbe finire i pulsanti sotto la barra del browser. La regola della skill di design "min-h-dvh invece di 100vh" serve a non avere un hero più alto dello schermo; `svh` lo rispetta e in più evita lo spostamento del contenuto (CLS).
+- **Prove**: solo CSS. Da confermare da Ivan sul telefono.

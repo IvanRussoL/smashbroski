@@ -253,7 +253,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    min-height: 100dvh;
+    /* svh: alto quanto lo schermo con la barra del browser visibile. Con dvh l'hero cambiava altezza
+       mentre la barra si nasconde e ricompare, e risalendo la foto sembrava fare un balzo. */
+    min-height: 100svh;
     padding: calc(var(--ingombro-navbar) + 1.5rem) 1.25rem 2.5rem;
     color: var(--crema);
     background: var(--blu-scuro);

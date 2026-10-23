@@ -277,7 +277,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .hero-contenuto {
     width: 100%;
-    max-width: var(--larghezza-contenuto);
+    /* Larga quanto il testo del footer (contenuto meno il suo spazio interno): bordo sinistro allineato a "Dove siamo". */
+    max-width: calc(var(--larghezza-contenuto) - 2.5rem);
     margin: auto; /* centrato in verticale nell'hero */
     text-align: center;
 }
@@ -588,7 +589,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* Le pagine brevi (privacy, login, errori) mostrano subito il footer: al-footer farebbe rosso tutto il fondo,
    quindi il contenuto tiene il suo crema. Righe di testo entro 65 caratteri circa. */
 main:has(> .pagina-testo) { background: var(--crema); }
-.pagina-testo { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.pagina-testo { max-width: calc(65ch + 2rem); margin: 0 auto; padding: 1.5rem 1rem 3rem; } /* colonna centrata: margini uguali ai lati */
 .pagina-testo p, .pagina-testo li { max-width: 65ch; }
 .pagina-testo h1 { margin: 0.5rem 0; font-size: 2rem; color: var(--blu-scuro); }
 .pagina-menu {
@@ -792,10 +793,15 @@ main:has(> .pagina-testo) { background: var(--crema); }
 
 /* Prezzo unico (patatine, bibite, kids): bollino a destra del nome. */
 .voce:has(> .prezzo-unico) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 1rem; align-items: start; }
+/* Il bollino sta a metà altezza di nome e descrizione, come i prezzi in colonna dei burger;
+   senza descrizione nome e bollino sono centrati sulla stessa riga. */
+.voce:has(> .prezzo-unico):not(:has(> .descrizione, > .nota-voce)) { align-items: center; }
+.voce:not(:has(> .descrizione, > .nota-voce)) > .prezzo-unico { grid-row: 1; }
 .voce:has(> .prezzo-unico) > :not(.prezzo-unico) { grid-column: 1; }
 .prezzo-unico {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1 / span 3;
+    align-self: center;
     padding: 0.1rem 0.65rem;
     background: var(--tessera);
     color: var(--tessera-testo);
@@ -881,6 +887,8 @@ main:has(> .pagina-testo) { background: var(--crema); }
 
 /* ---------- Pagine di testo, moduli e area riservata ---------- */
 
+/* Accesso: colonna larga quanto i campi, centrata. */
+.pagina-modulo:not(.area) { max-width: 30rem; }
 .pagina-modulo label { display: block; margin-bottom: 0.2rem; font-weight: 600; }
 .pagina-modulo input:not([type="hidden"]), .pagina-modulo select {
     width: 100%;
@@ -912,6 +920,7 @@ main:has(> .pagina-testo) { background: var(--crema); }
     cursor: pointer;
 }
 .pulsante-modulo:hover { background: var(--blu-scuro); color: #fff; }
+.pulsante-modulo + a { margin-left: 1rem; } /* "Annulla" staccato da "Salva" */
 .pulsante-link { padding: 0; border: 0; background: none; color: var(--blu); font: inherit; text-decoration: underline; cursor: pointer; }
 .area-riservata { margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--bordo); }
 .area-riservata ul { display: flex; flex-wrap: wrap; gap: 1rem; margin: 0; padding: 0; list-style: none; font-weight: 600; }
@@ -920,7 +929,15 @@ main:has(> .pagina-testo) { background: var(--crema); }
 .errori { padding: 0.75rem 1rem; border-left: 4px solid var(--rosso); background: #FBE9EC; }
 .avviso { padding: 0.75rem 1rem; border-left: 4px solid var(--blu); background: #E7F0F9; }
 .area .pagina-menu, .area { max-width: 1000px; }
-.tabella-voci { width: 100%; border-collapse: collapse; background: #fff; }
+/* Indice dell'area: stesso spazio delle altre pagine dell'area, schede staccate fra loro. */
+.pagina-menu.area { padding: 1.5rem 1rem 3rem; }
+.area .categoria + .categoria { margin-top: 1.5rem; }
+/* Colonne di larghezza fissa: in tutte le categorie Prezzi, Stato e Azioni partono alla stessa x. */
+.tabella-voci { width: 100%; border-collapse: collapse; background: #fff; table-layout: fixed; }
+.tabella-voci th:nth-child(1) { width: 3.5rem; }
+.tabella-voci th:nth-child(3) { width: 30%; }
+.tabella-voci th:nth-child(4) { width: 6.5rem; }
+.tabella-voci th:nth-child(5) { width: 10rem; }
 .tabella-voci th, .tabella-voci td { padding: 0.5rem; border-bottom: 1px solid var(--bordo); text-align: left; vertical-align: top; }
 .tabella-voci form { display: inline; margin-left: 0.5rem; }
 .nascosta { color: var(--testo-secondario); background: var(--crema-scura); }
@@ -949,7 +966,7 @@ main:has(> .pagina-testo) { background: var(--crema); }
     .insegna { font-size: 3rem; }
     .info-indirizzo { font-size: 1rem; }
     .azione-info { min-height: 64px; }
-    .azioni-info { max-width: 36rem; }
+    .azioni-info { max-width: 34rem; } /* stesso bordo destro di orari e contatti */
     /* Gli orari restano larghi quanto serve: a tutta lavagna i giorni finirebbero lontani dalle ore. */
     .orari { max-width: 34rem; }
 }
@@ -1004,8 +1021,9 @@ main:has(> .pagina-testo) { background: var(--crema); }
     }
     /* Una categoria aggiunta in futuro prende una riga intera in fondo. */
     .categoria { grid-column: 1 / -1; padding: 1.4rem 1.5rem 1.2rem; }
-    .cat-starters { grid-area: starters; }
-    .cat-salad { grid-area: salad; }
+    /* Starters e Salad stanno sulla stessa riga: stessa altezza. */
+    .cat-starters { grid-area: starters; align-self: stretch; }
+    .cat-salad { grid-area: salad; align-self: stretch; }
     .cat-burger { grid-area: burger; }
     .cat-kids-menu { grid-area: kids; }
     .cat-soft-drinks { grid-area: soft; }
@@ -1057,8 +1075,13 @@ main:has(> .pagina-testo) { background: var(--crema); }
     .colonna-2 { grid-column: 3; }
     .colonna-3 { grid-column: 4; }
     .colonna-4 { grid-column: 5; }
-    /* Prezzo unico in una categoria con formati (Patatine stick): accanto al nome, mai sotto una colonna. */
-    .colonne-2 .voce:has(> .prezzo-unico), .colonne-4 .voce:has(> .prezzo-unico) { grid-template-columns: minmax(0, 1fr) auto; }
+    /* Bollini larghi quanto una colonna di prezzi: in tutte le schede il prezzo a destra cade sulla stessa verticale. */
+    .prezzo-unico { min-width: 6.3rem; text-align: center; }
+    /* Prezzo unico in una categoria con formati (Patatine stick): nell'ultima colonna, sotto l'ultimo prezzo;
+       il nome usa anche le colonne libere, così non va a capo. */
+    .colonne-2 .voce > .prezzo-unico, .colonne-4 .voce > .prezzo-unico { grid-column: -2; }
+    .colonne-2 .voce:has(> .prezzo-unico) > :not(.prezzi):not(.prezzo-mancante):not(.prezzo-unico),
+    .colonne-4 .voce:has(> .prezzo-unico) > :not(.prezzi):not(.prezzo-mancante):not(.prezzo-unico) { grid-column: 1 / -2; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -441,3 +441,16 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
   - **Descrizioni del menù** con interlinea 1,5 invece di 1,4.
 - **Errore trovato durante le prove**: nelle pagine brevi (Privacy, accesso, errori) il footer è subito sullo schermo, quindi `al-footer` rendeva rosso tutto il fondo e titoli e testo blu non si leggevano. Ora il `main` di quelle pagine (`main:has(> .pagina-testo)`) ha il suo fondo crema.
 - **Ombra di THE ORIGINALS** (segnalazione di Ivan): il titolo BURGER aveva l'ombra piena blu scuro, THE ORIGINALS, anche lui su fondo chiaro, no. Stessa ombra di 4 px anche lì. Provato a 320, 390 e 1366 px: nessuno scroll orizzontale, il titolo resta nel blocco.
+
+## 2026-10-23 · Fase 2 – Prezzi in colonna e simmetria di tutte le pagine
+
+- **Prezzi degli Starters su una colonna** (segnalazione di Ivan): sul computer i bollini a prezzo unico (Patatine stick) stavano 7 px più a destra di 7,00 €. Ora vanno nell'ultima colonna, larghi quanto la colonna dei prezzi (6,3rem) e centrati come "10 PZ" e 7,00 €; il nome usa anche le colonne libere, così "Patatine stick bacon & cheese" resta su una riga.
+- **Ricerca di altri difetti di simmetria** su tutte le pagine (pubbliche, accesso, errori, area proprietario), a 360 e 1366 px, misurati con Playwright:
+  - **Bollini a prezzo unico** larghi quanto una colonna di prezzi anche in Kids, Soft drinks e Beers: cadono sulla stessa verticale della colonna destra degli Starters.
+  - **Bollino centrato in verticale** su nome e descrizione (Kids menù), come i prezzi dei burger; prima stava sulla riga del nome e spingeva giù la descrizione. Senza descrizione nome e bollino sono centrati sulla stessa riga (bibite, patatine), anche su telefono.
+  - **Starters e Salad**, sulla stessa riga, hanno la stessa altezza.
+  - **Hero della home**: il testo cominciava 20 px più a sinistra di "Dove siamo"; ora la colonna dell'hero è larga quanto il testo del footer.
+  - **Orari e contatti**: i pulsanti Chiama/Indicazioni/WhatsApp (36rem) sporgevano di 30 px oltre orari e contatti (34rem); ora tutti larghi 34rem.
+  - **Privacy ed errori**: colonna di 900 px centrata ma righe di 65 caratteri, quindi testo tutto a sinistra; ora la colonna è larga quanto le righe (`calc(65ch + 2rem)`) e resta centrata. Accesso: colonna di 30rem, quanto i campi.
+  - **Area proprietario**: l'indice non aveva spazio sotto la barra e il titolo era 8 px più a destra che nelle altre pagine dell'area; ora stesso spazio. Schede delle categorie staccate di 1,5rem (prima si toccavano). Tabelle con colonne di larghezza fissa: Prezzi, Stato e Azioni partono alla stessa x in tutte le categorie. "Annulla" staccato da "Salva".
+- **Prove**: 194 test superati; nessuna pagina più larga dello schermo a 320, 768, 900, 1000 e 1366 px. Anteprime prima/dopo fuori da Git.

@@ -468,3 +468,13 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Stesso spazio sopra e sotto**: dal bordo al titolo 26 px, dall'ultima voce al bordo erano 46 px (37 nelle bibite). Ora l'ultima voce non ha spazio interno in basso né margini del testo: circa 26 px in tutti i blocchi.
 - **Spazio in più diviso fra le voci**: Starters e The Originals sono allungati per pareggiare il blocco vicino, e tutto lo spazio in più finiva in fondo (62 e 110 px). Su computer i blocchi sono colonne flex e le voci crescono (`flex-grow: 1`): righe tratteggiate equidistanti e fondo pari al vicino. La nota "Ortaggio su base stagionale" resta larga quanto il testo (`align-self: flex-start`).
 - **Prove**: 194 test superati; misurato con Playwright a 1366 px (spazio sopra il titolo 26 px, sotto l'ultima voce 23–26 px in tutti i blocchi). Anteprime prima/dopo fuori da Git.
+
+## 2026-10-23 · Fase 2 – Scroll fluido su computer in Home e Orari e contatti
+
+- **Segnalazione di Ivan**: su computer, scorrendo veloce, Home e Orari e contatti andavano a scatti; il Menù era fluido e sul telefono tutto andava bene.
+- **Misura invece di ipotesi**: traccia di Chromium (Playwright, 1440×900) durante uno scroll veloce con la rotella, togliendo un elemento alla volta. Esclusi sfondo di loghi, insegna al neon, sfumature della lavagna e taglio dello sfondo al footer.
+- **Orari e contatti, causa**: l'onda di "oggi" si muoveva animando `background-position`, quindi il browser ridisegnava la lavagna a ogni fotogramma, anche durante lo scroll (disegno 292 ms e rasterizzazione 753 ms nella prova, contro 30 e 49 del Menù). **Rimedio**: sul computer l'onda è un `::after` su un livello proprio che si sposta con `transform` di 24 px per ciclo, la stessa onda e lo stesso movimento (stessi pixel a parità di tempo). Dopo: 14 e 40 ms, come il Menù.
+- **Home, causa**: quando arriva il footer il fondo della pagina passa da blu a rosso (per Safari su iPhone) e il browser ridisegnava tutta la foto dell'hero, proprio all'inizio dello scroll. **Rimedio**: sul computer `.hero { will-change: transform }`, l'hero sta su un livello suo e si ridisegna solo il fondo (rasterizzazione da 173 a 14 ms).
+- **Solo computer** (`@media (hover: hover) and (pointer: fine)`): sul telefono era già fluido; controllato con l'emulazione di un Pixel 7 che gli stili calcolati siano identici a prima.
+- **Non toccato**: il vetro sfocato della navbar in home quasi raddoppia il costo di composizione di ogni fotogramma, ma è una scelta grafica approvata. Ridurre la sfocatura non cambia la misura; se la home resta poco fluida si può togliere solo sul computer.
+- **Prove**: solo CSS; misure prima/dopo con Playwright e confronto pixel dell'onda.

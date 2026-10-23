@@ -269,6 +269,11 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     z-index: -2;
 }
 .hero-foto img { object-fit: cover; object-position: center; }
+/* Sul computer l'hero (foto e velo) sta su un livello suo: quando il fondo della pagina passa da blu
+   a rosso (al-footer) il browser ridisegna solo il fondo, non tutta la foto, e lo scroll non si inceppa. */
+@media (hover: hover) and (pointer: fine) {
+    .hero { will-change: transform; }
+}
 .hero::after {
     content: "";
     position: absolute;
@@ -504,6 +509,24 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 /* L'onda scorre piano verso destra di un'onda intera (24 px) per ciclo, quindi il loop non ha salti. */
 @keyframes onda-gesso { to { background-position-x: 0; } }
+/* Sul computer l'onda è un livello a parte che si sposta con transform: animando background-position
+   il browser ridisegnava la lavagna a ogni fotogramma e lo scroll veloce andava a scatti.
+   Stessa onda, stessa posizione e stesso movimento; sul telefono resta com'è. */
+@media (hover: hover) and (pointer: fine) {
+    .orari-giorno.oggi { position: relative; overflow: hidden; background: none; animation: none; }
+    .orari-giorno.oggi::after {
+        content: "";
+        position: absolute;
+        left: -24px;
+        right: 0;
+        bottom: 0;
+        height: 10px;
+        background: url("../img/onda-gesso.svg") no-repeat 0 0 / 1200px 10px;
+        animation: onda-gesso-livello 3s linear infinite;
+        will-change: transform;
+    }
+}
+@keyframes onda-gesso-livello { to { transform: translateX(24px); } }
 
 /* Contatti: una riga intera da toccare per contatto, puntinata come gli orari.
    Griglia icona | etichetta e valore | freccia: tutte le righe hanno la stessa struttura e restano allineate. */
@@ -1099,7 +1122,7 @@ main:has(> .pagina-testo) { background: var(--crema); }
     .fila-loghi { animation: none; }
     .azione-info { transition: none; }
     .locale-aperto .insegna { animation: none; }
-    .orari-giorno.oggi { animation: none; }
+    .orari-giorno.oggi, .orari-giorno.oggi::after { animation: none; }
     .contatto-freccia { transition: none; }
 }
 

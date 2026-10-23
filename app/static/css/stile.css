@@ -703,10 +703,8 @@ main:has(> .pagina-testo) { background: var(--crema); }
     --fondo: var(--blu); --testo-blocco: var(--crema); --accento: var(--crema);
     --tessera: var(--crema); --tessera-testo: var(--blu-scuro);
 }
-/* Qualche blocco appena ruotato, come adesivi attaccati a mano. */
-.cat-salad { transform: rotate(0.5deg); }
-.cat-kids-menu { transform: rotate(-0.5deg); }
-.cat-beers { transform: rotate(0.6deg); }
+/* Blocchi dritti: bordi paralleli fra blocchi vicini e righe tratteggiate orizzontali. L'aria "attaccata a mano"
+   resta negli elementi piccoli ruotati (etichetta Menù, nastro, nota del Burger, bollini delle edizioni). */
 
 .categoria h2 {
     margin: 0 0 0.4rem;
@@ -752,6 +750,9 @@ main:has(> .pagina-testo) { background: var(--crema); }
 .intestazione-prezzi, .prezzo-mancante { display: none; }
 
 .voce { padding: 0.85rem 0; border-top: 2px dashed color-mix(in srgb, currentColor 45%, transparent); }
+/* Sotto l'ultima voce lo stesso spazio che sopra il titolo: niente spazio interno della voce né margini del testo. */
+.categoria > .voce:last-child { padding-bottom: 0; }
+.categoria > .voce:last-child > * { margin-bottom: 0; }
 .intestazione-prezzi + .voce, .nota-categoria + .voce, h2 + .voce { border-top: 0; }
 .voce h3 { margin: 0; font-family: var(--insegna); font-size: 1.15rem; font-weight: 400; line-height: 1.25; }
 .nome-voce { text-transform: uppercase; }
@@ -1031,6 +1032,12 @@ main:has(> .pagina-testo) { background: var(--crema); }
     .cat-soft-drinks { grid-area: soft; }
     .cat-beers { grid-area: beers; }
     .cat-the-originals { grid-area: originals; align-self: stretch; }
+    /* Nei blocchi allungati per pareggiare la riga (Starters, The Originals) lo spazio in più va diviso fra le voci,
+       non lasciato tutto in fondo: righe tratteggiate equidistanti e bordo inferiore pari al vicino. */
+    .categoria { display: flex; flex-direction: column; }
+    .categoria > .voce { flex-grow: 1; }
+    .categoria > .nota-categoria { align-self: flex-start; }
+    .cat-burger > .nota-categoria { align-self: stretch; }
     .cat-burger h2 { font-size: 4.1rem; }
 
     .colonne-2, .colonne-4 { --prezzi: 2; }

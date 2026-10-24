@@ -19,7 +19,7 @@ CONFIGURAZIONE_TEST = {
     "SECRET_KEY": "chiave-solo-per-i-test",
     "DB_NAME": os.environ.get("DB_NAME_TEST"),
     "WTF_CSRF_ENABLED": False,
-    "RATELIMIT_ENABLED": False,
+    "LIMITE_TENTATIVI_ATTIVO": False,
 }
 
 

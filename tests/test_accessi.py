@@ -2,7 +2,7 @@ import pytest
 from flask import url_for
 
 from app import create_app
-from app.limiti import limiter
+from app.servizi.tentativi import FINESTRA, LIMITE_TENTATIVI
 from conftest import configurazione_test
 
 EMAIL, PASSWORD = "proprietario@example.com", "password-dei-test-123"
@@ -97,26 +97,52 @@ def test_csrf_post_senza_token(database_di_prova):
 
 
 def test_login_avvisa_del_limite_di_tentativi(client):
-    from app.limiti import LIMITE_TENTATIVI_LOGIN
     pagina = client.get("/auth/login").get_data(as_text=True)
-    # La nota deve dire lo stesso numero del limite configurato.
-    assert LIMITE_TENTATIVI_LOGIN == "5 per minute"
+    # La nota deve dire lo stesso numero e la stessa durata del limite configurato.
+    assert (LIMITE_TENTATIVI, FINESTRA.total_seconds()) == (5, 60)
     assert "Dopo 5 tentativi sbagliati l'accesso si blocca per un minuto" in pagina
     assert 'aria-describedby="nota-tentativi"' in pagina
 
 
-def test_rate_limit_login(database_di_prova):
-    app = create_app(configurazione_test(RATELIMIT_ENABLED=True))
-    client = app.test_client()
-    with app.app_context():
-        limiter.reset()
+def _conta_tentativi(connessione) -> int:
+    with connessione.cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM tentativi_accesso")
+        return cur.fetchone()[0]
+
+
+def test_rate_limit_login(database_modificato):
+    # database_modificato: i tentativi restano nel database di prova e a fine test viene ricaricato.
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
     for _ in range(5):
         assert client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"}).status_code == 400
     risposta = client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"})
     assert risposta.status_code == 429
     assert "Troppi tentativi" in risposta.get_data(as_text=True)
-    with app.app_context():
-        limiter.reset()
+    # Bloccata anche la password giusta, come dice la nota sotto "Entra".
+    assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 429
+    # Le richieste rifiutate con 429 non allungano il blocco.
+    assert _conta_tentativi(database_modificato) == 5
+
+
+def test_rate_limit_login_riuscito_non_conta(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    for _ in range(6):
+        assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
+    assert _conta_tentativi(database_modificato) == 0
+
+
+def test_rate_limit_condiviso_fra_processi(database_modificato):
+    """
+    Due app create a parte sono come due processi del server: con il conteggio in memoria ognuna
+    avrebbe i suoi 5 tentativi, con il database il limite è unico.
+    """
+    primo = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    secondo = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    sbagliato = {"email": EMAIL, "password": "sbagliata"}
+    for client in (primo, secondo, primo, secondo, primo):
+        assert client.post("/auth/login", data=sbagliato).status_code == 400
+    assert secondo.post("/auth/login", data=sbagliato).status_code == 429
+    assert primo.post("/auth/login", data=sbagliato).status_code == 429
 
 
 def test_cache_no_store_area_riservata(client_proprietario):
@@ -134,11 +160,8 @@ def test_cookie_sessione_attributi(database_di_prova, produzione):
     assert ("Secure" in cookie) is produzione
 
 
-def test_rate_limit_cambio_password(database_di_prova):
-    app = create_app(configurazione_test(RATELIMIT_ENABLED=True))
-    client = app.test_client()
-    with app.app_context():
-        limiter.reset()
+def test_rate_limit_cambio_password(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
     assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
     dati = {"attuale": "sbagliata", "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test"}
     for _ in range(5):

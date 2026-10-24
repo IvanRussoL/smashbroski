@@ -6,11 +6,12 @@ from flask import Blueprint, flash, g, redirect, render_template, request, sessi
 from app.db import ottieni_connessione
 from app.eccezioni import DatiNonValidiError
 from app.formato import prezzo_per_modulo
-from app.limiti import LIMITE_TENTATIVI_LOGIN, limiter, tentativo_fallito
+from app.limiti import limita_tentativi
 from app.repository.utente import UtenteRepository
 from app.servizi.auth import AuthService
 from app.servizi.menu import DatiVoce, MenuService
 from app.servizi.orari import NOMI_GIORNI, OrariService
+from app.servizi.tentativi import AMBITO_CAMBIO_PASSWORD
 from app.sessione import apri_sessione, sessione_scaduta, sessione_valida
 
 bp = Blueprint("proprietario", __name__, url_prefix="/proprietario")
@@ -204,7 +205,7 @@ def orari():
 # --- Password ---
 
 @bp.route("/password", methods=["GET", "POST"])
-@limiter.limit(LIMITE_TENTATIVI_LOGIN, methods=["POST"], deduct_when=tentativo_fallito)
+@limita_tentativi(AMBITO_CAMBIO_PASSWORD)
 def password():
     """
     Cambio della password del proprietario. Stesso limite del login sui tentativi sbagliati, così

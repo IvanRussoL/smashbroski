@@ -53,7 +53,7 @@ Regole:
 - Dopo **un'ora senza aprire pagine** dell'area, o **8 ore dal login** anche se la si usa, si torna al login con il messaggio "Sessione scaduta".
 - Rigenerare l'elenco delle password comuni (raramente): scaricare gli elenchi di SecLists citati in testa al file e lanciare `python strumenti/elenco_password_comuni.py ELENCO1.txt ELENCO2.txt`.
 - La password scelta con `crea-proprietario` o `reimposta-password` si comunica al proprietario a voce o di persona, mai per email, e gli si chiede di cambiarla subito da **Cambia password** nell'area: da quel momento la conosce solo lui.
-- Dopo 5 tentativi sbagliati in un minuto (accesso o cambio password) quella connessione è bloccata per un minuto, poi si riprova. Non serve sbloccare niente. In sviluppo il conteggio è in memoria: riavviare il server lo azzera.
+- Dopo 5 tentativi sbagliati in un minuto (accesso o cambio password) quella connessione è bloccata per un minuto, poi si riprova. Non serve sbloccare niente. I tentativi sono nella tabella `tentativi_accesso` (con un'impronta dell'IP, mai l'IP in chiaro): riavviare il server non li azzera e il limite vale anche con più processi. Per sbloccare subito, in sviluppo: `DELETE FROM tentativi_accesso;` in Workbench.
 - Non esiste un blocco permanente dopo N errori, per scelta: chi conosce l'email potrebbe chiudere fuori il proprietario apposta.
 
 ### Se l'account sembra compromesso
@@ -72,6 +72,8 @@ Cambiare la password, dall'area o con `reimposta-password`, chiude subito le ses
 | Ricaricare tabelle e dati iniziali (cancella tutto, account compresi) | In MySQL Workbench, sul database `smashbroski`: eseguire `database/schema.sql`, poi `database/dati_iniziali.sql`; oppure da terminale `mysql -u root -p smashbroski -e "source database/schema.sql"` e lo stesso con `dati_iniziali.sql` |
 | Dopo la ricarica | `flask --app app crea-proprietario` |
 | Copia di sicurezza prima di cambiare i dati | `mysqldump -u root -p smashbroski > copia_smashbroski.sql` (in PowerShell: `cmd /c "mysqldump -u root -p smashbroski > copia_smashbroski.sql"`) |
+
+| Aggiornare un database già esistente senza perdere i dati | Eseguire una volta come `root`, in ordine di data, i file di `database/aggiornamenti/` non ancora applicati (24/10/2026: `2026-10-24_tentativi_accesso.sql`, tabella dei tentativi di accesso) |
 
 L'utente MySQL dell'app (`smashbroski_app`) ha solo SELECT, INSERT, UPDATE e DELETE sul database del sito: le operazioni sulle tabelle si fanno come `root`.
 
@@ -98,7 +100,7 @@ Da controllare uno per uno prima di aprire il sito al pubblico:
 
 1. **Account nuovo**: `flask --app app crea-proprietario` sul database online con un'email che non compare nel repository e una password nuova (mai quella usata in sviluppo).
 2. **`.env` del server**: `SECRET_KEY` nuova, `PRODUZIONE=1` (cookie solo HTTPS e header HSTS), `PROXY_FIDATI` uguale al numero di proxy dell'hosting davanti al sito (di solito 1: si legge nella documentazione dell'hosting).
-3. **Server WSGI, mai `python run.py`** (il debugger permette di eseguire codice dal browser; con `PRODUZIONE=1` `run.py` si rifiuta di partire). Su Windows `pip install waitress` e `waitress-serve --port=8000 run:app`, su Linux `pip install gunicorn` e `gunicorn --workers 1 run:app`. **Un solo processo**: il conteggio dei tentativi di login è nella memoria del processo, con più processi il limite si moltiplica (per averne di più serve Redis).
+3. **Server WSGI, mai `python run.py`** (il debugger permette di eseguire codice dal browser; con `PRODUZIONE=1` `run.py` si rifiuta di partire). Su Windows `pip install waitress` e `waitress-serve --port=8000 run:app`, su Linux `pip install gunicorn` e `gunicorn --workers 2 run:app`. Il numero di processi è libero: il limite dei tentativi di login è nel database e vale per tutti (dal 24/10).
 4. **HTTPS attivo** prima di aprire il login.
 5. **Librerie senza vulnerabilità note**: `pip install pip-audit`, poi `pip-audit -r requirements.txt` (da ripetere ogni tanto anche dopo la pubblicazione, e aggiornare `requirements.txt` se segnala qualcosa).
 

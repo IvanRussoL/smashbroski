@@ -566,7 +566,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 
 | | |
 |---|---|
-| **Origine** | — · Sezione 7 (Flask-Limiter) |
+| **Origine** | — · Sezione 7 (limite dei tentativi nel database) |
 | **Traguardo** | Demo |
 | **Precondizione** | Nessun login. |
 | **Passi** | 1) Sbagliare la password 6 volte entro un minuto.<br>2) Attendere un minuto e accedere con le credenziali corrette. |
@@ -716,7 +716,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 
 ## 3. Test unitari (pytest)
 
-I test si trovano in `tests/` e si eseguono con `pytest` dalla cartella del progetto. Le fixture di `tests/conftest.py` creano un'app con `create_app()` e la configurazione di test, un database di prova con i dati iniziali, un client di test e un proprietario di test. Nei test CSRF e rate limiting sono disattivati, tranne nei test che li verificano (sezione 3.6).
+I test si trovano in `tests/` e si eseguono con `pytest` dalla cartella del progetto. Le fixture di `tests/conftest.py` creano un'app con `create_app()` e la configurazione di test, un database di prova con i dati iniziali, un client di test e un proprietario di test. Nei test CSRF e limite dei tentativi (`LIMITE_TENTATIVI_ATTIVO`) sono disattivati, tranne nei test che li verificano (sezione 3.6).
 
 I servizi si testano senza Flask; le rotte con il client di test di Flask.
 
@@ -815,6 +815,19 @@ File: `tests/test_auth_service.py`
 | test_crea_proprietario_password_corta | Password di 11 caratteri → `DatiNonValidiError` |
 | test_crea_proprietario_email_duplicata | Email già registrata → `DatiNonValidiError` |
 
+### 3.5 bis TentativiService
+
+File: `tests/test_tentativi_service.py` (l'istante si passa come parametro)
+
+| Test | Scenario |
+|---|---|
+| test_quattro_errori_non_bloccano | 4 tentativi sbagliati in 4 secondi → non bloccato |
+| test_cinque_errori_bloccano | 5 tentativi sbagliati → bloccato |
+| test_blocco_finisce_dopo_un_minuto | Errori dalle 18:00:00 alle 18:00:04: bloccato alle 18:01:00, libero alle 18:01:01 |
+| test_ambiti_e_indirizzi_separati | 5 errori di login non bloccano il cambio password né un altro IP |
+| test_ip_non_salvato_in_chiaro | Nel database c'è solo l'impronta HMAC di 64 caratteri, diversa con un'altra chiave |
+| test_tentativi_vecchi_cancellati | Un tentativo nuovo cancella quelli di più di un'ora prima |
+
 ### 3.6 Rotte, accessi e sicurezza
 
 File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_header_sicurezza.py`
@@ -847,7 +860,9 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | test_login_messaggio_generico | Password errata ed email inesistente → stesso messaggio e stesso codice |
 | test_logout_solo_post | GET `/auth/logout` → 405; POST → sessione svuotata |
 | test_csrf_post_senza_token | Con CSRF attivo: POST a `/auth/logout`, `/proprietario/voci/nuova`, `/proprietario/voci/1/visibilita`, `/proprietario/orari` senza token → 400 |
-| test_rate_limit_login | Con il limite attivo: il sesto POST a `/auth/login` nello stesso minuto → 429 |
+| test_rate_limit_login | Con il limite attivo: il sesto POST a `/auth/login` nello stesso minuto → 429, anche con la password giusta; le richieste rifiutate non si registrano (5 righe in `tentativi_accesso`) |
+| test_rate_limit_login_riuscito_non_conta | 6 login riusciti di fila: nessun tentativo registrato |
+| test_rate_limit_condiviso_fra_processi | Due app separate (come due processi del server) dividono lo stesso limite: dopo 5 errori fra le due, entrambe rispondono 429 |
 | test_dati_non_validi_400 | POST di una voce con prezzo "abc" → 400 con il messaggio nel modulo |
 | test_voce_inesistente_404 | GET `/proprietario/voci/99999` da autenticato → 404 |
 | test_header_sicurezza | Su `/`, `/menu`, `/info`, `/privacy` e sulla pagina 404: CSP con il valore della sezione 7, `nosniff`, `DENY`, `strict-origin-when-cross-origin` |

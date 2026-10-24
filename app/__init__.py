@@ -9,7 +9,6 @@ from app.comandi import crea_proprietario, disattiva_proprietario, reimposta_pas
 from app.db import chiudi_connessione
 from app.eccezioni import NonTrovatoError
 from app.formato import descrivi_stato_apertura, euro, ora, telefono_leggibile
-from app.limiti import limiter
 from app.rotte import auth, proprietario, pubblico
 from app.sicurezza import crea_aggiungi_header
 
@@ -59,6 +58,9 @@ def create_app(configurazione: dict | None = None) -> Flask:
         # del visitatore, che conta i tentativi di login. Mai più alto dei proxy reali, altrimenti
         # chiunque potrebbe falsificare l'IP con l'header X-Forwarded-For.
         PROXY_FIDATI=int(os.environ.get("PROXY_FIDATI", "0")),
+        # Limite di 5 tentativi sbagliati al minuto su login e cambio password (app/limiti.py).
+        # Si spegne solo nei test che non lo verificano.
+        LIMITE_TENTATIVI_ATTIVO=True,
     )
     if configurazione is not None:
         app.config.update(configurazione)
@@ -74,7 +76,6 @@ def create_app(configurazione: dict | None = None) -> Flask:
     app.teardown_appcontext(chiudi_connessione)
     app.after_request(crea_aggiungi_header(app.config["PRODUZIONE"]))
     csrf.init_app(app)
-    limiter.init_app(app)
 
     app.register_blueprint(pubblico.bp)
     app.register_blueprint(auth.bp)

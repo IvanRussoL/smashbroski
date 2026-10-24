@@ -233,6 +233,19 @@ Contiene i dati del locale mostrati nelle pagine. Ha una sola riga, creata dai d
 | `url_instagram` | VARCHAR(255), obbligatoria | Indirizzo del profilo Instagram |
 | `fuso_orario` | VARCHAR(64), obbligatoria, predefinito 'Europe/Rome' | Fuso orario IANA usato da `zoneinfo` per "aperto ora" |
 
+### Tabella `tentativi_accesso`
+
+Contiene i tentativi sbagliati di login e di cambio password, per il limite di 5 al minuto (sezione 7). Sta nel database, e non nella memoria del server, perché il limite deve valere anche quando l'hosting fa girare il sito su più processi.
+
+| Colonna | Tipo | Significato |
+|---|---|---|
+| `id` | BIGINT, chiave primaria, auto-incrementale | Identificativo del tentativo |
+| `ambito` | VARCHAR(20), obbligatoria | `login` oppure `password` (cambio password dall'area): i due limiti sono separati |
+| `impronta_ip` | CHAR(64), obbligatoria | HMAC-SHA256 dell'indirizzo IP con la `SECRET_KEY`: l'IP in chiaro non si salva |
+| `tentato_il` | DATETIME(6), obbligatoria | Momento del tentativo, in UTC |
+
+Indici su (`ambito`, `impronta_ip`, `tentato_il`) per il conteggio e su `tentato_il` per la pulizia: a ogni nuovo tentativo si cancellano quelli più vecchi di un'ora. Nessuna relazione con `utenti`: si conta per indirizzo, anche per email inesistenti.
+
 ### Dati iniziali
 
 Li carica lo script dei dati iniziali dopo `schema.sql`. I prezzi sono stati letti a vista dal rendering del PDF `Menu_digitale.pdf` (titolo interno "Menù a parete 85,8x140,5cm 2025", modificato il 22/12/2025), non dal suo livello di testo.
@@ -372,6 +385,7 @@ Una classe per ogni gruppo di tabelle. Contengono tutte le query SQL, sempre par
 | `MenuRepository` | `categorie`, `formati_prezzo`, `voci_menu`, `prezzi_voce` |
 | `OrariRepository` | `orari_settimanali` |
 | `ImpostazioniRepository` | `impostazioni` |
+| `TentativiRepository` | `tentativi_accesso` (contare, registrare, cancellare i tentativi vecchi; lavora con valori semplici, senza modello) |
 
 `MenuRepository` legge il menù pubblico con poche query (categorie, formati, voci attive, prezzi) e lo ricompone in Python, senza una query per ogni voce.
 
@@ -383,6 +397,7 @@ Contengono le regole di business della sezione 3. Usano i repository e non dipen
 |---|---|
 | `AuthService` | Login con verifica Argon2id, controllo che l'account sia attivo, aggiornamento dell'hash quando i parametri di Argon2 cambiano, creazione del proprietario da riga di comando; cambio della password (con quella attuale), reimpostazione e attivazione/disattivazione dell'account da riga di comando |
 | `MenuService` | Menù pubblico (solo voci attive, in ordine di posizione); creazione e modifica di una voce con le regole sui prezzi (prezzo unico oppure formati della sua categoria) salvate in un'unica transazione; nascondere e rimostrare una voce; conversione del prezzo scritto dal proprietario ("7,50") in centesimi |
+| `TentativiService` | Limite di 5 tentativi sbagliati al minuto per IP e per ambito: blocco, registrazione con l'impronta HMAC dell'IP, pulizia dei tentativi più vecchi di un'ora. Riceve l'istante come parametro nei test, come `stato_apertura(adesso)` |
 | `OrariService` | Lettura e salvataggio del calendario settimanale con il controllo delle sovrapposizioni, anche oltre la mezzanotte; calcolo di `StatoApertura` |
 
 Il calcolo dell'apertura riceve l'istante come parametro (`stato_apertura(adesso)`) invece di leggere l'orologio: così i test controllano martedì alle 00:30 o lunedì alle 01:30 senza dipendere dall'ora in cui vengono eseguiti. La rotta gli passa l'ora attuale nel fuso delle impostazioni.
@@ -415,11 +430,13 @@ smashbroski/
 │   ├── templates/         # pagine Jinja
 │   ├── static/            # CSS, js/navbar.js, immagini WebP (logo, foto dell'hero, motivo dello sfondo)
 │   ├── eccezioni.py
+│   ├── limiti.py          # decoratore limita_tentativi delle rotte con password
 │   ├── comandi.py         # comandi da terminale (crea-proprietario, reimposta-password, disattiva/riattiva-proprietario)
 │   └── db.py              # connessione a MySQL
 ├── database/
 │   ├── schema.sql         # creazione delle tabelle
-│   └── dati_iniziali.sql  # menù, orari e impostazioni della sezione 4
+│   ├── dati_iniziali.sql  # menù, orari e impostazioni della sezione 4
+│   └── aggiornamenti/     # SQL per aggiornare un database già esistente senza ricaricarlo
 ├── strumenti/
 │   └── prepara_immagini.py # Pillow, solo sviluppo: originali → WebP
 ├── tests/
@@ -460,7 +477,7 @@ L'applicazione non è creata a livello di modulo, ma dalla funzione `create_app(
 - **Login con la sessione di Flask**, senza librerie esterne: dopo il controllo della password la sessione viene svuotata e riceve solo l'`id` dell'utente e l'impronta della password (protezione dalla session fixation; `app/sessione.py`). L'impronta è un HMAC-SHA256 dell'hash Argon2 con la `SECRET_KEY` (il cookie è firmato ma leggibile, l'hash non deve finirci): a ogni richiesta il `before_request` la confronta con quella della password attuale, quindi un cambio di password (dall'area o con `reimposta-password`) chiude subito le sessioni sugli altri dispositivi. Il logout è una richiesta POST e svuota la sessione.
 - **Utente ricaricato a ogni richiesta** dal `before_request` di `proprietario`: un account disattivato perde l'accesso subito.
 - **Cookie di sessione** con `HttpOnly`, `SameSite=Lax` e, in produzione, `Secure`; sessione chiusa dal server dopo **1 ora di inattività** o **8 ore dal login** (OWASP WSTG e ASVS 3.3/3.4): ora del login e dell'ultima attività sono nella sessione firmata e il `before_request` le controlla. Senza questo controllo Flask rinnoverebbe il cookie a ogni richiesta e la sessione non scadrebbe mai per chi la usa.
-- **Rate limiting con Flask-Limiter**: al massimo 5 tentativi di login al minuto per indirizzo IP, poi risposta 429. L'IP serve solo a contare i tentativi e non viene salvato. Dietro il proxy dell'hosting l'IP vero si legge con `ProxyFix`, attivo solo se `PROXY_FIDATI` in `.env` indica quanti proxy ci sono (0 in sviluppo): senza, tutti i visitatori avrebbero l'IP del proxy e 5 errori di chiunque bloccherebbero il login a tutti; con un numero troppo alto chiunque potrebbe falsificare l'IP. I conteggi sono nella memoria del processo: online un solo processo (o Redis).
+- **Limite ai tentativi sbagliati** (`TentativiService` e decoratore `limita_tentativi` in `app/limiti.py`): al massimo 5 tentativi sbagliati al minuto per indirizzo IP sul login e, separatamente, sul cambio password, poi risposta 429 fino a quando il più vecchio esce dalla finestra di un minuto; si contano solo le risposte 400 e le richieste rifiutate non allungano il blocco. I tentativi stanno nella tabella `tentativi_accesso`, quindi il limite vale per tutti i processi del server e non si azzera a un riavvio (dal 24/10 al posto di Flask-Limiter in memoria, che con 3 processi permetteva fino a 15 tentativi). Dell'IP si salva solo un HMAC con la `SECRET_KEY`, cancellato dopo un'ora. Dietro il proxy dell'hosting l'IP vero si legge con `ProxyFix`, attivo solo se `PROXY_FIDATI` in `.env` indica quanti proxy ci sono (0 in sviluppo): senza, tutti i visitatori avrebbero l'IP del proxy e 5 errori di chiunque bloccherebbero il login a tutti; con un numero troppo alto chiunque potrebbe falsificare l'IP.
 - **Nessuna registrazione pubblica**: il proprietario si crea con `flask crea-proprietario`, che chiede la password senza mostrarla (`getpass`).
 
 ### Protezione delle richieste

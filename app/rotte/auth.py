@@ -1,8 +1,9 @@
 from flask import Blueprint, redirect, render_template, request, session, url_for
 
 from app.db import ottieni_connessione
-from app.limiti import LIMITE_TENTATIVI_LOGIN, limiter, tentativo_fallito
+from app.limiti import limita_tentativi
 from app.servizi.auth import AuthService
+from app.servizi.tentativi import AMBITO_LOGIN
 from app.sessione import apri_sessione
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -11,7 +12,7 @@ MESSAGGIO_LOGIN_ERRATO = "Email o password non corretti."
 
 
 @bp.route("/login", methods=["GET", "POST"])
-@limiter.limit(LIMITE_TENTATIVI_LOGIN, methods=["POST"], deduct_when=tentativo_fallito)
+@limita_tentativi(AMBITO_LOGIN)
 def login():
     """
     Login del proprietario. Dopo il controllo della password la sessione viene svuotata e riceve

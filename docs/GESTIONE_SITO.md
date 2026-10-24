@@ -38,6 +38,8 @@ I test usano il database `smashbroski_test` (`DB_NAME_TEST` in `.env`) e lo ricr
 
 ## 4. Account del proprietario
 
+Il manuale per il proprietario (come usare l'area riservata) è `docs/MANUALE_PROPRIETARIO.md`: si consegna insieme alla scheda con indirizzo, email e prima password, che resta fuori da Git.
+
 | Cosa | Comando |
 |---|---|
 | Creare l'account (chiede email e password, che non compare a schermo) | `flask --app app crea-proprietario` |
@@ -102,7 +104,7 @@ Da controllare uno per uno prima di aprire il sito al pubblico:
 
 ## 9. Cosa può stare nel repository pubblico
 
-Sì: codice, questo file, `.env.example`, indirizzo del login. La sicurezza non dipende dal fatto che nessuno sappia come funziona il sito, ma da password, Argon2, limite di tentativi e CSRF; i comandi di questo file funzionano solo per chi ha già accesso al server.
+Sì: codice, questo file, il manuale del proprietario (`docs/MANUALE_PROPRIETARIO.md`, senza dati reali), `.env.example`, indirizzo del login. La sicurezza non dipende dal fatto che nessuno sappia come funziona il sito, ma da password, Argon2, limite di tentativi e CSRF; i comandi di questo file funzionano solo per chi ha già accesso al server.
 
 Mai: `.env`, password, `SECRET_KEY`, email reali degli account (neanche come esempio nei commenti), IP e dati dell'hosting, copie del database. Controllo prima di un push: `git diff --cached` e, per tutta la storia, `git log -p --all | Select-String "password|secret|@"` (PowerShell).
 

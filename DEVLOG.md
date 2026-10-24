@@ -509,3 +509,9 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Pagina corrente segnata** con `aria-current="page"` (anche in nuova voce e modifica, che fanno parte della gestione del menù): testo blu notte senza sottolineatura e riga rossa sotto, come una scheda selezionata.
 - **Test**: `test_barra_area_distinta_dalla_navbar_e_pagina_corrente`. 197 test superati.
 
+## 2026-10-24 · Fase 2 – Indice delle categorie in "Gestisci il menù"
+
+- **Problema (dal collaudo)**: sul telefono l'elenco delle voci era lungo circa 6900 px e per arrivare a The Originals bisognava scorrere tutto.
+- **Stesso indice a pillole del menù pubblico** (stesso markup, stessa classe `.indice`, stesso `static/js/indice.js`): fisso sotto la navbar, pillola rossa sulla categoria che si sta guardando, atterraggio preciso al tocco. Nessun CSS né JavaScript nuovo: le sezioni dell'area hanno già `section.categoria` con il titolo `h2` e l'id della categoria. Etichetta per i lettori di schermo "Categorie da gestire".
+- **Verifica**: a 360 px un tocco su THE ORIGINALS porta il titolo a 188 px dall'alto con la pillola attiva; nessuno scroll orizzontale. Test `test_indice_categorie_nella_gestione_del_menu`. 198 test superati.
+

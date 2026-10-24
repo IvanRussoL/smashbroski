@@ -30,6 +30,13 @@ def test_barra_area_distinta_dalla_navbar_e_pagina_corrente(client_proprietario)
     assert 'aria-current="page">Gestisci gli orari</a>' in orari
 
 
+def test_indice_categorie_nella_gestione_del_menu(client_proprietario):
+    pagina = html(client_proprietario.get("/proprietario/"))
+    assert 'aria-label="Categorie da gestire"' in pagina
+    assert pagina.count('<li><a href="#') == 7
+    assert 'href="#the-originals"' in pagina and 'id="the-originals"' in pagina
+
+
 def test_nuova_voce_compare_nel_menu(client_proprietario, database_modificato):
     risposta = client_proprietario.post(f"/proprietario/voci/nuova?categoria={BURGER}", data=dati_voce(
         nome="Smash Pompei", descrizione="Hamburger, provola", **{f"prezzo_{PANINO_SINGLE}": "8,50"},

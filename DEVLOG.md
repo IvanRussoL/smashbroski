@@ -502,3 +502,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Ora `valida_turni` distingue il campo vuoto dall'ora scritta male**: "Giovedì: manca l'ora di fine del turno (se chiude dopo mezzanotte, es. 01:00)." e "Mercoledì: manca l'ora di inizio del turno."; il messaggio sul formato HH:MM resta per le ore non valide. Il suggerimento sulla mezzanotte è nel messaggio perché è il caso in cui è più facile sbagliare.
 - **Test**: `test_manca_ora_di_fine_messaggio_chiaro`, `test_manca_ora_di_inizio_messaggio_chiaro`. 196 test superati.
 
+## 2026-10-24 · Fase 2 – Barra dell'area proprietario distinta dalla navbar
+
+- **Problema (dal collaudo)**: nell'area c'erano due link "Menù": quello della navbar (menù pubblico) e quello della barra dell'area (gestione delle voci).
+- **Voci della barra dell'area: "Gestisci il menù", "Gestisci gli orari", "Esci"**. La navbar resta com'è: dall'area si apre al volo la pagina pubblica per controllare una modifica. Scartato: togliere la navbar nell'area (si perde il controllo rapido) o rinominare le voci pubbliche.
+- **Pagina corrente segnata** con `aria-current="page"` (anche in nuova voce e modifica, che fanno parte della gestione del menù): testo blu notte senza sottolineatura e riga rossa sotto, come una scheda selezionata.
+- **Test**: `test_barra_area_distinta_dalla_navbar_e_pagina_corrente`. 197 test superati.
+

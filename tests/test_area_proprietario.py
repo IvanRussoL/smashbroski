@@ -22,6 +22,14 @@ def test_indice_mostra_tutte_le_voci(client_proprietario):
     assert "Aggiungi una voce in Kids Menù" in pagina
 
 
+def test_barra_area_distinta_dalla_navbar_e_pagina_corrente(client_proprietario):
+    indice = html(client_proprietario.get("/proprietario/"))
+    assert 'aria-current="page">Gestisci il menù</a>' in indice
+    assert 'aria-current="page">Gestisci gli orari</a>' not in indice
+    orari = html(client_proprietario.get("/proprietario/orari"))
+    assert 'aria-current="page">Gestisci gli orari</a>' in orari
+
+
 def test_nuova_voce_compare_nel_menu(client_proprietario, database_modificato):
     risposta = client_proprietario.post(f"/proprietario/voci/nuova?categoria={BURGER}", data=dati_voce(
         nome="Smash Pompei", descrizione="Hamburger, provola", **{f"prezzo_{PANINO_SINGLE}": "8,50"},

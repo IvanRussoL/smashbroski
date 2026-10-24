@@ -1,7 +1,8 @@
 <nav class="area-riservata" aria-label="Area riservata">
     <ul>
-        <li><a href="{{ url_for('proprietario.indice') }}">Menù</a></li>
-        <li><a href="{{ url_for('proprietario.orari') }}">Orari</a></li>
+        {# "Gestisci" distingue queste voci da Menù e Orari e contatti della barra in alto, che portano alle pagine pubbliche. #}
+        <li><a href="{{ url_for('proprietario.indice') }}"{% if request.endpoint in ('proprietario.indice', 'proprietario.nuova_voce', 'proprietario.modifica_voce') %} aria-current="page"{% endif %}>Gestisci il menù</a></li>
+        <li><a href="{{ url_for('proprietario.orari') }}"{% if request.endpoint == 'proprietario.orari' %} aria-current="page"{% endif %}>Gestisci gli orari</a></li>
         <li>
             <form method="post" action="{{ url_for('auth.logout') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

@@ -94,6 +94,15 @@ def test_csrf_post_senza_token(database_di_prova):
         assert "Modulo scaduto o non valido" in risposta.get_data(as_text=True)
 
 
+def test_login_avvisa_del_limite_di_tentativi(client):
+    from app.limiti import LIMITE_TENTATIVI_LOGIN
+    pagina = client.get("/auth/login").get_data(as_text=True)
+    # La nota deve dire lo stesso numero del limite configurato.
+    assert LIMITE_TENTATIVI_LOGIN == "5 per minute"
+    assert "Dopo 5 tentativi sbagliati l'accesso si blocca per un minuto" in pagina
+    assert 'aria-describedby="nota-tentativi"' in pagina
+
+
 def test_rate_limit_login(database_di_prova):
     app = create_app(configurazione_test(RATELIMIT_ENABLED=True))
     client = app.test_client()

@@ -515,3 +515,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Stesso indice a pillole del menù pubblico** (stesso markup, stessa classe `.indice`, stesso `static/js/indice.js`): fisso sotto la navbar, pillola rossa sulla categoria che si sta guardando, atterraggio preciso al tocco. Nessun CSS né JavaScript nuovo: le sezioni dell'area hanno già `section.categoria` con il titolo `h2` e l'id della categoria. Etichetta per i lettori di schermo "Categorie da gestire".
 - **Verifica**: a 360 px un tocco su THE ORIGINALS porta il titolo a 188 px dall'alto con la pillola attiva; nessuno scroll orizzontale. Test `test_indice_categorie_nella_gestione_del_menu`. 198 test superati.
 
+## 2026-10-24 · Fase 2 – Accesso: nota sul blocco dopo 5 tentativi
+
+- **Problema (dal collaudo)**: dopo 5 login sbagliati in un minuto Flask-Limiter blocca l'indirizzo IP, quindi anche la password giusta riceve "Troppi tentativi" per un minuto, e il modulo non lo diceva.
+- **Nota sotto "Entra"**: "Dopo 5 tentativi sbagliati l'accesso si blocca per un minuto, anche con la password giusta.", 14 px nel colore secondario, collegata al campo password con `aria-describedby` (i lettori di schermo la leggono con il campo). Scartato: mostrare i tentativi rimasti (rivelerebbe il funzionamento del limite a chi prova password a caso).
+- **Test**: `test_login_avvisa_del_limite_di_tentativi` controlla anche che `LIMITE_TENTATIVI_LOGIN` sia ancora "5 per minute", così nota e limite non si separano. 199 test superati.
+- **Chiusi i 5 punti deboli del collaudo del 24/10.** Resta il cambio della password dall'area.
+

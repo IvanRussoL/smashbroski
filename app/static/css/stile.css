@@ -970,6 +970,7 @@ main:has(> .pagina-testo) { background: var(--crema); }
 .area-riservata a[aria-current="page"] { color: var(--blu-scuro); text-decoration: none; border-bottom: 3px solid var(--rosso); }
 .utente { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--testo-secondario); }
 .errori { padding: 0.75rem 1rem; border-left: 4px solid var(--rosso); background: #FBE9EC; }
+.nota-modulo { font-size: 0.875rem; color: var(--testo-secondario); }
 .avviso { padding: 0.75rem 1rem; border-left: 4px solid var(--blu); background: #E7F0F9; }
 .area .pagina-menu, .area { max-width: 1000px; }
 /* Indice dell'area: stesso spazio delle altre pagine dell'area, schede staccate fra loro. */

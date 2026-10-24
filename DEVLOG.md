@@ -487,3 +487,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Difetti trovati, da correggere uno alla volta**: sul telefono il campo "alle" degli orari va a capo e spezza ogni turno; un turno con solo l'inizio riceve "scrivi le ore nel formato HH:MM" invece di "manca l'ora di fine"; nell'area ci sono due link "Menù" che portano a pagine diverse; l'elenco delle voci sul telefono è lungo circa 6900 px senza indice delle categorie; il blocco dopo 5 tentativi vale per l'IP e ferma anche la password giusta per un minuto, senza che il modulo lo dica.
 - **Manca**: il cambio della password dall'area (oggi solo ricreando l'utente da riga di comando). Eliminare una voce e modificare contatti e logo restano fuori per scelta.
 - **Da verificare sull'Oppo Reno 12 Pro**: campi dell'ora a 24 ore (Chromium senza interfaccia li mostra AM/PM) e un possibile lampo del pannello del menù mobile al caricamento.
+
+## 2026-10-24 · Fase 2 – Orari dell'area proprietario su una riga per turno
+
+- **Problema (dal collaudo)**: sul telefono "Dalle [campo] alle" stava su una riga e il secondo campo andava a capo da solo, quindi ogni turno occupava due righe spezzate e la pagina degli orari era lunga 3650 px a 360 px di larghezza.
+- **Telefono**: "Dalle" e "alle" sopra il proprio campo (griglia di due colonne larghe al massimo 10rem, riempita per colonna), i due campi affiancati anche a 320 px. Etichette a 14 px nel colore secondario, sempre collegate al campo con `for`; campi alti 48 px. Pagina da 3650 a 2808 px.
+- **Da 768 px**: "Dalle [ ] alle [ ]" su una riga (colonne `auto 10rem auto 10rem` addossate a sinistra), come si legge un orario. Pagina da 2512 a 2244 px a 1366 px.
+- **Scartato**: togliere le etichette visibili e lasciare solo "[ ] – [ ]" con etichette per i lettori di schermo (più compatto, ma meno chiaro per il proprietario); campi uno sotto l'altro (pagina ancora più lunga).
+- **Solo CSS** (`.riga-turno`), nessun template toccato. 194 test superati.
+

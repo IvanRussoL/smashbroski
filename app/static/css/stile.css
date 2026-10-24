@@ -929,9 +929,24 @@ main:has(> .pagina-testo) { background: var(--crema); }
 .cambia-categoria { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem 1rem; margin-bottom: 1rem; }
 .cambia-categoria label { width: 100%; }
 .cambia-categoria select { width: auto; }
-.riga-turno { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
-.riga-turno label { display: inline; margin: 0; font-weight: normal; }
-.pagina-modulo .riga-turno input[type="time"] { width: auto; }
+/* Orari: un turno per riga anche a 320 px. "Dalle" e "alle" stanno sopra il loro campo (colonna 1 e 2),
+   così i due campi restano affiancati e non va a capo il secondo come con le etichette in linea. */
+.riga-turno {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 10rem));
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    gap: 0.15rem 1rem;
+    margin: 0 0 0.75rem;
+}
+.riga-turno:last-child { margin-bottom: 0; }
+.riga-turno label { margin: 0; font-size: 0.875rem; font-weight: normal; color: var(--testo-secondario); }
+.pagina-modulo .riga-turno input[type="time"] { width: 100%; min-width: 0; min-height: 44px; padding-inline: 0.5rem; }
+/* Da 768 px c'è spazio: "Dalle [ ] alle [ ]" su una riga, come si legge un orario. */
+@media (min-width: 768px) {
+    .riga-turno { grid-template-columns: auto 10rem auto 10rem; grid-template-rows: auto; grid-auto-flow: row; justify-content: start; align-items: center; gap: 0.75rem; }
+    .riga-turno label { font-size: 1rem; color: var(--testo); }
+}
 .pulsante-modulo {
     display: inline-block;
     min-height: 44px;

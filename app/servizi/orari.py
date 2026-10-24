@@ -92,6 +92,13 @@ def valida_turni(righe: list[tuple]) -> list[Turno]:
             continue
         inizio, fine = converti_ora(inizio_testo), converti_ora(fine_testo)
         nome = NOMI_GIORNI[giorno].capitalize()
+        # Un campo vuoto è una dimenticanza, non un errore di formato: il messaggio dice quale manca.
+        if not (inizio_testo or "").strip():
+            messaggi.append(f"{nome}: manca l'ora di inizio del turno.")
+            continue
+        if not (fine_testo or "").strip():
+            messaggi.append(f"{nome}: manca l'ora di fine del turno (se chiude dopo mezzanotte, es. 01:00).")
+            continue
         if inizio is None or fine is None:
             messaggi.append(f"{nome}: scrivi le ore nel formato HH:MM, es. 18:30.")
             continue

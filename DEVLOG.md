@@ -496,3 +496,9 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Scartato**: togliere le etichette visibili e lasciare solo "[ ] – [ ]" con etichette per i lettori di schermo (più compatto, ma meno chiaro per il proprietario); campi uno sotto l'altro (pagina ancora più lunga).
 - **Solo CSS** (`.riga-turno`), nessun template toccato. 194 test superati.
 
+## 2026-10-24 · Fase 2 – Orari: messaggio chiaro quando manca un'ora
+
+- **Problema (dal collaudo)**: un turno con solo l'ora di inizio riceveva "scrivi le ore nel formato HH:MM", ma il formato era giusto: mancava l'ora di fine.
+- **Ora `valida_turni` distingue il campo vuoto dall'ora scritta male**: "Giovedì: manca l'ora di fine del turno (se chiude dopo mezzanotte, es. 01:00)." e "Mercoledì: manca l'ora di inizio del turno."; il messaggio sul formato HH:MM resta per le ore non valide. Il suggerimento sulla mezzanotte è nel messaggio perché è il caso in cui è più facile sbagliare.
+- **Test**: `test_manca_ora_di_fine_messaggio_chiaro`, `test_manca_ora_di_inizio_messaggio_chiaro`. 196 test superati.
+

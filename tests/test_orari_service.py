@@ -137,6 +137,18 @@ def test_ora_formato_non_valido_errore(ora):
         valida_turni([(1, ora, "15:00")])
 
 
+def test_manca_ora_di_fine_messaggio_chiaro():
+    with pytest.raises(DatiNonValidiError) as errore:
+        valida_turni([(1, "18:00", "")])
+    assert errore.value.messaggi == ["Lunedì: manca l'ora di fine del turno (se chiude dopo mezzanotte, es. 01:00)."]
+
+
+def test_manca_ora_di_inizio_messaggio_chiaro():
+    with pytest.raises(DatiNonValidiError) as errore:
+        valida_turni([(3, " ", "15:00")])
+    assert errore.value.messaggi == ["Mercoledì: manca l'ora di inizio del turno."]
+
+
 @pytest.mark.parametrize("giorno", [0, 8, "x"])
 def test_giorno_fuori_intervallo_errore(giorno):
     with pytest.raises(DatiNonValidiError):

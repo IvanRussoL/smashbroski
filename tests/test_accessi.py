@@ -145,3 +145,23 @@ def test_rate_limit_cambio_password(database_di_prova):
         assert client.post("/proprietario/password", data=dati).status_code == 400
     assert client.post("/proprietario/password", data=dati).status_code == 429
 
+
+
+def test_richiesta_troppo_grande_rifiutata(client):
+    risposta = client.post("/auth/login", data={"email": EMAIL, "password": "x" * 70_000})
+    assert risposta.status_code == 413
+    assert "Dati inviati troppo grandi." in risposta.get_data(as_text=True)
+
+
+@pytest.mark.parametrize("proxy, ip_atteso", [(0, "127.0.0.1"), (1, "203.0.113.7")])
+def test_ip_del_visitatore_dietro_proxy(database_di_prova, proxy, ip_atteso):
+    """
+    Senza proxy dichiarati X-Forwarded-For si ignora (chiunque potrebbe scriverlo); con un proxy
+    l'IP che conta i tentativi di login è quello del visitatore, non quello del proxy.
+    """
+    from flask import request
+
+    app = create_app(configurazione_test(PROXY_FIDATI=proxy))
+    app.add_url_rule("/ip-di-prova", "ip_di_prova", lambda: request.remote_addr)
+    risposta = app.test_client().get("/ip-di-prova", headers={"X-Forwarded-For": "203.0.113.7"})
+    assert risposta.get_data(as_text=True) == ip_atteso

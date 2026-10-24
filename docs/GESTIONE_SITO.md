@@ -86,3 +86,21 @@ Gli originali restano fuori da Git; nel sito vanno solo i WebP prodotti dallo sc
 | Aggiornare il branch | `git pull` |
 | `git status` segna `DEVLOG.md` o `stile.css` modificati ma il contenuto è uguale (solo fine riga di Windows) | `git restore DEVLOG.md app/static/css/stile.css` |
 | Controllare che cambino solo le fini riga | `git diff --ignore-cr-at-eol --stat` (vuoto = solo fine riga) |
+
+## 8. Pubblicazione online
+
+Da controllare uno per uno prima di aprire il sito al pubblico:
+
+1. **Account nuovo**: `flask --app app crea-proprietario` sul database online con un'email che non compare nel repository e una password nuova (mai quella usata in sviluppo).
+2. **`.env` del server**: `SECRET_KEY` nuova, `PRODUZIONE=1` (cookie solo HTTPS e header HSTS), `PROXY_FIDATI` uguale al numero di proxy dell'hosting davanti al sito (di solito 1: si legge nella documentazione dell'hosting).
+3. **Server WSGI, mai `python run.py`** (il debugger permette di eseguire codice dal browser; con `PRODUZIONE=1` `run.py` si rifiuta di partire). Su Windows `pip install waitress` e `waitress-serve --port=8000 run:app`, su Linux `pip install gunicorn` e `gunicorn --workers 1 run:app`. **Un solo processo**: il conteggio dei tentativi di login è nella memoria del processo, con più processi il limite si moltiplica (per averne di più serve Redis).
+4. **HTTPS attivo** prima di aprire il login.
+5. **Librerie senza vulnerabilità note**: `pip install pip-audit`, poi `pip-audit -r requirements.txt` (da ripetere ogni tanto anche dopo la pubblicazione, e aggiornare `requirements.txt` se segnala qualcosa).
+
+## 9. Cosa può stare nel repository pubblico
+
+Sì: codice, questo file, `.env.example`, indirizzo del login. La sicurezza non dipende dal fatto che nessuno sappia come funziona il sito, ma da password, Argon2, limite di tentativi e CSRF; i comandi di questo file funzionano solo per chi ha già accesso al server.
+
+Mai: `.env`, password, `SECRET_KEY`, email reali degli account (neanche come esempio nei commenti), IP e dati dell'hosting, copie del database. Controllo prima di un push: `git diff --cached` e, per tutta la storia, `git log -p --all | Select-String "password|secret|@"` (PowerShell).
+
+Se un segreto finisce in un commit già pubblicato, cancellarlo dal file non basta (resta nella storia): si cambia il segreto (nuova password, nuova `SECRET_KEY`, altro account).

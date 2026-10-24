@@ -1,7 +1,7 @@
 import pytest
 
 from app import create_app
-from app.sicurezza import CONTENT_SECURITY_POLICY
+from app.sicurezza import CONTENT_SECURITY_POLICY, PERMISSIONS_POLICY
 
 
 @pytest.mark.parametrize("indirizzo", ["/", "/menu", "/info", "/privacy", "/pagina-inesistente"])
@@ -12,6 +12,8 @@ def test_header_sicurezza(client, indirizzo):
     assert header["X-Content-Type-Options"] == "nosniff"
     assert header["X-Frame-Options"] == "DENY"
     assert header["Referrer-Policy"] == "strict-origin-when-cross-origin"
+    assert header["Permissions-Policy"] == PERMISSIONS_POLICY
+    assert header["Cross-Origin-Opener-Policy"] == "same-origin"
 
 
 def test_hsts_solo_produzione(app, database_di_prova):

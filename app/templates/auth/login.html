@@ -14,7 +14,7 @@
         </p>
         <p>
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" autocomplete="current-password" aria-describedby="nota-tentativi" required>
+            <input id="password" name="password" type="password" autocomplete="current-password" maxlength="128" aria-describedby="nota-tentativi" required>
         </p>
         <p><button class="pulsante-modulo" type="submit">Entra</button></p>
         {# Il limite vale per la connessione, quindi blocca anche la password giusta: meglio dirlo prima. #}

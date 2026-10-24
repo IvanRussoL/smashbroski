@@ -533,3 +533,14 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **`docs/GESTIONE_SITO.md`**: tutti i comandi dello sviluppatore (ambiente, avvio anche dal telefono, test, account, database, immagini, Git) e cosa fare se l'account sembra compromesso. `PROGETTAZIONE.md` aggiornata (RF-16, `AuthService`, rotte, `comandi.py`).
 - **Test**: 14 nuovi (8 in `test_auth_service.py`, 5 in `test_area_proprietario.py` tra pagina e comandi, limite dei tentativi in `test_accessi.py`; la nuova rotta è anche nel controllo CSRF). 213 test superati.
 
+
+## 2026-10-24 · Fase 2 – Analisi di sicurezza e correzioni prima della pubblicazione
+
+- **Analisi** del repository pubblico e del codice: storia Git completa (nessun `.env`, password o chiave; commit con l'email noreply di GitHub), `pip-audit` sulle versioni di `requirements.txt` (nessuna vulnerabilità nota al 24/10), `bandit`, query SQL, escape dei template, CSRF, password, sessioni, header. Codice solido; i punti deboli riguardano la messa online.
+- **Email reale negli esempi**: due docstring di `app/comandi.py` usavano l'email dell'account di sviluppo. Sostituita con `proprietario@example.com`; resta nella storia Git, quindi online l'account del proprietario si crea con un'altra email.
+- **`docs/GESTIONE_SITO.md` resta nel repository**: i comandi non sono segreti (principio di Kerckhoffs), funzionano solo per chi ha già accesso al server. Aggiunte le sezioni "Pubblicazione online" (checklist) e "Cosa può stare nel repository pubblico".
+- **Dimensione delle richieste**: `MAX_CONTENT_LENGTH` 64 KB (413 "Dati inviati troppo grandi."). **Password al massimo 128 caratteri** (creazione, reimpostazione, cambio; al login una password più lunga è rifiutata senza calcolare l'hash), `maxlength="128"` nei campi.
+- **ProxyFix** con `PROXY_FIDATI` in `.env` (0 in sviluppo): dietro il proxy dell'hosting il limite dei tentativi conta l'IP del visitatore invece di quello del proxy, che bloccherebbe il login a tutti.
+- **Header nuovi**: `Permissions-Policy` (fotocamera, microfono, posizione, pagamenti, USB negati) e `Cross-Origin-Opener-Policy: same-origin`.
+- **`run.py`** si rifiuta di partire con `PRODUZIONE=1` (il debugger online permetterebbe di eseguire codice).
+- **Test**: 5 nuovi (password troppo lunga e di 128 caratteri, richiesta troppo grande, IP con e senza proxy) e controllo dei nuovi header. 218 test superati.

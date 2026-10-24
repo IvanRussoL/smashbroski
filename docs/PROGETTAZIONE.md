@@ -455,16 +455,17 @@ L'applicazione non è creata a livello di modulo, ma dalla funzione `create_app(
 
 ### Autenticazione e sessione
 
-- **Password con Argon2id** (`argon2-cffi`, classe `PasswordHasher` con i parametri predefiniti della libreria). Al login, se `check_needs_rehash()` indica parametri superati, l'hash viene ricalcolato e salvato. Lunghezza minima della password: 12 caratteri.
+- **Password con Argon2id** (`argon2-cffi`, classe `PasswordHasher` con i parametri predefiniti della libreria). Al login, se `check_needs_rehash()` indica parametri superati, l'hash viene ricalcolato e salvato. Lunghezza della password: da 12 a 128 caratteri (oltre 128 è rifiutata senza calcolare l'hash, così una password enorme non fa lavorare il server).
 - **Stesso tempo di risposta per email esistenti e inesistenti**: se l'email non esiste, `AuthService` verifica comunque la password contro un hash fittizio, così dai tempi non si capisce quali email sono registrate. Il messaggio di errore è sempre generico ("email o password non corretti").
 - **Login con la sessione di Flask**, senza librerie esterne: dopo il controllo della password la sessione viene svuotata e riceve solo l'`id` dell'utente (protezione dalla session fixation). Il logout è una richiesta POST e svuota la sessione.
 - **Utente ricaricato a ogni richiesta** dal `before_request` di `proprietario`: un account disattivato perde l'accesso subito.
 - **Cookie di sessione** con `HttpOnly`, `SameSite=Lax` e, in produzione, `Secure`; durata massima della sessione di 8 ore.
-- **Rate limiting con Flask-Limiter**: al massimo 5 tentativi di login al minuto per indirizzo IP, poi risposta 429. L'IP serve solo a contare i tentativi e non viene salvato.
+- **Rate limiting con Flask-Limiter**: al massimo 5 tentativi di login al minuto per indirizzo IP, poi risposta 429. L'IP serve solo a contare i tentativi e non viene salvato. Dietro il proxy dell'hosting l'IP vero si legge con `ProxyFix`, attivo solo se `PROXY_FIDATI` in `.env` indica quanti proxy ci sono (0 in sviluppo): senza, tutti i visitatori avrebbero l'IP del proxy e 5 errori di chiunque bloccherebbero il login a tutti; con un numero troppo alto chiunque potrebbe falsificare l'IP. I conteggi sono nella memoria del processo: online un solo processo (o Redis).
 - **Nessuna registrazione pubblica**: il proprietario si crea con `flask crea-proprietario`, che chiede la password senza mostrarla (`getpass`).
 
 ### Protezione delle richieste
 
+- **Dimensione delle richieste**: `MAX_CONTENT_LENGTH` di 64 KB, oltre la richiesta è rifiutata con 413.
 - **CSRF**: `CSRFProtect` di Flask-WTF protegge tutti i moduli POST, compreso il logout.
 - **SQL injection**: tutte le query usano parametri (`%s`) passati separatamente al driver.
 - **XSS**: Jinja applica l'escape automatico; `|safe` non si usa mai su dati inseriti dal proprietario. Il JSON-LD si scrive con il filtro `tojson`, che rende innocui i caratteri `<`, `>` e `&`.
@@ -480,6 +481,8 @@ Un `after_request` registrato in `create_app()` aggiunge a tutte le risposte:
 | `X-Content-Type-Options` | `nosniff` | Il browser rispetta il tipo dichiarato dei file |
 | `X-Frame-Options` | `DENY` | Stessa protezione di `frame-ancestors` per i browser più vecchi |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Ai siti esterni (Maps, social) arriva solo il dominio, non il percorso |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | Il browser nega queste funzioni a tutte le pagine del sito |
+| `Cross-Origin-Opener-Policy` | `same-origin` | Una pagina di un altro sito aperta dal nostro non può controllare la nostra finestra |
 | `Strict-Transport-Security` | `max-age=31536000` (solo in produzione) | Il browser usa sempre HTTPS |
 
 Le pagine di `proprietario` hanno anche `Cache-Control: no-store`. Nessuna pagina contiene il meta `generator` (AU-SEO03).
@@ -493,7 +496,8 @@ Le pagine di `proprietario` hanno anche `Cache-Control: no-store`. Nessuna pagin
 
 - **Segreti solo nel file `.env`**, escluso da Git e letto con `python-dotenv`: `SECRET_KEY` (lunga e casuale, generata con il modulo `secrets`) e credenziali del database. Nel repository c'è solo `.env.example`.
 - **Utente MySQL dedicato all'app**, con permessi solo sul database del progetto, mai `root`.
-- **Debug solo in sviluppo**: in produzione è spento e gli errori mostrano una pagina generica.
+- **Debug solo in sviluppo**: in produzione è spento e gli errori mostrano una pagina generica. `run.py` (che accende il debugger) si rifiuta di partire con `PRODUZIONE=1`; online il sito gira con un server WSGI.
+- **Repository pubblico**: i comandi di gestione e l'indirizzo del login possono stare in Git; mai `.env`, password, `SECRET_KEY`, email reali degli account (neanche negli esempi), IP e dati dell'hosting, copie del database.
 
 ### Test degli accessi
 

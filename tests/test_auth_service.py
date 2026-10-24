@@ -166,3 +166,22 @@ def test_disattiva_e_riattiva(connessione, proprietario):
     servizio.imposta_attivo(EMAIL, True)
     assert servizio.login(EMAIL, PASSWORD).id == proprietario
 
+
+
+def test_password_troppo_lunga_rifiutata(connessione, proprietario):
+    lunga = "x" * 129
+    servizio = AuthService(connessione)
+    assert servizio.login(EMAIL, PASSWORD + lunga) is None
+    with pytest.raises(DatiNonValidiError, match="al massimo 128 caratteri"):
+        servizio.crea_proprietario("altro@example.com", lunga)
+    with pytest.raises(DatiNonValidiError, match="al massimo 128 caratteri"):
+        servizio.cambia_password(proprietario, PASSWORD, lunga, lunga)
+    with pytest.raises(DatiNonValidiError, match="al massimo 128 caratteri"):
+        servizio.reimposta_password(EMAIL, lunga)
+
+
+def test_password_di_128_caratteri_accettata(connessione, proprietario):
+    massima = "y" * 128
+    servizio = AuthService(connessione)
+    servizio.cambia_password(proprietario, PASSWORD, massima, massima)
+    assert servizio.login(EMAIL, massima) is not None

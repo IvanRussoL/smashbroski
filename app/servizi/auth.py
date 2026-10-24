@@ -6,6 +6,8 @@ from app.modelli.utente import Utente
 from app.repository.utente import UtenteRepository
 
 LUNGHEZZA_MINIMA_PASSWORD = 12
+# Oltre questa lunghezza la password è rifiutata: Argon2 su testi enormi farebbe lavorare il server a vuoto.
+LUNGHEZZA_MASSIMA_PASSWORD = 128
 LUNGHEZZA_MASSIMA_EMAIL = 255
 
 # Argon2id con i parametri predefiniti della libreria (argon2-cffi).
@@ -36,7 +38,10 @@ class AuthService:
         senza dire quale controllo è fallito.
         """
         utente = self._utenti.leggi_per_email((email or "").strip())
-        corretta = self._verifica(utente.password_hash if utente else self._hash_fittizio, password or "")
+        password = password or ""
+        troppo_lunga = len(password) > LUNGHEZZA_MASSIMA_PASSWORD
+        corretta = self._verifica(utente.password_hash if utente else self._hash_fittizio,
+                                  "" if troppo_lunga else password) and not troppo_lunga
         if utente is None or not corretta or not utente.attivo:
             return None
         if self._hasher.check_needs_rehash(utente.password_hash):
@@ -60,6 +65,8 @@ class AuthService:
             messaggi.append("Esiste già un account con questa email.")
         if len(password or "") < LUNGHEZZA_MINIMA_PASSWORD:
             messaggi.append(f"La password deve avere almeno {LUNGHEZZA_MINIMA_PASSWORD} caratteri.")
+        elif len(password) > LUNGHEZZA_MASSIMA_PASSWORD:
+            messaggi.append(f"La password può avere al massimo {LUNGHEZZA_MASSIMA_PASSWORD} caratteri.")
         if messaggi:
             raise DatiNonValidiError(messaggi)
 
@@ -120,11 +127,13 @@ class AuthService:
     @staticmethod
     def _controlla_nuova_password(nuova: str, conferma: str) -> list[str]:
         """
-        Returns: i messaggi di errore sulla nuova password (lunghezza, conferma); lista vuota se va bene.
+        Returns: i messaggi di errore sulla nuova password (lunghezza minima e massima, conferma); lista vuota se va bene.
         """
         messaggi = []
         if len(nuova or "") < LUNGHEZZA_MINIMA_PASSWORD:
             messaggi.append(f"La nuova password deve avere almeno {LUNGHEZZA_MINIMA_PASSWORD} caratteri.")
+        elif len(nuova) > LUNGHEZZA_MASSIMA_PASSWORD:
+            messaggi.append(f"La nuova password può avere al massimo {LUNGHEZZA_MASSIMA_PASSWORD} caratteri.")
         if (nuova or "") != (conferma or ""):
             messaggi.append("La nuova password e la conferma non coincidono.")
         return messaggi

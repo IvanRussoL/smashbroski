@@ -52,7 +52,7 @@ def reimposta_password():
 def disattiva_proprietario(email):
     """
     Blocca un account: non entra più e chi è già dentro esce alla richiesta successiva.
-    Esempio: flask --app app disattiva-proprietario proprietario@smashbroski.example
+    Esempio: flask --app app disattiva-proprietario proprietario@example.com
     """
     _imposta_attivo(email, False)
     click.echo("Account disattivato.")
@@ -63,7 +63,7 @@ def disattiva_proprietario(email):
 @with_appcontext
 def riattiva_proprietario(email):
     """
-    Sblocca un account disattivato. Esempio: flask --app app riattiva-proprietario proprietario@smashbroski.example
+    Sblocca un account disattivato. Esempio: flask --app app riattiva-proprietario proprietario@example.com
     """
     _imposta_attivo(email, True)
     click.echo("Account riattivato.")

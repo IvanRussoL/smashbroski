@@ -141,8 +141,9 @@ def database_modificato(app, database_di_prova):
 @pytest.fixture
 def client_proprietario(client):
     """
-    Client già entrato nell'area riservata come proprietario di prova (sessione con il suo id).
+    Client già entrato nell'area riservata come proprietario di prova, passando dal login vero
+    (la sessione deve avere anche l'impronta della password).
     """
-    with client.session_transaction() as sessione:
-        sessione["utente_id"] = 1
+    risposta = client.post("/auth/login", data={"email": EMAIL_PROPRIETARIO, "password": PASSWORD_PROPRIETARIO})
+    assert risposta.status_code == 302
     return client

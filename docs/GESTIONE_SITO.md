@@ -58,7 +58,7 @@ Regole:
 3. Se si vuole chiudere ogni sessione aperta di chiunque: nuova `SECRET_KEY` in `.env` e riavvio del sito (i cookie di sessione firmati con la vecchia chiave non valgono più).
 4. `flask --app app riattiva-proprietario EMAIL` e consegna della nuova password.
 
-Cambiare la password dall'area rinnova la sessione di chi la cambia, ma le sessioni aperte su altri dispositivi restano valide fino alla scadenza (8 ore): per chiuderle subito servono i passi 1 o 3.
+Cambiare la password, dall'area o con `reimposta-password`, chiude subito le sessioni aperte su tutti gli altri dispositivi (alla loro richiesta successiva tornano al login); chi la cambia dall'area resta dentro.
 
 ## 5. Database
 

@@ -62,7 +62,8 @@ def test_login_sessione_solo_id(client):
     client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD})
     with client.session_transaction() as sessione:
         assert sessione["utente_id"] == 1
-        assert set(sessione.keys()) <= {"utente_id", "_permanent"}
+        assert set(sessione.keys()) <= {"utente_id", "impronta", "_permanent"}
+        assert len(sessione["impronta"]) == 64 and "argon2" not in sessione["impronta"]
 
 
 def test_login_messaggio_generico(client):
@@ -138,8 +139,7 @@ def test_rate_limit_cambio_password(database_di_prova):
     client = app.test_client()
     with app.app_context():
         limiter.reset()
-    with client.session_transaction() as sessione:
-        sessione["utente_id"] = 1
+    assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
     dati = {"attuale": "sbagliata", "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test"}
     for _ in range(5):
         assert client.post("/proprietario/password", data=dati).status_code == 400
@@ -165,3 +165,33 @@ def test_ip_del_visitatore_dietro_proxy(database_di_prova, proxy, ip_atteso):
     app.add_url_rule("/ip-di-prova", "ip_di_prova", lambda: request.remote_addr)
     risposta = app.test_client().get("/ip-di-prova", headers={"X-Forwarded-For": "203.0.113.7"})
     assert risposta.get_data(as_text=True) == ip_atteso
+
+
+def test_sessione_vecchia_non_basta(client):
+    # Una sessione con il solo id (per esempio di prima di questa versione) non apre l'area.
+    with client.session_transaction() as sessione:
+        sessione["utente_id"] = 1
+    assert client.get("/proprietario/").headers["Location"].endswith("/auth/login")
+
+
+def test_cambio_password_chiude_le_altre_sessioni(app, database_modificato):
+    telefono, computer = app.test_client(), app.test_client()
+    for dispositivo in (telefono, computer):
+        assert dispositivo.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
+    risposta = telefono.post("/proprietario/password", data={
+        "attuale": PASSWORD, "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test",
+    })
+    assert risposta.status_code == 302
+    assert telefono.get("/proprietario/").status_code == 200  # chi l'ha cambiata resta dentro
+    risposta = computer.get("/proprietario/")
+    assert risposta.headers["Location"].endswith("/auth/login")  # l'altro dispositivo esce subito
+    with computer.session_transaction() as sessione:
+        assert "utente_id" not in sessione
+
+
+def test_reimposta_password_chiude_le_sessioni(app, client_proprietario, database_modificato):
+    risultato = app.test_cli_runner().invoke(
+        args=["reimposta-password"], input=f"{EMAIL}\nreimpostata-dallo-sviluppatore\nreimpostata-dallo-sviluppatore\n",
+    )
+    assert risultato.exit_code == 0, risultato.output
+    assert client_proprietario.get("/proprietario/").headers["Location"].endswith("/auth/login")

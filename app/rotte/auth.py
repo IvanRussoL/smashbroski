@@ -3,6 +3,7 @@ from flask import Blueprint, redirect, render_template, request, session, url_fo
 from app.db import ottieni_connessione
 from app.limiti import LIMITE_TENTATIVI_LOGIN, limiter, tentativo_fallito
 from app.servizi.auth import AuthService
+from app.sessione import apri_sessione
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -14,7 +15,7 @@ MESSAGGIO_LOGIN_ERRATO = "Email o password non corretti."
 def login():
     """
     Login del proprietario. Dopo il controllo della password la sessione viene svuotata e riceve
-    solo l'id dell'utente (protezione dalla session fixation). Ogni errore ha lo stesso messaggio.
+    solo l'id dell'utente e l'impronta della password (app/sessione.py). Ogni errore ha lo stesso messaggio.
     """
     if request.method == "GET":
         return render_template("auth/login.html")
@@ -24,9 +25,7 @@ def login():
     if utente is None:
         return render_template("auth/login.html", errore=MESSAGGIO_LOGIN_ERRATO, email=email), 400
 
-    session.clear()
-    session["utente_id"] = utente.id
-    session.permanent = True
+    apri_sessione(utente)
     return redirect(url_for("proprietario.indice"))
 
 

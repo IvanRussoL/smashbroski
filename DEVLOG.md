@@ -544,3 +544,11 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Header nuovi**: `Permissions-Policy` (fotocamera, microfono, posizione, pagamenti, USB negati) e `Cross-Origin-Opener-Policy: same-origin`.
 - **`run.py`** si rifiuta di partire con `PRODUZIONE=1` (il debugger online permetterebbe di eseguire codice).
 - **Test**: 5 nuovi (password troppo lunga e di 128 caratteri, richiesta troppo grande, IP con e senza proxy) e controllo dei nuovi header. 218 test superati.
+
+## 2026-10-24 · Fase 2 – Il cambio della password chiude le altre sessioni
+
+- **Problema**: le sessioni sono cookie firmati, quindi dopo un cambio di password una sessione rubata o dimenticata su un altro dispositivo restava valida fino a 8 ore. Ivan preferisce che si esca subito.
+- **Impronta della password nella sessione** (`app/sessione.py`): al login la sessione riceve, oltre all'id, un HMAC-SHA256 dell'hash Argon2 calcolato con la `SECRET_KEY` (il cookie è leggibile, l'hash non deve finirci). Il `before_request` dell'area lo confronta con l'hash attuale (`hmac.compare_digest`): se la password è cambiata, la sessione si svuota e si torna al login. Nessuna colonna nuova nel database.
+- **Chi cambia la password dall'area resta dentro**: la sua sessione viene ricreata con l'impronta nuova. Anche `reimposta-password` chiude tutte le sessioni. Effetto collaterale accettato: se un giorno Argon2 ricalcola l'hash con parametri nuovi al login, gli altri dispositivi escono una volta.
+- **All'aggiornamento** le sessioni aperte prima (senza impronta) non valgono più: si rientra una volta.
+- **Test**: la fixture `client_proprietario` entra dal login vero; 3 nuovi (sessione con il solo id rifiutata, cambio password che chiude l'altro dispositivo e tiene dentro chi la cambia, `reimposta-password` che chiude la sessione). 221 test superati.

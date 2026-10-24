@@ -31,7 +31,7 @@ Ogni caso indica il **traguardo** per cui serve (sezione 1 di `PROGETTAZIONE.md`
 
 ### 1.3 Account di test
 
-- Proprietario di test creato con `flask crea-proprietario`, email `proprietario@example.com`. La password (almeno 12 caratteri) si sceglie al momento e non si scrive in questo documento né nel repository.
+- Proprietario di test creato con `flask crea-proprietario`, email `proprietario@example.com`. La password (almeno 15 caratteri, non comune) si sceglie al momento e non si scrive in questo documento né nel repository.
 - Per il caso dell'account disattivato si usa il client MySQL: `UPDATE utenti SET attivo = 0 WHERE email = 'proprietario@example.com';` e poi `attivo = 1` per ripristinare.
 
 ### 1.4 Browser, strumenti e viewport
@@ -434,7 +434,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo |
 | **Precondizione** | Proprietario di test attivo. Finestra in incognito. |
 | **Passi** | 1) Aprire `/auth/login`.<br>2) Inserire email e password corrette e fare clic su "Accedi".<br>3) In DevTools → Application → Cookies leggere gli attributi del cookie di sessione. |
-| **Atteso** | Redirect a `/proprietario/` con l'elenco delle voci per categoria. Cookie di sessione con `HttpOnly` e `SameSite=Lax`, durata massima 8 ore. |
+| **Atteso** | Redirect a `/proprietario/` con l'elenco delle voci per categoria. Cookie di sessione con `HttpOnly` e `SameSite=Lax`, sessione chiusa dopo 1 ora di inattività o 8 ore dal login. |
 
 #### TC-P02 — Login con credenziali errate
 

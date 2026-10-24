@@ -11,7 +11,7 @@ from app.repository.utente import UtenteRepository
 from app.servizi.auth import AuthService
 from app.servizi.menu import DatiVoce, MenuService
 from app.servizi.orari import NOMI_GIORNI, OrariService
-from app.sessione import apri_sessione, sessione_valida
+from app.sessione import apri_sessione, sessione_scaduta, sessione_valida
 
 bp = Blueprint("proprietario", __name__, url_prefix="/proprietario")
 
@@ -26,11 +26,16 @@ def richiedi_proprietario():
     Eseguito prima di ogni rotta di questo Blueprint, comprese quelle aggiunte in futuro (nega per
     default). L'utente si ricarica dal database a ogni richiesta: un account disattivato, o una
     password cambiata da un altro dispositivo o dallo sviluppatore, chiude subito la sessione.
+    Dopo un'ora di inattività o 8 ore dal login si rientra (app/sessione.py).
     """
     utente_id = session.get("utente_id")
     utente = UtenteRepository(ottieni_connessione()).leggi_per_id(utente_id) if utente_id else None
     if not sessione_valida(utente):
         session.clear()
+        return redirect(url_for("auth.login"))
+    if sessione_scaduta():
+        session.clear()
+        flash("Sessione scaduta: per sicurezza si esce dopo un'ora senza attività o 8 ore dall'accesso. Entra di nuovo.")
         return redirect(url_for("auth.login"))
     g.utente = utente
 

@@ -47,7 +47,10 @@ I test usano il database `smashbroski_test` (`DB_NAME_TEST` in `.env`) e lo ricr
 | Vedere gli account (in MySQL Workbench) | `SELECT id, email, attivo, creato_il FROM utenti;` |
 
 Regole:
-- La password ha almeno 12 caratteri. Quella scelta con `crea-proprietario` o `reimposta-password` si comunica al proprietario a voce o di persona, mai per email, e gli si chiede di cambiarla subito da **Cambia password** nell'area: da quel momento la conosce solo lui.
+- La password ha da 15 a 128 caratteri e non può essere una password comune (elenco in `app/dati/password_comuni.txt`), ripetitiva (meno di 5 caratteri diversi) o contenere il nome del sito o la parte dell'email prima della @. Va bene una frase di tre o quattro parole. Le password già in uso più corte di 15 caratteri continuano a funzionare: il controllo vale quando se ne sceglie una nuova.
+- Dopo **un'ora senza aprire pagine** dell'area, o **8 ore dal login** anche se la si usa, si torna al login con il messaggio "Sessione scaduta".
+- Rigenerare l'elenco delle password comuni (raramente): scaricare gli elenchi di SecLists citati in testa al file e lanciare `python strumenti/elenco_password_comuni.py ELENCO1.txt ELENCO2.txt`.
+- La password scelta con `crea-proprietario` o `reimposta-password` si comunica al proprietario a voce o di persona, mai per email, e gli si chiede di cambiarla subito da **Cambia password** nell'area: da quel momento la conosce solo lui.
 - Dopo 5 tentativi sbagliati in un minuto (accesso o cambio password) quella connessione è bloccata per un minuto, poi si riprova. Non serve sbloccare niente. In sviluppo il conteggio è in memoria: riavviare il server lo azzera.
 - Non esiste un blocco permanente dopo N errori, per scelta: chi conosce l'email potrebbe chiudere fuori il proprietario apposta.
 

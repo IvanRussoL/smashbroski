@@ -62,7 +62,7 @@ def test_login_sessione_solo_id(client):
     client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD})
     with client.session_transaction() as sessione:
         assert sessione["utente_id"] == 1
-        assert set(sessione.keys()) <= {"utente_id", "impronta", "_permanent"}
+        assert set(sessione.keys()) <= {"utente_id", "impronta", "entrato_il", "ultima_attivita", "_permanent"}
         assert len(sessione["impronta"]) == 64 and "argon2" not in sessione["impronta"]
 
 
@@ -195,3 +195,29 @@ def test_reimposta_password_chiude_le_sessioni(app, client_proprietario, databas
     )
     assert risultato.exit_code == 0, risultato.output
     assert client_proprietario.get("/proprietario/").headers["Location"].endswith("/auth/login")
+
+
+def _sposta_indietro(client, chiave, secondi):
+    with client.session_transaction() as sessione:
+        sessione[chiave] -= secondi
+
+
+@pytest.mark.parametrize("chiave, secondi", [
+    ("ultima_attivita", 60 * 60 + 1),       # più di un'ora senza attività
+    ("entrato_il", 8 * 60 * 60 + 1),        # più di 8 ore dal login, anche se attivo
+])
+def test_sessione_scaduta(client_proprietario, chiave, secondi):
+    _sposta_indietro(client_proprietario, chiave, secondi)
+    risposta = client_proprietario.get("/proprietario/")
+    assert risposta.headers["Location"].endswith("/auth/login")
+    pagina = client_proprietario.get("/auth/login").get_data(as_text=True)
+    assert "Sessione scaduta" in pagina
+    with client_proprietario.session_transaction() as sessione:
+        assert "utente_id" not in sessione
+
+
+def test_attivita_rinnova_il_timeout_di_inattivita(client_proprietario):
+    _sposta_indietro(client_proprietario, "ultima_attivita", 50 * 60)
+    assert client_proprietario.get("/proprietario/").status_code == 200
+    _sposta_indietro(client_proprietario, "ultima_attivita", 50 * 60)  # 50 minuti dall'ultima pagina, non 100
+    assert client_proprietario.get("/proprietario/").status_code == 200

@@ -140,7 +140,7 @@ def test_comando_crea_proprietario(app, database_modificato):
 def test_comando_crea_proprietario_password_corta(app, database_di_prova):
     risultato = app.test_cli_runner().invoke(args=["crea-proprietario"], input="corta@example.com\ncorta\ncorta\n")
     assert risultato.exit_code != 0
-    assert "La password deve avere almeno 12 caratteri." in risultato.output
+    assert "La password deve avere almeno 15 caratteri." in risultato.output
 
 
 def test_comando_reimposta_password(app, database_modificato):

@@ -5,6 +5,7 @@
 {% block contenuto %}
 <div class="pagina-testo pagina-modulo">
     <h1>Accesso all'area riservata</h1>
+    {% for messaggio in get_flashed_messages() %}<p class="avviso" role="status">{{ messaggio }}</p>{% endfor %}
     {% if errore %}<p class="errori" role="alert">{{ errore }}</p>{% endif %}
     <form method="post" action="{{ url_for('auth.login') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

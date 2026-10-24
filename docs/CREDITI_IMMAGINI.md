@@ -17,3 +17,9 @@ Salvati nel sito (`app/static/fonts/`), senza servizi esterni; la licenza di ogn
 | `archivo-latin-variabile.woff2` | Archivo (variabile: pesi 100–900, larghezze 62–125%) | The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo) | SIL Open Font License 1.1 (`OFL-Archivo.txt`) | Testo normale e titoli (larghezza 125%, peso 900) di tutto il sito |
 
 File WebFont del sottoinsieme latino presi dai pacchetti npm `@fontsource/archivo-black` e `@fontsource-variable/archivo` (versione 5, file con gli assi peso e larghezza).
+
+## Dati di terze parti
+
+| File nel sito | Contenuto | Provenienza | Licenza |
+|---|---|---|---|
+| `app/dati/password_comuni.txt` | Password comuni di 15-128 caratteri, rifiutate quando se ne sceglie una nuova | SecLists (https://github.com/danielmiessler/SecLists), file `Passwords/Common-Credentials/100k-most-used-passwords-NCSC.txt` e `xato-net-10-million-passwords-1000000.txt`, scaricati il 24/10/2026 e filtrati con `strumenti/elenco_password_comuni.py` | MIT |

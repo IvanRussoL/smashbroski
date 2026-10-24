@@ -86,8 +86,11 @@ def test_crea_proprietario_password_corta(connessione):
         AuthService(connessione).crea_proprietario("corta@example.com", "x" * 11)
 
 
-def test_crea_proprietario_password_di_12_caratteri(connessione):
-    assert AuthService(connessione).crea_proprietario("dodici@example.com", "x" * 12) > 0
+def test_crea_proprietario_password_di_15_caratteri(connessione):
+    servizio = AuthService(connessione)
+    assert servizio.crea_proprietario("quindici@example.com", "pane olio sale!") > 0
+    with pytest.raises(DatiNonValidiError, match="almeno 15"):
+        servizio.crea_proprietario("quattordici@example.com", "pane olio sale")
 
 
 def test_crea_proprietario_email_duplicata(connessione, proprietario):
@@ -130,7 +133,7 @@ def test_cambia_password_errori_raccolti(connessione, proprietario):
         AuthService(connessione).cambia_password(proprietario, "sbagliata", "corta", "diversa")
     assert errore.value.messaggi == [
         "La password attuale non è corretta.",
-        "La nuova password deve avere almeno 12 caratteri.",
+        "La nuova password deve avere almeno 15 caratteri.",
         "La nuova password e la conferma non coincidono.",
     ]
 
@@ -155,7 +158,7 @@ def test_reimposta_password(connessione, proprietario):
 def test_reimposta_password_email_sconosciuta_o_corta(connessione, proprietario):
     with pytest.raises(DatiNonValidiError, match="Nessun account"):
         AuthService(connessione).reimposta_password("nessuno@example.com", NUOVA)
-    with pytest.raises(DatiNonValidiError, match="almeno 12"):
+    with pytest.raises(DatiNonValidiError, match="almeno 15"):
         AuthService(connessione).reimposta_password(EMAIL, "corta")
 
 
@@ -181,7 +184,36 @@ def test_password_troppo_lunga_rifiutata(connessione, proprietario):
 
 
 def test_password_di_128_caratteri_accettata(connessione, proprietario):
-    massima = "y" * 128
+    massima = ("gatto lampione mercoledì " * 6)[:128]
     servizio = AuthService(connessione)
     servizio.cambia_password(proprietario, PASSWORD, massima, massima)
     assert servizio.login(EMAIL, massima) is not None
+
+
+@pytest.mark.parametrize("debole", [
+    "passwordpassword",          # nell'elenco delle password comuni
+    "QWERTYUIOPASDFGH",          # elenco, anche in maiuscolo
+    "aaaaaaaaaaaaaaaaaaa",       # ripetitiva
+    "1212121212121212",          # meno di 5 caratteri diversi
+    "la mia Smash Broski preferita",  # nome del sito, anche con spazi e maiuscole
+    "proprietario.auth e basta",  # parte dell'email prima della @
+])
+def test_password_facile_da_indovinare_rifiutata(connessione, proprietario, debole):
+    servizio = AuthService(connessione)
+    for operazione in (lambda: servizio.cambia_password(proprietario, PASSWORD, debole, debole),
+                       lambda: servizio.reimposta_password(EMAIL, debole),
+                       lambda: servizio.crea_proprietario("proprietario.auth@altro.example.com", debole)):
+        with pytest.raises(DatiNonValidiError, match="facile da indovinare"):
+            operazione()
+
+
+def test_frase_di_parole_accettata(connessione, proprietario):
+    frase = "gatto lampione mercoledì"
+    AuthService(connessione).cambia_password(proprietario, PASSWORD, frase, frase)
+    assert AuthService(connessione).login(EMAIL, frase) is not None
+
+
+def test_elenco_password_comuni_caricato():
+    from app.servizi.auth import PASSWORD_COMUNI
+    assert len(PASSWORD_COMUNI) > 10_000
+    assert all(len(password) >= 15 for password in PASSWORD_COMUNI)

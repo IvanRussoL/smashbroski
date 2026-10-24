@@ -57,7 +57,7 @@ Dal 18/10 (grafica 2) la home è solo l'hero; orari e contatti sono nella pagina
 
 | ID | Requisito | Risolve |
 |---|---|---|
-| RF-16 | Accede all'area riservata con email e password ed esce con il logout | — |
+| RF-16 | Accede all'area riservata con email e password ed esce con il logout; dal 24/10 cambia la propria password dall'area (serve quella attuale). Account, password dimenticate e blocchi li gestisce lo sviluppatore da riga di comando (`docs/GESTIONE_SITO.md`) | — |
 | RF-17 | Aggiunge, modifica, nasconde e rimostra le voci del menù: nome, ingredienti, prezzi, categoria, posizione nella categoria, etichetta di edizione, nota | AU-NAV01-06 (il menù si aggiorna senza rifare il PDF) |
 | RF-18 | Modifica gli orari settimanali: per ogni giorno, chiuso oppure uno o più turni, anche oltre la mezzanotte | AU-NAV11 |
 | RF-19 | Le modifiche sono visibili subito nelle pagine pubbliche | — |
@@ -381,7 +381,7 @@ Contengono le regole di business della sezione 3. Usano i repository e non dipen
 
 | Servizio | Compito |
 |---|---|
-| `AuthService` | Login con verifica Argon2id, controllo che l'account sia attivo, aggiornamento dell'hash quando i parametri di Argon2 cambiano, creazione del proprietario da riga di comando |
+| `AuthService` | Login con verifica Argon2id, controllo che l'account sia attivo, aggiornamento dell'hash quando i parametri di Argon2 cambiano, creazione del proprietario da riga di comando; cambio della password (con quella attuale), reimpostazione e attivazione/disattivazione dell'account da riga di comando |
 | `MenuService` | Menù pubblico (solo voci attive, in ordine di posizione); creazione e modifica di una voce con le regole sui prezzi (prezzo unico oppure formati della sua categoria) salvate in un'unica transazione; nascondere e rimostrare una voce; conversione del prezzo scritto dal proprietario ("7,50") in centesimi |
 | `OrariService` | Lettura e salvataggio del calendario settimanale con il controllo delle sovrapposizioni, anche oltre la mezzanotte; calcolo di `StatoApertura` |
 
@@ -415,7 +415,7 @@ smashbroski/
 │   ├── templates/         # pagine Jinja
 │   ├── static/            # CSS, js/navbar.js, immagini WebP (logo, foto dell'hero, motivo dello sfondo)
 │   ├── eccezioni.py
-│   ├── comandi.py         # comandi da terminale (flask crea-proprietario)
+│   ├── comandi.py         # comandi da terminale (crea-proprietario, reimposta-password, disattiva/riattiva-proprietario)
 │   └── db.py              # connessione a MySQL
 ├── database/
 │   ├── schema.sql         # creazione delle tabelle
@@ -439,7 +439,7 @@ Ogni Blueprint ha un prefisso nell'URL; quello riservato ha un controllo in `bef
 |---|---|---|---|
 | `pubblico` | `/` | Tutti | `/` home, `/menu` menù, `/info` orari e contatti, `/privacy` privacy e cookie |
 | `auth` | `/auth` | Tutti | `/auth/login` (GET e POST), `/auth/logout` (solo POST) |
-| `proprietario` | `/proprietario` | Solo proprietario con account attivo | `/proprietario/` elenco delle voci per categoria; `/proprietario/voci/nuova`; `/proprietario/voci/<id>` modifica; `/proprietario/voci/<id>/visibilita` nascondi o rimostra (POST); `/proprietario/orari` calendario settimanale |
+| `proprietario` | `/proprietario` | Solo proprietario con account attivo | `/proprietario/` elenco delle voci per categoria; `/proprietario/voci/nuova`; `/proprietario/voci/<id>` modifica; `/proprietario/voci/<id>/visibilita` nascondi o rimostra (POST); `/proprietario/orari` calendario settimanale; `/proprietario/password` cambio della password (stesso limite di 5 tentativi al minuto del login) |
 
 Un visitatore non loggato che apre una rotta di `proprietario` viene mandato al login. Con un solo ruolo non esiste il caso "ruolo sbagliato" (403).
 

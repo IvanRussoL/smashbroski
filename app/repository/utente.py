@@ -57,3 +57,10 @@ class UtenteRepository:
         """
         with self._conn.cursor() as cur:
             cur.execute("UPDATE utenti SET password_hash = %s WHERE id = %s", (password_hash, utente_id))
+
+    def aggiorna_attivo(self, utente_id: int, attivo: bool) -> None:
+        """
+        Attiva o disattiva un account: un account disattivato non entra e perde subito l'accesso.
+        """
+        with self._conn.cursor() as cur:
+            cur.execute("UPDATE utenti SET attivo = %s WHERE id = %s", (attivo, utente_id))

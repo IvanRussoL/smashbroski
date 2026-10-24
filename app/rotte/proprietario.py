@@ -6,7 +6,9 @@ from flask import Blueprint, flash, g, redirect, render_template, request, sessi
 from app.db import ottieni_connessione
 from app.eccezioni import DatiNonValidiError
 from app.formato import prezzo_per_modulo
+from app.limiti import LIMITE_TENTATIVI_LOGIN, limiter, tentativo_fallito
 from app.repository.utente import UtenteRepository
+from app.servizi.auth import AuthService
 from app.servizi.menu import DatiVoce, MenuService
 from app.servizi.orari import NOMI_GIORNI, OrariService
 
@@ -191,3 +193,30 @@ def orari():
             (turno.ora_inizio.strftime("%H:%M"), turno.ora_fine.strftime("%H:%M"))
         )
     return render_template("proprietario/orari.html", giorni=_righe_orari(esistenti))
+
+
+# --- Password ---
+
+@bp.route("/password", methods=["GET", "POST"])
+@limiter.limit(LIMITE_TENTATIVI_LOGIN, methods=["POST"], deduct_when=tentativo_fallito)
+def password():
+    """
+    Cambio della password del proprietario. Stesso limite del login sui tentativi sbagliati, così
+    con la sessione aperta non si può provare la password attuale all'infinito. Dopo il cambio
+    la sessione viene rinnovata.
+    """
+    if request.method == "POST":
+        try:
+            AuthService(ottieni_connessione()).cambia_password(
+                g.utente.id, request.form.get("attuale", ""), request.form.get("nuova", ""),
+                request.form.get("conferma", ""),
+            )
+        except DatiNonValidiError as errore:
+            return render_template("proprietario/password.html", errori=errore.messaggi), 400
+        session.clear()
+        session["utente_id"] = g.utente.id
+        session.permanent = True
+        flash("Password cambiata. Da ora entra con quella nuova.")
+        return redirect(url_for("proprietario.password"))
+    return render_template("proprietario/password.html")
+

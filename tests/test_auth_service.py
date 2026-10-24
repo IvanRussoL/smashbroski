@@ -1,7 +1,7 @@
 import pytest
 from argon2 import PasswordHasher
 
-from app.eccezioni import DatiNonValidiError
+from app.eccezioni import DatiNonValidiError, NonTrovatoError
 from app.modelli.utente import Utente
 from app.repository.utente import UtenteRepository
 from app.servizi.auth import AuthService
@@ -104,3 +104,65 @@ def test_crea_proprietario_email_non_valida(connessione, email):
 def test_crea_proprietario_email_salvata_minuscola(connessione):
     utente_id = AuthService(connessione).crea_proprietario("Nuovo.Proprietario@Example.com", PASSWORD)
     assert UtenteRepository(connessione).leggi_per_id(utente_id).email == "nuovo.proprietario@example.com"
+
+
+# --- Cambio e reimpostazione della password, account attivo ---
+
+NUOVA = "una-nuova-password-lunga"
+
+
+def test_cambia_password(connessione, proprietario):
+    servizio = AuthService(connessione)
+    servizio.cambia_password(proprietario, PASSWORD, NUOVA, NUOVA)
+    assert servizio.login(EMAIL, NUOVA).id == proprietario
+    assert servizio.login(EMAIL, PASSWORD) is None
+
+
+def test_cambia_password_attuale_sbagliata(connessione, proprietario):
+    with pytest.raises(DatiNonValidiError) as errore:
+        AuthService(connessione).cambia_password(proprietario, "sbagliata", NUOVA, NUOVA)
+    assert errore.value.messaggi == ["La password attuale non è corretta."]
+    assert AuthService(connessione).login(EMAIL, PASSWORD) is not None  # invariata
+
+
+def test_cambia_password_errori_raccolti(connessione, proprietario):
+    with pytest.raises(DatiNonValidiError) as errore:
+        AuthService(connessione).cambia_password(proprietario, "sbagliata", "corta", "diversa")
+    assert errore.value.messaggi == [
+        "La password attuale non è corretta.",
+        "La nuova password deve avere almeno 12 caratteri.",
+        "La nuova password e la conferma non coincidono.",
+    ]
+
+
+def test_cambia_password_uguale_alla_attuale(connessione, proprietario):
+    with pytest.raises(DatiNonValidiError) as errore:
+        AuthService(connessione).cambia_password(proprietario, PASSWORD, PASSWORD, PASSWORD)
+    assert errore.value.messaggi == ["La nuova password deve essere diversa da quella attuale."]
+
+
+def test_cambia_password_utente_inesistente(connessione):
+    with pytest.raises(NonTrovatoError):
+        AuthService(connessione).cambia_password(9999, PASSWORD, NUOVA, NUOVA)
+
+
+def test_reimposta_password(connessione, proprietario):
+    servizio = AuthService(connessione)
+    servizio.reimposta_password(" Proprietario.Auth@Example.com ", NUOVA)
+    assert servizio.login(EMAIL, NUOVA).id == proprietario
+
+
+def test_reimposta_password_email_sconosciuta_o_corta(connessione, proprietario):
+    with pytest.raises(DatiNonValidiError, match="Nessun account"):
+        AuthService(connessione).reimposta_password("nessuno@example.com", NUOVA)
+    with pytest.raises(DatiNonValidiError, match="almeno 12"):
+        AuthService(connessione).reimposta_password(EMAIL, "corta")
+
+
+def test_disattiva_e_riattiva(connessione, proprietario):
+    servizio = AuthService(connessione)
+    servizio.imposta_attivo(EMAIL, False)
+    assert servizio.login(EMAIL, PASSWORD) is None
+    servizio.imposta_attivo(EMAIL, True)
+    assert servizio.login(EMAIL, PASSWORD).id == proprietario
+

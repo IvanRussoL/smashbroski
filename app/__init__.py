@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFError, CSRFProtect
 
-from app.comandi import crea_proprietario
+from app.comandi import crea_proprietario, disattiva_proprietario, reimposta_password, riattiva_proprietario
 from app.db import chiudi_connessione
 from app.eccezioni import NonTrovatoError
 from app.formato import descrivi_stato_apertura, euro, ora, telefono_leggibile
@@ -68,6 +68,9 @@ def create_app(configurazione: dict | None = None) -> Flask:
     app.register_blueprint(auth.bp)
     app.register_blueprint(proprietario.bp)
     app.cli.add_command(crea_proprietario)
+    app.cli.add_command(reimposta_password)
+    app.cli.add_command(disattiva_proprietario)
+    app.cli.add_command(riattiva_proprietario)
 
     app.add_template_filter(euro)
     app.add_template_filter(ora)

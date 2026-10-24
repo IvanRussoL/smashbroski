@@ -1,7 +1,7 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 
-from app.eccezioni import DatiNonValidiError
+from app.eccezioni import DatiNonValidiError, NonTrovatoError
 from app.modelli.utente import Utente
 from app.repository.utente import UtenteRepository
 
@@ -66,6 +66,68 @@ class AuthService:
         utente_id = self._utenti.inserisci(Utente(email=email, password_hash=self._hasher.hash(password)))
         self._conn.commit()
         return utente_id
+
+    def cambia_password(self, utente_id: int, attuale: str, nuova: str, conferma: str) -> None:
+        """
+        Cambio della password dall'area proprietario: serve la password attuale, così chi trova
+        il telefono con la sessione aperta non può cambiarla. Raccoglie tutti gli errori.
+        Raises: DatiNonValidiError se la password attuale è sbagliata, la nuova ha meno di 12
+        caratteri, è uguale all'attuale o non coincide con la conferma; NonTrovatoError se
+        l'utente non esiste.
+        """
+        utente = self._utenti.leggi_per_id(utente_id)
+        if utente is None:
+            raise NonTrovatoError("Utente non trovato.")
+        messaggi = []
+        if not self._verifica(utente.password_hash, attuale or ""):
+            messaggi.append("La password attuale non è corretta.")
+        messaggi += self._controlla_nuova_password(nuova, conferma)
+        if not messaggi and nuova == attuale:
+            messaggi.append("La nuova password deve essere diversa da quella attuale.")
+        if messaggi:
+            raise DatiNonValidiError(messaggi)
+        self._utenti.aggiorna_password_hash(utente.id, self._hasher.hash(nuova))
+        self._conn.commit()
+
+    def reimposta_password(self, email: str, nuova: str) -> None:
+        """
+        Nuova password scelta dallo sviluppatore (comando flask reimposta-password), per quando il
+        proprietario l'ha dimenticata: non serve quella attuale.
+        Raises: DatiNonValidiError se l'email non è registrata o la password ha meno di 12 caratteri.
+        """
+        utente = self._utente_da_email(email)
+        messaggi = self._controlla_nuova_password(nuova, nuova)
+        if messaggi:
+            raise DatiNonValidiError(messaggi)
+        self._utenti.aggiorna_password_hash(utente.id, self._hasher.hash(nuova))
+        self._conn.commit()
+
+    def imposta_attivo(self, email: str, attivo: bool) -> None:
+        """
+        Disattiva o riattiva un account (comandi flask disattiva-proprietario e riattiva-proprietario).
+        Raises: DatiNonValidiError se l'email non è registrata.
+        """
+        utente = self._utente_da_email(email)
+        self._utenti.aggiorna_attivo(utente.id, attivo)
+        self._conn.commit()
+
+    def _utente_da_email(self, email: str) -> Utente:
+        utente = self._utenti.leggi_per_email((email or "").strip())
+        if utente is None:
+            raise DatiNonValidiError(["Nessun account con questa email."])
+        return utente
+
+    @staticmethod
+    def _controlla_nuova_password(nuova: str, conferma: str) -> list[str]:
+        """
+        Returns: i messaggi di errore sulla nuova password (lunghezza, conferma); lista vuota se va bene.
+        """
+        messaggi = []
+        if len(nuova or "") < LUNGHEZZA_MINIMA_PASSWORD:
+            messaggi.append(f"La nuova password deve avere almeno {LUNGHEZZA_MINIMA_PASSWORD} caratteri.")
+        if (nuova or "") != (conferma or ""):
+            messaggi.append("La nuova password e la conferma non coincidono.")
+        return messaggi
 
     def _verifica(self, password_hash: str, password: str) -> bool:
         """

@@ -88,7 +88,8 @@ def test_csrf_post_senza_token(database_di_prova):
     with client.session_transaction() as sessione:
         sessione["utente_id"] = 1
     for indirizzo in ("/auth/logout", "/proprietario/voci/nuova?categoria=3",
-                      "/proprietario/voci/1/visibilita", "/proprietario/orari", "/auth/login"):
+                      "/proprietario/voci/1/visibilita", "/proprietario/orari", "/proprietario/password",
+                      "/auth/login"):
         risposta = client.post(indirizzo, data={"attiva": "0"})
         assert risposta.status_code == 400, indirizzo
         assert "Modulo scaduto o non valido" in risposta.get_data(as_text=True)
@@ -130,3 +131,17 @@ def test_cookie_sessione_attributi(database_di_prova, produzione):
     assert "HttpOnly" in cookie
     assert "SameSite=Lax" in cookie
     assert ("Secure" in cookie) is produzione
+
+
+def test_rate_limit_cambio_password(database_di_prova):
+    app = create_app(configurazione_test(RATELIMIT_ENABLED=True))
+    client = app.test_client()
+    with app.app_context():
+        limiter.reset()
+    with client.session_transaction() as sessione:
+        sessione["utente_id"] = 1
+    dati = {"attuale": "sbagliata", "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test"}
+    for _ in range(5):
+        assert client.post("/proprietario/password", data=dati).status_code == 400
+    assert client.post("/proprietario/password", data=dati).status_code == 429
+

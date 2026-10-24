@@ -1090,6 +1090,9 @@ main:has(> .pagina-testo) { background: var(--crema); }
         column-gap: 0.4rem;
         align-items: center;
     }
+    /* Voce allungata (flex-grow nei blocchi pareggiati): righe della griglia compatte al centro, così
+       nome, descrizione e nota restano uniti e lo spazio in più va sopra e sotto la voce. */
+    .colonne-2 .voce, .colonne-4 .voce { align-content: center; }
     .colonne-2 .intestazione-prezzi, .colonne-4 .intestazione-prezzi { margin-bottom: 0.2rem; }
     .intestazione-prezzi span {
         padding: 0.25rem 0.3rem;

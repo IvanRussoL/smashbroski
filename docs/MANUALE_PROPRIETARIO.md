@@ -10,7 +10,7 @@ L'indirizzo del sito, l'email dell'account e la prima password vengono consegnat
 2. Scrivi email e password e premi **Entra**.
 3. Se email o password sono sbagliate compare "Email o password non corretti." (il sito non dice quale delle due, per sicurezza).
 
-**Blocco dopo 5 tentativi**: dopo 5 tentativi sbagliati in un minuto l'accesso si blocca per un minuto, anche con la password giusta. Basta aspettare e riprovare: non serve chiamare nessuno.
+**Blocco dopo 5 tentativi**: dopo 5 tentativi sbagliati in un minuto l'accesso si blocca per un minuto, anche con la password giusta. Dopo ogni errore il sito dice quanti tentativi restano ("Tentativi rimasti: 3 su 5.", poi "Ultimo tentativo"); al quinto errore dice subito che l'accesso è bloccato. Basta aspettare un minuto e riprovare: non serve chiamare nessuno. Vale anche per la password attuale nella pagina Cambia password.
 
 **Uscita automatica**: dopo **un'ora** senza aprire pagine dell'area, oppure **8 ore** dopo l'accesso, il sito chiede di entrare di nuovo ("Sessione scaduta"). Le modifiche già salvate restano; quelle scritte e non salvate vanno riscritte.
 
@@ -115,7 +115,8 @@ Per sicurezza alcune operazioni non esistono nel sito e vanno chieste allo svilu
 
 | Problema | Cosa fare |
 |---|---|
-| "Troppi tentativi: aspetta un minuto e riprova." | Aspetta un minuto e riprova con calma. |
+| "Tentativi rimasti: … su 5." o "Ultimo tentativo" | Fermati e ricontrolla la password (maiuscole, tastiera) prima di riprovare. |
+| "Hai sbagliato 5 volte…" o "Troppi tentativi: aspetta un minuto e riprova." | Aspetta un minuto e riprova con calma. |
 | "Sessione scaduta" | Normale dopo un'ora di pausa: entra di nuovo. |
 | "Modulo scaduto o non valido: ricarica la pagina e riprova." | La pagina è rimasta aperta a lungo: ricaricala e rifai la modifica. |
 | Il prezzo non viene accettato | Usa la virgola (7,50), non il punto. |

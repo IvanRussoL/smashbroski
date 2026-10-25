@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
-from app.servizi.tentativi import AMBITO_CAMBIO_PASSWORD, AMBITO_LOGIN, TentativiService
+from app.servizi.tentativi import (
+    AMBITO_CAMBIO_PASSWORD, AMBITO_LOGIN, TentativiService, messaggio_tentativi_rimasti,
+)
 
 IP = "203.0.113.7"
 INIZIO = datetime(2026, 10, 24, 18, 0, 0)
@@ -62,3 +64,21 @@ def test_tentativi_vecchi_cancellati(connessione):
     with connessione.cursor() as cur:
         cur.execute("SELECT COUNT(*) FROM tentativi_accesso")
         assert cur.fetchone()[0] == 1
+
+
+def test_rimasti_scende_da_5_a_0(connessione):
+    servizio = _servizio(connessione)
+    adesso = INIZIO + timedelta(seconds=10)
+    assert servizio.rimasti(AMBITO_LOGIN, IP, adesso) == 5
+    _registra(servizio, 3)
+    assert servizio.rimasti(AMBITO_LOGIN, IP, adesso) == 2
+    _registra(servizio, 4, dal=INIZIO + timedelta(seconds=3))
+    assert servizio.rimasti(AMBITO_LOGIN, IP, adesso) == 0  # mai negativo
+
+
+def test_messaggio_tentativi_rimasti():
+    assert messaggio_tentativi_rimasti(4) == "Tentativi rimasti: 4 su 5."
+    assert messaggio_tentativi_rimasti(2) == "Tentativi rimasti: 2 su 5."
+    assert messaggio_tentativi_rimasti(1).startswith("Ultimo tentativo")
+    assert messaggio_tentativi_rimasti(0).startswith("Hai sbagliato 5 volte")
+

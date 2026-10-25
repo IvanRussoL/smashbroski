@@ -41,13 +41,21 @@ class TentativiService:
         """
         return hmac.new(self._chiave, (ip or "").encode(), sha256).hexdigest()
 
+    def rimasti(self, ambito: str, ip: str, adesso: datetime | None = None) -> int:
+        """
+        Returns: quanti tentativi sbagliati può ancora fare quell'IP nell'ambito prima del blocco
+        (da LIMITE_TENTATIVI a 0), contando quelli dell'ultimo minuto.
+        """
+        adesso = adesso or adesso_utc()
+        fatti = self._tentativi.conta_dal(ambito, self.impronta(ip), adesso - FINESTRA)
+        return max(LIMITE_TENTATIVI - fatti, 0)
+
     def bloccato(self, ambito: str, ip: str, adesso: datetime | None = None) -> bool:
         """
         Returns: True se quell'IP ha già fatto LIMITE_TENTATIVI tentativi sbagliati nell'ambito
         nell'ultimo minuto.
         """
-        adesso = adesso or adesso_utc()
-        return self._tentativi.conta_dal(ambito, self.impronta(ip), adesso - FINESTRA) >= LIMITE_TENTATIVI
+        return self.rimasti(ambito, ip, adesso) == 0
 
     def registra_fallito(self, ambito: str, ip: str, adesso: datetime | None = None) -> None:
         """
@@ -58,3 +66,17 @@ class TentativiService:
         self._tentativi.cancella_prima_di(adesso - CONSERVAZIONE)
         self._tentativi.inserisci(ambito, self.impronta(ip), adesso)
         self._conn.commit()
+
+
+def messaggio_tentativi_rimasti(rimasti: int) -> str:
+    """
+    Frase mostrata sotto l'errore di password, con i tentativi che restano dopo quello appena
+    sbagliato. Al quinto errore dice subito che l'accesso è bloccato, così non serve un sesto
+    tentativo per scoprirlo.
+    """
+    if rimasti <= 0:
+        return (f"Hai sbagliato {LIMITE_TENTATIVI} volte: l'accesso è bloccato per un minuto, "
+                "anche con la password giusta.")
+    if rimasti == 1:
+        return "Ultimo tentativo: se sbagli ancora, l'accesso si blocca per un minuto."
+    return f"Tentativi rimasti: {rimasti} su {LIMITE_TENTATIVI}."

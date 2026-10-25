@@ -17,6 +17,8 @@ LUNGHEZZA_MASSIMA_EMAIL = 255
 CARATTERI_DIVERSI_MINIMI = 5
 # Nome del sito: una password che lo contiene è tra le prime che un attaccante prova (NIST, parole del contesto).
 PAROLE_DEL_SITO = ("smashbroski",)
+# Nel cambio password solo questo errore conta come tentativo sbagliato (app/limiti.py).
+MESSAGGIO_ATTUALE_ERRATA = "La password attuale non è corretta."
 
 
 def _carica_password_comuni() -> frozenset[str]:
@@ -109,7 +111,7 @@ class AuthService:
             raise NonTrovatoError("Utente non trovato.")
         messaggi = []
         if not self._verifica(utente.password_hash, attuale or ""):
-            messaggi.append("La password attuale non è corretta.")
+            messaggi.append(MESSAGGIO_ATTUALE_ERRATA)
         messaggi += self._controlla_nuova_password(nuova, conferma, utente.email)
         if not messaggi and nuova == attuale:
             messaggi.append("La nuova password deve essere diversa da quella attuale.")

@@ -8,10 +8,10 @@ from app.eccezioni import DatiNonValidiError
 from app.formato import prezzo_per_modulo
 from app.limiti import limita_tentativi
 from app.repository.utente import UtenteRepository
-from app.servizi.auth import AuthService
+from app.servizi.auth import MESSAGGIO_ATTUALE_ERRATA, AuthService
 from app.servizi.menu import DatiVoce, MenuService
 from app.servizi.orari import NOMI_GIORNI, OrariService
-from app.servizi.tentativi import AMBITO_CAMBIO_PASSWORD
+from app.servizi.tentativi import AMBITO_CAMBIO_PASSWORD, messaggio_tentativi_rimasti
 from app.sessione import apri_sessione, sessione_scaduta, sessione_valida
 
 bp = Blueprint("proprietario", __name__, url_prefix="/proprietario")
@@ -208,8 +208,8 @@ def orari():
 @limita_tentativi(AMBITO_CAMBIO_PASSWORD)
 def password():
     """
-    Cambio della password del proprietario. Stesso limite del login sui tentativi sbagliati, così
-    con la sessione aperta non si può provare la password attuale all'infinito. Dopo il cambio
+    Cambio della password del proprietario. Stesso limite del login sui tentativi con la password
+    attuale sbagliata, così con la sessione aperta non si può provarla all'infinito. Dopo il cambio
     la sessione di chi l'ha cambiata viene rinnovata; quelle aperte su altri dispositivi si chiudono.
     """
     if request.method == "POST":
@@ -219,7 +219,13 @@ def password():
                 request.form.get("conferma", ""),
             )
         except DatiNonValidiError as errore:
-            return render_template("proprietario/password.html", errori=errore.messaggi), 400
+            messaggi = errore.messaggi
+            # Solo la password attuale sbagliata consuma il limite: una conferma che non coincide no.
+            if MESSAGGIO_ATTUALE_ERRATA in messaggi:
+                g.password_sbagliata = True
+                if "tentativi_rimasti" in g:
+                    messaggi = messaggi + [messaggio_tentativi_rimasti(g.tentativi_rimasti)]
+            return render_template("proprietario/password.html", errori=messaggi), 400
         apri_sessione(UtenteRepository(ottieni_connessione()).leggi_per_id(g.utente.id))
         flash("Password cambiata. Da ora entra con quella nuova.")
         return redirect(url_for("proprietario.password"))

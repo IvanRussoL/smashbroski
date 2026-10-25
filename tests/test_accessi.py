@@ -105,6 +105,8 @@ def test_login_avvisa_del_limite_di_tentativi(client):
 
 
 def _conta_tentativi(connessione) -> int:
+    # Chiude la lettura precedente: con REPEATABLE READ si vedrebbe ancora la tabella di allora.
+    connessione.commit()
     with connessione.cursor() as cur:
         cur.execute("SELECT COUNT(*) FROM tentativi_accesso")
         return cur.fetchone()[0]
@@ -122,6 +124,47 @@ def test_rate_limit_login(database_modificato):
     assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 429
     # Le richieste rifiutate con 429 non allungano il blocco.
     assert _conta_tentativi(database_modificato) == 5
+
+
+def test_login_conta_i_tentativi_rimasti(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    attesi = [
+        "Tentativi rimasti: 4 su 5.",
+        "Tentativi rimasti: 3 su 5.",
+        "Tentativi rimasti: 2 su 5.",
+        "Ultimo tentativo: se sbagli ancora, l&#39;accesso si blocca per un minuto.",
+        "Hai sbagliato 5 volte: l&#39;accesso è bloccato per un minuto, anche con la password giusta.",
+    ]
+    for numero, atteso in enumerate(attesi):
+        # Email esistente e inesistente alternate: il contatore scende allo stesso modo.
+        email = EMAIL if numero % 2 == 0 else "nessuno@example.com"
+        pagina = client.post("/auth/login", data={"email": email, "password": "sbagliata"}).get_data(as_text=True)
+        assert "Email o password non corretti. " + atteso in pagina
+    assert client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"}).status_code == 429
+
+
+def test_login_senza_limite_niente_contatore(client):
+    pagina = client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"}).get_data(as_text=True)
+    assert "Email o password non corretti." in pagina
+    assert "Tentativi rimasti" not in pagina
+
+
+def test_cambio_password_conta_solo_la_password_attuale(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
+    # Password attuale giusta, conferma diversa: errore, ma nessun tentativo consumato.
+    pagina = client.post("/proprietario/password", data={
+        "attuale": PASSWORD, "nuova": "nuova-password-dei-test", "conferma": "altra-password-dei-test",
+    }).get_data(as_text=True)
+    assert "La nuova password e la conferma non coincidono." in pagina
+    assert "Tentativi rimasti" not in pagina
+    assert _conta_tentativi(database_modificato) == 0
+    # Password attuale sbagliata: conta e lo dice.
+    pagina = client.post("/proprietario/password", data={
+        "attuale": "sbagliata", "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test",
+    }).get_data(as_text=True)
+    assert "Tentativi rimasti: 4 su 5." in pagina
+    assert _conta_tentativi(database_modificato) == 1
 
 
 def test_rate_limit_login_riuscito_non_conta(database_modificato):

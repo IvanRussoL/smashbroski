@@ -570,7 +570,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo |
 | **Precondizione** | Nessun login. |
 | **Passi** | 1) Sbagliare la password 6 volte entro un minuto.<br>2) Attendere un minuto e accedere con le credenziali corrette. |
-| **Atteso** | I primi 5 tentativi mostrano il messaggio generico; il sesto riceve la risposta 429. Dopo un minuto il login funziona. |
+| **Atteso** | I primi 4 tentativi mostrano il messaggio generico seguito da "Tentativi rimasti: 4 su 5.", poi 3 e 2, poi "Ultimo tentativo"; il quinto dice "Hai sbagliato 5 volte: l'accesso è bloccato per un minuto". Il sesto riceve la risposta 429, anche con la password giusta. Dopo un minuto il login funziona. |
 
 #### TC-S04 — Header di sicurezza
 
@@ -827,6 +827,8 @@ File: `tests/test_tentativi_service.py` (l'istante si passa come parametro)
 | test_ambiti_e_indirizzi_separati | 5 errori di login non bloccano il cambio password né un altro IP |
 | test_ip_non_salvato_in_chiaro | Nel database c'è solo l'impronta HMAC di 64 caratteri, diversa con un'altra chiave |
 | test_tentativi_vecchi_cancellati | Un tentativo nuovo cancella quelli di più di un'ora prima |
+| test_rimasti_scende_da_5_a_0 | Da 5 a 0 tentativi rimasti, mai negativo |
+| test_messaggio_tentativi_rimasti | Frasi del contatore per 4, 2, 1 e 0 |
 
 ### 3.6 Rotte, accessi e sicurezza
 
@@ -861,6 +863,9 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | test_logout_solo_post | GET `/auth/logout` → 405; POST → sessione svuotata |
 | test_csrf_post_senza_token | Con CSRF attivo: POST a `/auth/logout`, `/proprietario/voci/nuova`, `/proprietario/voci/1/visibilita`, `/proprietario/orari` senza token → 400 |
 | test_rate_limit_login | Con il limite attivo: il sesto POST a `/auth/login` nello stesso minuto → 429, anche con la password giusta; le richieste rifiutate non si registrano (5 righe in `tentativi_accesso`) |
+| test_login_conta_i_tentativi_rimasti | Contatore 4, 3, 2, "Ultimo tentativo", "Hai sbagliato 5 volte", poi 429; uguale con email esistente e inesistente |
+| test_login_senza_limite_niente_contatore | Con il limite spento il messaggio resta solo "Email o password non corretti." |
+| test_cambio_password_conta_solo_la_password_attuale | Conferma diversa con la password attuale giusta: nessun tentativo consumato; password attuale sbagliata: "Tentativi rimasti: 4 su 5." |
 | test_rate_limit_login_riuscito_non_conta | 6 login riusciti di fila: nessun tentativo registrato |
 | test_rate_limit_condiviso_fra_processi | Due app separate (come due processi del server) dividono lo stesso limite: dopo 5 errori fra le due, entrambe rispondono 429 |
 | test_dati_non_validi_400 | POST di una voce con prezzo "abc" → 400 con il messaggio nel modulo |

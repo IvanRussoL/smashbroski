@@ -263,6 +263,14 @@ def test_fondo_rosso_al_footer(client):
         assert "/static/js/fondo-pagina.js" in html(client.get(indirizzo))
 
 
+def test_classe_js_prima_del_primo_disegno(client):
+    # Nel <head> e prima del CSS: altrimenti sul telefono il pannello del menù si vede aperto e poi sfuma.
+    for indirizzo in ("/", "/menu", "/info", "/privacy", "/auth/login"):
+        testa = html(client.get(indirizzo)).split("</head>")[0]
+        assert "/static/js/js-attivo.js" in testa
+        assert testa.index("/static/js/js-attivo.js") < testa.index("/static/css/stile.css")
+
+
 def test_nessun_generator(client):
     for indirizzo in ("/", "/menu", "/info", "/privacy"):
         assert 'name="generator"' not in html(client.get(indirizzo))

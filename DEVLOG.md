@@ -606,3 +606,12 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Librerie nuove**: `pyotp` 2.10.0, `qrcode` 8.2, `cryptography` 50.0.2; `pip-audit` senza vulnerabilità note.
 - **Test**: 22 nuovi in `tests/test_due_passaggi.py` (servizio con l'istante come parametro e percorso completo dalle pagine). 267 test superati nel cloud su MariaDB. Prova nel browser a 360 e 1366 px: attivazione, codici di riserva, login con codice, nessun errore in Console. Screenshot nell'archivio (`docs/collaudi/due-passaggi/`).
 
+
+## 2026-10-25 · Fase 2 – Lampo del pannello del menù sul telefono
+
+- **Difetto**: al caricamento di ogni pagina, sul telefono, le voci della navbar si vedevano aperte per un attimo e poi sfumavano. Visto da Ivan e nelle prove a 360 px.
+- **Causa**: la classe `js` sull'elemento `<html>`, che trasforma le voci in un pannello chiuso, la aggiungeva `navbar.js`, caricato in fondo alla pagina. Il primo disegno avveniva senza la classe (voci visibili, come per chi non ha JavaScript); quando la classe arrivava partiva la transizione di opacità di 300 ms definita in `stile.css`.
+- **Correzione**: piccolo file `js-attivo.js` nel `<head>`, prima del CSS, che aggiunge la classe prima del primo disegno. File esterno e non script in linea, perché la Content-Security-Policy accetta solo `script-src 'self'`. `navbar.js` la aggiunge ancora, nel caso il file non si carichi. Senza JavaScript le voci restano visibili come prima.
+- **Scartati**: script in linea con hash o nonce nella CSP (un'eccezione alla regola per una riga); togliere la transizione (il lampo resterebbe, solo senza dissolvenza); nascondere le voci senza JavaScript (il menù non si aprirebbe più).
+- **Misura** con Playwright a 360 px, opacità del pannello letta a ogni frame e `navbar.js` ritardato di 400 ms per simulare un telefono lento: prima voci visibili per circa 46 frame su 73 in tutte le pagine (`/`, `/menu`, `/info`, `/orari`, `/auth/login`), dopo 0.
+- **Test**: `test_classe_js_prima_del_primo_disegno` controlla che lo script stia nel `<head>` prima del CSS. 268 test superati nel cloud su MariaDB.

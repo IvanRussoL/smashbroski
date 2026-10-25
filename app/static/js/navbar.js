@@ -7,7 +7,8 @@
     if (!navbar || !pulsante || !voci) {
         return;
     }
-    // La classe "js" mostra il pulsante e trasforma le voci in un pannello a scomparsa (stile.css).
+    // La classe "js" (messa nel <head> da js-attivo.js) mostra il pulsante e trasforma le voci
+    // in un pannello a scomparsa (stile.css); qui si ripete nel caso quel file non si carichi.
     document.documentElement.classList.add("js");
 
     function aperto() {

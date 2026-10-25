@@ -21,7 +21,19 @@
     --ingombro-navbar: calc(var(--altezza-navbar) + var(--margine-navbar));
     --larghezza-contenuto: 1100px;
     --raggio: 6px;
-    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Titoli: Archivo largo e nero, lettere "schiacciate" come uno smash burger. */
+    --titolo: "Archivo", "Arial Black", sans-serif;
+    --font: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Archivo, salvato nel sito (licenza SIL OFL in static/fonts): un solo file variabile per il testo
+   (larghezza normale) e per i titoli (larghezza 125%, nero), così è uguale su ogni dispositivo. */
+@font-face {
+    font-family: "Archivo";
+    src: url("../fonts/archivo-latin-variabile.woff2") format("woff2");
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    font-display: swap;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -36,6 +48,11 @@ body {
     color: var(--testo);
     background: var(--crema);
 }
+/* Safari 26 su iPhone colora lo spazio sotto la sua barra "a vetro" con il fondo della pagina.
+   In home in cima c'è l'hero blu; quando si arriva al footer fondo-pagina.js mette la classe
+   al-footer e il fondo diventa rosso come il footer, così non restano righe di un altro colore. */
+body.pagina-home { background: var(--blu); }
+.al-footer body { background: var(--rosso); }
 
 img { max-width: 100%; height: auto; }
 
@@ -83,7 +100,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     width: min(100% - 2 * var(--margine-navbar), 1240px);
     height: var(--altezza-navbar);
     margin: 0 auto;
-    padding: 0 0.75rem 0 1rem;
+    padding: 0 1rem; /* stesso spazio a sinistra (scritta) e a destra (linee o ultima voce) */
     color: var(--crema);
     background: var(--navbar-sfondo);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -93,7 +110,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .navbar-marchio {
     justify-self: start;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 800;
     line-height: 1.05;
     letter-spacing: 0.14em;
@@ -125,7 +142,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .navbar-nav { gap: 0.3rem; }
     .navbar-ora { gap: 0.25rem; font-size: 0.85rem; letter-spacing: 0.02em; }
     .navbar-ora svg { width: 16px; height: 16px; }
-    .navbar-pulsante { width: 42px; }
+    .navbar-pulsante { width: 42px; margin-right: calc((30px - 42px) / 2); }
     .navbar-linee { width: 30px; }
 }
 .navbar-link { display: flex; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
@@ -157,6 +174,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     background: none;
     color: var(--crema);
     cursor: pointer;
+    /* Il pulsante è più largo delle linee: sporge nel bordo della barra, così le linee
+       finiscono alla stessa distanza dal bordo destro della scritta dal sinistro. */
+    margin-right: calc((34px - 52px) / 2);
 }
 .navbar-linee { position: relative; display: block; width: 34px; height: 16px; }
 .navbar-linee span {
@@ -221,6 +241,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
    altrimenti il rosso schiarisce e diventa rosa. */
 .pagina-interna main { padding-top: var(--ingombro-navbar); }
 .pagina-interna .navbar { background: rgba(176, 12, 54, 0.94); }
+/* Al 94% la sfocatura del vetro non si vede, ma sopra lo sfondo animato andrebbe ricalcolata
+   a ogni fotogramma: sulle pagine interne si toglie. */
+.pagina-interna .navbar, .js .pagina-interna .navbar-link { -webkit-backdrop-filter: none; backdrop-filter: none; }
 
 /* ---------- Hero a tutto schermo con la foto del locale ---------- */
 
@@ -230,7 +253,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    min-height: 100dvh;
+    /* svh: alto quanto lo schermo con la barra del browser visibile. Con dvh l'hero cambiava altezza
+       mentre la barra si nasconde e ricompare, e risalendo la foto sembrava fare un balzo. */
+    min-height: 100svh;
     padding: calc(var(--ingombro-navbar) + 1.5rem) 1.25rem 2.5rem;
     color: var(--crema);
     background: var(--blu-scuro);
@@ -244,6 +269,11 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     z-index: -2;
 }
 .hero-foto img { object-fit: cover; object-position: center; }
+/* Sul computer l'hero (foto e velo) sta su un livello suo: quando il fondo della pagina passa da blu
+   a rosso (al-footer) il browser ridisegna solo il fondo, non tutta la foto, e lo scroll non si inceppa. */
+@media (hover: hover) and (pointer: fine) {
+    .hero { will-change: transform; }
+}
 .hero::after {
     content: "";
     position: absolute;
@@ -254,7 +284,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .hero-contenuto {
     width: 100%;
-    max-width: var(--larghezza-contenuto);
+    /* Larga quanto il testo del footer (contenuto meno il suo spazio interno): bordo sinistro allineato a "Dove siamo". */
+    max-width: calc(var(--larghezza-contenuto) - 2.5rem);
     margin: auto; /* centrato in verticale nell'hero */
     text-align: center;
 }
@@ -303,57 +334,250 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .pulsante-secondario:hover { background: var(--crema); color: var(--blu-scuro); }
 .hero :focus-visible { outline-color: var(--crema); }
 
-/* ---------- Pagina Orari e contatti ---------- */
+/* ---------- Pagina Orari e contatti: una lavagna come quella fuori dal locale ---------- */
 
-.pagina-info { --larghezza-pannello: var(--larghezza-contenuto); max-width: var(--larghezza-contenuto); margin-inline: auto; padding: 1.5rem 1rem 2rem; }
-.pagina-info h1 { margin: 0.5rem 0 0.75rem; font-size: 2rem; color: var(--blu-scuro); }
-.pagina-info .stato-apertura { background: #fff; border-color: var(--bordo); color: var(--testo); }
-.sezioni-info { display: grid; gap: 1.5rem; margin-top: 0.5rem; }
-.sezione {
-    padding: 1.5rem 1.25rem;
-    background: #fff;
-    border: 1px solid var(--bordo);
-    border-radius: 10px;
+/* Carattere "a gesso" dei titoli della lavagna, salvato nel sito (licenza SIL OFL in static/fonts).
+   Solo per i titoli: su testi lunghi e numeri un carattere decorativo si legge peggio. */
+@font-face {
+    font-family: "Cabin Sketch";
+    src: url("../fonts/cabin-sketch-latin-700.woff2") format("woff2");
+    font-weight: 700;
+    font-display: swap;
 }
+.pagina-info {
+    --gessetto: "Cabin Sketch", "Comic Sans MS", cursive;
+    --gesso: #F4F1EA;
+    --gesso-rosso: #FF9AAE;
+    --gesso-blu: #9CCBF5;
+    --gesso-traccia: rgba(244, 241, 234, 0.55);
+    max-width: 1120px;
+    margin-inline: auto;
+    padding: 0 0.75rem 3rem;
+    color: var(--blu-scuro);
+}
+
+/* Titolo su un'etichetta inclinata, come "Menù", fuori dalla lavagna. */
+.testata-info {
+    display: inline-block;
+    margin: 1rem 0;
+    padding: 0.35rem 0.75rem 0.45rem;
+    background: var(--crema);
+    border: 4px solid var(--blu-scuro);
+    box-shadow: 4px 4px 0 var(--blu-scuro);
+    transform: rotate(-1.5deg);
+}
+.testata-info h1 {
+    margin: 0;
+    font-family: var(--titolo);
+    font-size: min(1.5rem, calc((100vw - 60px) / 12.4)); /* su una riga anche a 320 px; 32 px da 768 px */
+    font-weight: 900;
+    font-stretch: 125%;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--rosso);
+}
+
+/* La lavagna: fondo blu scuro con macchie chiare sfumate, come una lavagna cancellata più volte.
+   Niente cornice di legno: bordo e ombra piena sono quelli degli adesivi del sito. */
+.lavagna {
+    margin-top: 0.5rem;
+    padding: 1.25rem 1rem 1.5rem;
+    border: 4px solid var(--blu-scuro);
+    border-radius: 18px;
+    box-shadow: 7px 7px 0 var(--blu-scuro);
+    margin-right: 7px; /* posto per l'ombra: a destra resta lo stesso spazio che a sinistra */
+    color: var(--gesso);
+    background:
+        radial-gradient(ellipse 60% 40% at 15% 20%, rgba(255, 255, 255, 0.07), transparent 70%),
+        radial-gradient(ellipse 50% 35% at 85% 45%, rgba(255, 255, 255, 0.05), transparent 70%),
+        radial-gradient(ellipse 70% 30% at 40% 85%, rgba(255, 255, 255, 0.06), transparent 70%),
+        linear-gradient(170deg, #26496A 0%, var(--blu-scuro) 55%, #1A3348 100%);
+}
+.lavagna :focus-visible { outline-color: var(--gesso); }
+/* Le sezioni sono separate da una riga tratteggiata, come tirata col gesso. */
+.lavagna-sezione { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 2px dashed var(--gesso-traccia); }
+.lavagna-sezione h2 {
+    margin: 0 0 0.75rem;
+    font-family: var(--gessetto);
+    font-size: 2rem; /* 32 px su telefono, 38 px da 768 px */
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--gesso);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.6);
+}
+#contatti h2 { color: var(--gesso-blu); }
+
+/* In cima l'insegna al neon, allineata a sinistra come tutto il resto, poi indirizzo e stato.
+   Da aperto l'insegna è accesa (bagliore rosso), da chiuso è spenta (solo il contorno). */
+.lavagna-testata { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+.insegna {
+    margin: 0 0 0.35rem;
+    font-family: var(--titolo);
+    font-size: min(1.85rem, calc((100vw - 76px) / 13.3)); /* il nome largo sta su una riga anche a 320 px */
+    font-weight: 900;
+    font-stretch: 125%;
+    line-height: 1;
+    white-space: nowrap;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 250, 240, 0.3);
+}
+.locale-aperto .insegna {
+    color: #FFE6EC;
+    -webkit-text-stroke: 0;
+    text-shadow: 0 0 2px #fff, 0 0 8px #FF3D6E, 0 0 18px var(--rosso), 0 0 36px var(--rosso), 0 0 60px rgba(176, 12, 54, 0.8);
+    animation: accensione 1.4s ease-out 0.3s both;
+}
+/* Si accende una volta sola all'apertura della pagina, con due sfarfallii come un vero neon. */
+@keyframes accensione {
+    0%, 18%, 26%, 44% { opacity: 0.15; }
+    20%, 24%, 46%, 100% { opacity: 1; }
+}
+.info-indirizzo { margin: 0 0 0.25rem; font-size: 0.95rem; font-weight: 500; letter-spacing: 0.04em; }
+/* Stato come etichetta chiara sul fondo scuro, con il pallino verde (aperto) o giallo (chiuso). */
+.pagina-info .stato-apertura {
+    margin: 0;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: rgba(255, 250, 240, 0.14);
+    border: 1px solid rgba(255, 250, 240, 0.45);
+    color: var(--crema);
+}
+
+/* Chiama, Indicazioni, Scrivi: scritte cerchiate col gesso, con un bordo un po' irregolare. */
+.azioni-info {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.azione-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: 60px; /* sopra i 44-48 px consigliati per il tocco */
+    padding: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid var(--gesso);
+    border-radius: 14px 18px 12px 16px;
+    color: var(--gesso);
+    transition: background-color 0.1s ease, transform 0.1s ease;
+}
+.azione-info svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.azione-info:hover { background: rgba(255, 255, 255, 0.08); color: var(--gesso); }
+.azione-info:active { transform: scale(0.97); }
+.azione-chiama, .azione-chiama:hover { border-color: var(--gesso-rosso); color: var(--gesso-rosso); }
+.azione-indicazioni, .azione-indicazioni:hover { border-color: var(--gesso-blu); color: var(--gesso-blu); }
+
+/* Orari: un giorno per riga, separati da puntini; oggi in rosso, sottolineato da un'onda di gesso. */
 .orari { margin: 0; }
 .orari-giorno {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 0.55rem 0;
-    border-bottom: 1px solid var(--bordo);
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-bottom: 1px dotted var(--gesso-traccia);
 }
-.orari-giorno:last-child { border-bottom: 0; }
-.orari dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.orari dd { margin: 0; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .turno { white-space: nowrap; } /* un turno non si spezza sul trattino: si va a capo solo tra i turni */
-.orari-giorno.oggi { color: var(--rosso); }
-.contatti { margin: 0; padding: 0; list-style: none; }
-.contatti li { padding: 0.55rem 0; border-bottom: 1px solid var(--bordo); overflow-wrap: anywhere; }
-.contatti li:last-child { border-bottom: 0; }
-.contatti a { font-weight: 600; }
-.social { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.social a {
-    display: inline-block;
-    min-height: 48px;
-    padding: 0.7rem 1.1rem;
-    border: 2px solid var(--blu);
-    border-radius: var(--raggio);
+/* Telefoni stretti (320 px): meno spazio interno e testo più piccolo, così pulsanti e orari
+   restano dentro la lavagna. */
+@media (max-width: 379.98px) {
+    .lavagna { padding-inline: 0.75rem; }
+    .azione-info { font-size: 0.8rem; padding-inline: 0.25rem; }
+    .orari-giorno { padding-inline: 0.5rem; font-size: 0.85rem; }
+}
+.orari-giorno.oggi {
+    color: var(--gesso-rosso);
+    border-bottom-color: transparent; /* l'onda prende il posto dei puntini, alla stessa altezza */
+    background: url("../img/onda-gesso.svg") no-repeat -24px 100% / 1200px 10px; /* un'unica onda lunga: nessuna giunzione */
+    animation: onda-gesso 3s linear infinite;
+}
+/* L'onda scorre piano verso destra di un'onda intera (24 px) per ciclo, quindi il loop non ha salti. */
+@keyframes onda-gesso { to { background-position-x: 0; } }
+/* Sul computer l'onda è un livello a parte che si sposta con transform: animando background-position
+   il browser ridisegnava la lavagna a ogni fotogramma e lo scroll veloce andava a scatti.
+   Stessa onda, stessa posizione e stesso movimento; sul telefono resta com'è. */
+@media (hover: hover) and (pointer: fine) {
+    .orari-giorno.oggi { position: relative; overflow: hidden; background: none; animation: none; }
+    .orari-giorno.oggi::after {
+        content: "";
+        position: absolute;
+        left: -24px;
+        right: 0;
+        bottom: 0;
+        height: 10px;
+        background: url("../img/onda-gesso.svg") no-repeat 0 0 / 1200px 10px;
+        animation: onda-gesso-livello 3s linear infinite;
+        will-change: transform;
+    }
+}
+@keyframes onda-gesso-livello { to { transform: translateX(24px); } }
+
+/* Contatti: una riga intera da toccare per contatto, puntinata come gli orari.
+   Griglia icona | etichetta e valore | freccia: tutte le righe hanno la stessa struttura e restano allineate. */
+.contatti { max-width: 34rem; margin: 0; padding: 0; list-style: none; }
+.contatto {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 20px;
+    grid-template-areas: "icona etichetta freccia" "icona valore freccia";
+    column-gap: 1rem;
+    align-items: center;
+    padding: 0.7rem 0;
+    border-bottom: 1px dotted var(--gesso-traccia);
+    color: var(--gesso);
     text-decoration: none;
 }
+.contatto-icona {
+    grid-area: icona;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--gesso-traccia);
+    border-radius: 12px;
+}
+.contatto-etichetta { grid-area: etichetta; align-self: end; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.contatto-valore { grid-area: valore; align-self: start; margin-top: 0.1rem; font-weight: 700; overflow-wrap: anywhere; }
+.contatto-freccia { grid-area: freccia; color: var(--gesso-traccia); transition: transform 0.15s ease; }
+.contatto-icona svg, .titolo-icona svg, .contatto-freccia { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.contatto-freccia { stroke-width: 2.5; }
+.titolo-icona { display: flex; align-items: center; gap: 0.5rem; }
+.titolo-icona svg { flex: none; width: 0.9em; height: 0.9em; stroke-width: 2.4; }
+.lavagna .segnaposto { color: var(--gesso-traccia); font-weight: 400; }
 .segnaposto { font-style: italic; color: var(--testo-secondario); }
 
 /* ---------- Sfondo animato di Menù e Orari e contatti ---------- */
 
 /* Fisso dietro la pagina; ogni fila è più larga dello schermo di una mattonella (192 px) e scorre
    di una mattonella per ciclo, quindi il movimento non ha salti. Si muove solo transform. */
+/* Il fondo scende di un quinto dello schermo oltre il bordo: sui browser con la barra in basso
+   galleggiante (o che si nasconde) lo spazio sotto la barra resta coperto di loghi, invece di una
+   striscia crema senza disegno. */
 .sfondo-loghi {
     position: fixed;
-    inset: 0;
+    inset: 0 0 -20vh;
     z-index: -1;
     overflow: hidden;
     background: var(--crema);
     pointer-events: none;
 }
+/* Con il footer sullo schermo lo sfondo finisce sopra le fasce del footer (vedi fondo-pagina.js). */
+.al-footer .sfondo-loghi { bottom: var(--taglio-sfondo, -20vh); }
 .fila-loghi {
     width: calc(100% + 192px);
     height: 84px;
@@ -368,36 +592,32 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     from { transform: translateX(0); }
     to { transform: translateX(192px); }
 }
-
-/* Contenuto su un pannello crema pieno: i loghi non passano sotto orari e contatti. */
-.sfondo-loghi ~ .pagina-info {
-    width: min(100% - 1rem, var(--larghezza-pannello));
-    margin-top: 1rem;
-    margin-bottom: 2rem;
-    background: var(--crema);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(32, 62, 86, 0.12);
-}
+/* Mentre la pagina scorre i loghi si fermano (classe messa da static/js/sfondo.js): sedici file in
+   movimento più lo scroll appesantivano il browser e lo scorrimento del menù andava a scatti. */
+.scorrendo .fila-loghi { animation-play-state: paused; }
+/* Durante lo zoom con due dita e finché la pagina è ingrandita le file sono ferme e senza livello
+   proprio (classe messa da sfondo.js): il telefono ridisegna la pagina senza lasciare zone vuote. */
+.zoom .fila-loghi { animation: none; will-change: auto; }
+/* Passaggio tra navbar larga e pulsante a tre linee (classe messa da navbar.js): niente animazioni. */
+.senza-animazioni .navbar-linee span, .senza-animazioni .navbar-link, .senza-animazioni .navbar-link li { transition: none !important; }
 
 /* ---------- Menù: blocchi-adesivo come i riquadri del PDF, stile street food ---------- */
 
-/* Caratteri del menù, salvati nel sito (licenza SIL OFL in static/fonts): Anton per i titoli,
-   Archivo Black per nomi delle voci e prezzi. Finché non sono caricati si vede il carattere di sistema. */
-@font-face {
-    font-family: "Anton";
-    src: url("../fonts/anton-latin-400.woff2") format("woff2");
-    font-display: swap;
-}
+/* Carattere di nomi delle voci e prezzi, salvato nel sito (licenza SIL OFL in static/fonts).
+   Finché non è caricato si vede il carattere di sistema. */
 @font-face {
     font-family: "Archivo Black";
     src: url("../fonts/archivo-black-latin-400.woff2") format("woff2");
     font-display: swap;
 }
 
-.pagina-testo { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+/* Le pagine brevi (privacy, login, errori) mostrano subito il footer: al-footer farebbe rosso tutto il fondo,
+   quindi il contenuto tiene il suo crema. Righe di testo entro 65 caratteri circa. */
+main:has(> .pagina-testo) { background: var(--crema); }
+.pagina-testo { max-width: calc(65ch + 2rem); margin: 0 auto; padding: 1.5rem 1rem 3rem; } /* colonna centrata: margini uguali ai lati */
+.pagina-testo p, .pagina-testo li { max-width: 65ch; }
 .pagina-testo h1 { margin: 0.5rem 0; font-size: 2rem; color: var(--blu-scuro); }
 .pagina-menu {
-    --titolo: "Anton", Impact, "Arial Narrow", sans-serif;
     --insegna: "Archivo Black", "Arial Black", var(--font);
     --ombra-adesivo: 7px 7px 0 var(--blu-scuro);
     max-width: 1120px;
@@ -417,10 +637,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 }
 .testata-menu h1 {
     margin: 0;
-    padding-top: 0.15em; /* spazio per l'accento della Ù, alto in Anton */
     font-family: var(--titolo);
-    font-size: 3.6rem;
-    font-weight: 400;
+    font-size: 2.7rem;
+    font-weight: 900;
+    font-stretch: 125%;
     line-height: 1;
     text-transform: uppercase;
     color: var(--rosso);
@@ -437,7 +657,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     overflow-x: auto;
     scrollbar-width: none;
 }
-.indice ul { display: flex; gap: 0.55rem; width: max-content; margin: 0; padding: 0 0.4rem 0.4rem 0; list-style: none; }
+.indice ul { display: flex; gap: 0.55rem; width: max-content; margin: 0; padding: 0 3px 0.4rem 0; list-style: none; } /* 3px: l'ombra dell'ultima pillola */
 .indice a {
     display: block;
     min-height: 44px;
@@ -454,7 +674,13 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     text-decoration: none;
     white-space: nowrap;
 }
-.indice a:hover { background: var(--rosso); color: var(--crema); }
+/* Categoria che si sta guardando (aria-current, da static/js/indice.js). L'hover solo con il mouse:
+   sui telefoni il tocco lascerebbe la pillola rossa anche dopo, come se fosse ancora quella attiva. */
+.indice a[aria-current] { background: var(--rosso); color: var(--crema); }
+@media (hover: hover) {
+    .contatto:hover .contatto-freccia { color: var(--gesso); transform: translateX(3px); }
+    .indice a:hover { background: var(--rosso); color: var(--crema); }
+}
 
 /* Nastro decorativo inclinato. */
 .nastro {
@@ -466,8 +692,10 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     color: var(--crema);
     border-block: 3px solid var(--blu-scuro);
     font-family: var(--titolo);
-    font-size: 1.4rem;
-    letter-spacing: 0.06em;
+    font-size: 1.05rem;
+    font-weight: 900;
+    font-stretch: 125%;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     transform: rotate(-1.5deg);
 }
@@ -488,6 +716,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     border: 4px solid var(--blu-scuro);
     border-radius: 16px;
     box-shadow: var(--ombra-adesivo);
+    margin-right: 7px; /* posto per l'ombra: a destra resta lo stesso spazio che a sinistra */
 }
 .cat-starters, .cat-salad, .cat-kids-menu {
     --fondo: var(--rosso); --testo-blocco: var(--crema); --accento: var(--crema);
@@ -497,25 +726,27 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     --fondo: var(--blu); --testo-blocco: var(--crema); --accento: var(--crema);
     --tessera: var(--crema); --tessera-testo: var(--blu-scuro);
 }
-/* Qualche blocco appena ruotato, come adesivi attaccati a mano. */
-.cat-salad { transform: rotate(0.5deg); }
-.cat-kids-menu { transform: rotate(-0.5deg); }
-.cat-beers { transform: rotate(0.6deg); }
+/* Blocchi dritti: bordi paralleli fra blocchi vicini e righe tratteggiate orizzontali. L'aria "attaccata a mano"
+   resta negli elementi piccoli ruotati (etichetta Menù, nastro, nota del Burger, bollini delle edizioni). */
 
 .categoria h2 {
     margin: 0 0 0.4rem;
     padding-top: 0.1em;
     font-family: var(--titolo);
-    font-size: 3rem;
-    font-weight: 400;
+    font-size: min(2.25rem, 10.4vw); /* "ORIGINALS" entra anche a 320 px */
+    font-weight: 900;
+    font-stretch: 125%;
     line-height: 1;
-    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--accento);
-    /* Il link dell'indice porta qui: il blocco resta visibile sotto navbar e indice. */
-    scroll-margin-top: calc(var(--ingombro-navbar) + 6rem);
+    /* Il link dell'indice porta qui. Lo spazio della navbar lo toglie già scroll-padding-top
+       dell'html: qui si aggiunge solo l'indice fisso, così il bordo del blocco arriva appena sotto le pillole
+       (prima navbar contata due volte: il blocco atterrava circa 85 px più in basso). */
+    scroll-margin-top: 6.25rem;
 }
-.cat-burger h2 { font-size: 4.2rem; text-shadow: 4px 4px 0 var(--blu-scuro); }
+.cat-burger h2 { font-size: min(3.1rem, 13.6vw); }
+/* Ombra piena sui titoli dei due blocchi a fondo chiaro. */
+.cat-burger h2, .cat-the-originals h2 { text-shadow: 4px 4px 0 var(--blu-scuro); }
 
 .nota-categoria {
     display: inline-block;
@@ -529,7 +760,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* La nota del Burger ("Brooo, prova il menù…") è un'etichetta rossa, come sul cartellone. */
 .cat-burger .nota-categoria {
     display: block;
-    margin: 0.2rem 0 0.8rem;
+    margin: 0.2rem 3px 0.8rem 0; /* 3px a destra: posto per l'ombra, come i blocchi */
     padding: 0.6rem 0.8rem;
     background: var(--rosso);
     color: var(--crema);
@@ -542,6 +773,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .intestazione-prezzi, .prezzo-mancante { display: none; }
 
 .voce { padding: 0.85rem 0; border-top: 2px dashed color-mix(in srgb, currentColor 45%, transparent); }
+/* Sotto l'ultima voce lo stesso spazio che sopra il titolo: niente spazio interno della voce né margini del testo. */
+.categoria > .voce:last-child { padding-bottom: 0; }
+.categoria > .voce:last-child > * { margin-bottom: 0; }
 .intestazione-prezzi + .voce, .nota-categoria + .voce, h2 + .voce { border-top: 0; }
 .voce h3 { margin: 0; font-family: var(--insegna); font-size: 1.15rem; font-weight: 400; line-height: 1.25; }
 .nome-voce { text-transform: uppercase; }
@@ -565,7 +799,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     vertical-align: 0.15em;
     transform: rotate(-3deg);
 }
-.descrizione { margin: 0.15rem 0 0.55rem; line-height: 1.4; }
+.descrizione { margin: 0.15rem 0 0.55rem; line-height: 1.5; }
 .nota-voce { margin: -0.3rem 0 0.55rem; font-size: 0.95rem; font-style: italic; }
 
 /* Prezzi su telefono: una tessera per formato, con il formato scritto sopra il prezzo. */
@@ -585,10 +819,15 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 /* Prezzo unico (patatine, bibite, kids): bollino a destra del nome. */
 .voce:has(> .prezzo-unico) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 1rem; align-items: start; }
+/* Il bollino sta a metà altezza di nome e descrizione, come i prezzi in colonna dei burger;
+   senza descrizione nome e bollino sono centrati sulla stessa riga. */
+.voce:has(> .prezzo-unico):not(:has(> .descrizione, > .nota-voce)) { align-items: center; }
+.voce:not(:has(> .descrizione, > .nota-voce)) > .prezzo-unico { grid-row: 1; }
 .voce:has(> .prezzo-unico) > :not(.prezzo-unico) { grid-column: 1; }
 .prezzo-unico {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1 / span 3;
+    align-self: center;
     padding: 0.1rem 0.65rem;
     background: var(--tessera);
     color: var(--tessera-testo);
@@ -598,8 +837,6 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     font-size: 1.15rem;
 }
 
-.torna-indice { margin: 0.6rem 0 0; text-align: right; }
-.torna-indice a { color: inherit; font-weight: 800; }
 
 /* ---------- Footer ---------- */
 
@@ -676,6 +913,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 
 /* ---------- Pagine di testo, moduli e area riservata ---------- */
 
+/* Accesso: colonna larga quanto i campi, centrata. */
+.pagina-modulo:not(.area) { max-width: 30rem; }
 .pagina-modulo label { display: block; margin-bottom: 0.2rem; font-weight: 600; }
 .pagina-modulo input:not([type="hidden"]), .pagina-modulo select {
     width: 100%;
@@ -690,9 +929,24 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 .cambia-categoria { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem 1rem; margin-bottom: 1rem; }
 .cambia-categoria label { width: 100%; }
 .cambia-categoria select { width: auto; }
-.riga-turno { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
-.riga-turno label { display: inline; margin: 0; font-weight: normal; }
-.pagina-modulo .riga-turno input[type="time"] { width: auto; }
+/* Orari: un turno per riga anche a 320 px. "Dalle" e "alle" stanno sopra il loro campo (colonna 1 e 2),
+   così i due campi restano affiancati e non va a capo il secondo come con le etichette in linea. */
+.riga-turno {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 10rem));
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    gap: 0.15rem 1rem;
+    margin: 0 0 0.75rem;
+}
+.riga-turno:last-child { margin-bottom: 0; }
+.riga-turno label { margin: 0; font-size: 0.875rem; font-weight: normal; color: var(--testo-secondario); }
+.pagina-modulo .riga-turno input[type="time"] { width: 100%; min-width: 0; min-height: 44px; padding-inline: 0.5rem; }
+/* Da 768 px c'è spazio: "Dalle [ ] alle [ ]" su una riga, come si legge un orario. */
+@media (min-width: 768px) {
+    .riga-turno { grid-template-columns: auto 10rem auto 10rem; grid-template-rows: auto; grid-auto-flow: row; justify-content: start; align-items: center; gap: 0.75rem; }
+    .riga-turno label { font-size: 1rem; color: var(--testo); }
+}
 .pulsante-modulo {
     display: inline-block;
     min-height: 44px;
@@ -707,15 +961,38 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     cursor: pointer;
 }
 .pulsante-modulo:hover { background: var(--blu-scuro); color: #fff; }
+.pulsante-modulo + a { margin-left: 1rem; } /* "Annulla" staccato da "Salva" */
 .pulsante-link { padding: 0; border: 0; background: none; color: var(--blu); font: inherit; text-decoration: underline; cursor: pointer; }
 .area-riservata { margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--bordo); }
 .area-riservata ul { display: flex; flex-wrap: wrap; gap: 1rem; margin: 0; padding: 0; list-style: none; font-weight: 600; }
 .area-riservata form { display: inline; }
+/* Pagina in cui si è: testo pieno senza sottolineatura, come una scheda selezionata. */
+.area-riservata a[aria-current="page"] { color: var(--blu-scuro); text-decoration: none; border-bottom: 3px solid var(--rosso); }
 .utente { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--testo-secondario); }
 .errori { padding: 0.75rem 1rem; border-left: 4px solid var(--rosso); background: #FBE9EC; }
+.nota-modulo { font-size: 0.875rem; color: var(--testo-secondario); }
 .avviso { padding: 0.75rem 1rem; border-left: 4px solid var(--blu); background: #E7F0F9; }
+/* Verifica in due passaggi: stato acceso, QR su fondo bianco (si legge meglio), codici di riserva in colonna. */
+.avviso-acceso { padding: 0.75rem 1rem; border-left: 4px solid #1E7B45; background: #E6F4EC; }
+.pulsante-pericolo { background: var(--rosso); }
+.pulsante-pericolo:hover { background: var(--rosso-scuro); }
+.passi-attivazione { padding-left: 1.25rem; }
+.passi-attivazione li + li { margin-top: 0.75rem; }
+.codice-qr { width: min(100%, 15rem); margin: 0.75rem 0; padding: 0.5rem; background: #fff; border: 1px solid var(--bordo); border-radius: var(--raggio); }
+.codice-qr svg { display: block; width: 100%; height: auto; }
+.segreto { font-size: 1rem; letter-spacing: 0.05em; overflow-wrap: anywhere; }
+.codici-riserva { margin-bottom: 1.5rem; padding: 0.75rem 1rem; border: 2px dashed var(--blu-scuro); border-radius: var(--raggio); background: #fff; }
+.elenco-codici { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.25rem 1rem; padding: 0; list-style: none; font-size: 1.125rem; }
 .area .pagina-menu, .area { max-width: 1000px; }
-.tabella-voci { width: 100%; border-collapse: collapse; background: #fff; }
+/* Indice dell'area: stesso spazio delle altre pagine dell'area, schede staccate fra loro. */
+.pagina-menu.area { padding: 1.5rem 1rem 3rem; }
+.area .categoria + .categoria { margin-top: 1.5rem; }
+/* Colonne di larghezza fissa: in tutte le categorie Prezzi, Stato e Azioni partono alla stessa x. */
+.tabella-voci { width: 100%; border-collapse: collapse; background: #fff; table-layout: fixed; }
+.tabella-voci th:nth-child(1) { width: 3.5rem; }
+.tabella-voci th:nth-child(3) { width: 30%; }
+.tabella-voci th:nth-child(4) { width: 6.5rem; }
+.tabella-voci th:nth-child(5) { width: 10rem; }
 .tabella-voci th, .tabella-voci td { padding: 0.5rem; border-bottom: 1px solid var(--bordo); text-align: left; vertical-align: top; }
 .tabella-voci form { display: inline; margin-left: 0.5rem; }
 .nascosta { color: var(--testo-secondario); background: var(--crema-scura); }
@@ -738,18 +1015,35 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
 /* ---------- Tablet e computer ---------- */
 
 @media (min-width: 768px) {
-    .sezioni-info { grid-template-columns: 1fr 1fr; }
+    .testata-info h1 { font-size: 2rem; }
+    .lavagna { padding: 2rem 2.5rem 2.5rem; }
+    .lavagna-sezione h2 { font-size: 2.4rem; }
+    .insegna { font-size: 3rem; }
+    .info-indirizzo { font-size: 1rem; }
+    .azione-info { min-height: 64px; }
+    .azioni-info { max-width: 34rem; } /* stesso bordo destro di orari e contatti */
+    /* Gli orari restano larghi quanto serve: a tutta lavagna i giorni finirebbero lontani dalle ore. */
+    .orari { max-width: 34rem; }
 }
 
 /* Computer: barra più alta e più staccata, come Habita79; voci sempre visibili. */
 @media (min-width: 900px) {
     :root { --altezza-navbar: 84px; --margine-navbar: 1.5rem; }
-    .navbar { width: min(100% - 6rem, 1240px); padding: 0 1.25rem 0 1.75rem; border-radius: 14px; }
+    .navbar { width: min(100% - 6rem, 1240px); padding: 0 1.75rem; border-radius: 14px; }
+    /* L'ultima voce sporge di quanto è il suo spazio interno: il testo finisce a 1.75rem dal bordo. */
+    .navbar-link li:last-child a { margin-right: -0.9rem; }
     .navbar-marchio { font-size: 0.85rem; }
     .navbar-logo img { height: 58px; }
     .navbar-link a { padding: 0.6rem 0.9rem; }
     .navbar-nav { gap: 1.25rem; }
     .navbar-ora { font-size: 1.05rem; }
+    .navbar-link a { white-space: nowrap; }
+}
+/* Computer piccoli: voci più vicine, così "Orari e contatti" resta su una riga accanto all'ora. */
+@media (min-width: 900px) and (max-width: 1099.98px) {
+    .navbar-nav { gap: 0.6rem; }
+    .navbar-link a { padding-inline: 0.6rem; }
+    .navbar-link li:last-child a { margin-right: -0.6rem; }
 }
 
 @media (min-width: 900px) and (orientation: landscape) {
@@ -782,14 +1076,21 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     }
     /* Una categoria aggiunta in futuro prende una riga intera in fondo. */
     .categoria { grid-column: 1 / -1; padding: 1.4rem 1.5rem 1.2rem; }
-    .cat-starters { grid-area: starters; }
-    .cat-salad { grid-area: salad; }
+    /* Starters e Salad stanno sulla stessa riga: stessa altezza. */
+    .cat-starters { grid-area: starters; align-self: stretch; }
+    .cat-salad { grid-area: salad; align-self: stretch; }
     .cat-burger { grid-area: burger; }
     .cat-kids-menu { grid-area: kids; }
     .cat-soft-drinks { grid-area: soft; }
     .cat-beers { grid-area: beers; }
     .cat-the-originals { grid-area: originals; align-self: stretch; }
-    .cat-burger h2 { font-size: 5.5rem; }
+    /* Nei blocchi allungati per pareggiare la riga (Starters, The Originals) lo spazio in più va diviso fra le voci,
+       non lasciato tutto in fondo: righe tratteggiate equidistanti e bordo inferiore pari al vicino. */
+    .categoria { display: flex; flex-direction: column; }
+    .categoria > .voce { flex-grow: 1; }
+    .categoria > .nota-categoria { align-self: flex-start; }
+    .cat-burger > .nota-categoria { align-self: stretch; }
+    .cat-burger h2 { font-size: 4.1rem; }
 
     .colonne-2, .colonne-4 { --prezzi: 2; }
     .colonne-4 { --prezzi: 4; }
@@ -800,6 +1101,9 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
         column-gap: 0.4rem;
         align-items: center;
     }
+    /* Voce allungata (flex-grow nei blocchi pareggiati): righe della griglia compatte al centro, così
+       nome, descrizione e nota restano uniti e lo spazio in più va sopra e sotto la voce. */
+    .colonne-2 .voce, .colonne-4 .voce { align-content: center; }
     .colonne-2 .intestazione-prezzi, .colonne-4 .intestazione-prezzi { margin-bottom: 0.2rem; }
     .intestazione-prezzi span {
         padding: 0.25rem 0.3rem;
@@ -809,7 +1113,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
         border-radius: 999px;
         box-shadow: 2px 2px 0 var(--blu-scuro);
         font-family: var(--insegna);
-        font-size: 0.68rem;
+        font-size: 0.75rem;
         line-height: 1.15;
         text-align: center;
         text-transform: uppercase;
@@ -835,12 +1139,22 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     .colonna-2 { grid-column: 3; }
     .colonna-3 { grid-column: 4; }
     .colonna-4 { grid-column: 5; }
-    /* Prezzo unico in una categoria con formati (Patatine stick): accanto al nome, mai sotto una colonna. */
-    .colonne-2 .voce:has(> .prezzo-unico), .colonne-4 .voce:has(> .prezzo-unico) { grid-template-columns: minmax(0, 1fr) auto; }
+    /* Bollini larghi quanto una colonna di prezzi: in tutte le schede il prezzo a destra cade sulla stessa verticale. */
+    .prezzo-unico { min-width: 6.3rem; text-align: center; }
+    /* Prezzo unico in una categoria con formati (Patatine stick): nell'ultima colonna, sotto l'ultimo prezzo;
+       il nome usa anche le colonne libere, così non va a capo. */
+    .colonne-2 .voce > .prezzo-unico, .colonne-4 .voce > .prezzo-unico { grid-column: -2; }
+    .colonne-2 .voce:has(> .prezzo-unico) > :not(.prezzi):not(.prezzo-mancante):not(.prezzo-unico),
+    .colonne-4 .voce:has(> .prezzo-unico) > :not(.prezzi):not(.prezzo-mancante):not(.prezzo-unico) { grid-column: 1 / -2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .navbar-linee span, .js .navbar-link, .js .navbar-link li { transition: none !important; }
     .fila-loghi { animation: none; }
+    .azione-info { transition: none; }
+    .locale-aperto .insegna { animation: none; }
+    .orari-giorno.oggi, .orari-giorno.oggi::after { animation: none; }
+    .contatto-freccia { transition: none; }
 }
+

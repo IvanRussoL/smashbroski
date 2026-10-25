@@ -35,7 +35,7 @@ Dal 18/10 (grafica 2) la home è solo l'hero; orari e contatti sono nella pagina
 | RF-01 | La home mostra logo, stato di apertura, pulsante per il menù e "Come arrivare"; la pagina Orari e contatti mostra telefono, email, indirizzo e link Facebook e Instagram; indirizzo e social sono anche nel footer. Tutto visibile e senza sovrapposizioni su qualsiasi dimensione di schermo, in verticale e in orizzontale, e con lo zoom al 200% | AU-UI01, AU-UI02, AU-UI05, AU-UI06 |
 | RF-02 | La pagina Orari e contatti mostra gli orari della settimana, con il giorno di oggi evidenziato e con il giorno di chiusura scritto in modo esplicito ("Martedì: chiuso") | AU-NAV11 |
 | RF-03 | La home e la pagina Orari e contatti mostrano se il locale è aperto o chiuso in questo momento e, se è chiuso, quando riapre (es. "Chiuso · apre domani alle 12:00"; "oggi" e "domani" quando la riapertura è vicina, altrimenti il nome del giorno, es. "apre venerdì alle 12:00") | AU-NAV11 |
-| RF-04 | Il telefono è un link `tel:` che avvia la chiamata; nessun link WhatsApp | AU-CON02, AU-NAV08 (BLOCKED) |
+| RF-04 | Il telefono è un link `tel:` che avvia la chiamata; il numero fisso non porta mai a WhatsApp. Dal 22/10 la pagina Orari e contatti ha un pulsante WhatsApp con un numero suo (`whatsapp`, link `wa.me`), segnaposto finché i titolari non lo danno (DEVLOG) | AU-CON02, AU-NAV08 (BLOCKED) |
 | RF-05 | L'email è un link `mailto:` scritto in chiaro nell'HTML, che funziona anche senza JavaScript | AU-NAV09 (PASS, da mantenere) |
 | RF-06 | L'indirizzo apre Google Maps sulla posizione del locale, con un link costruito dall'indirizzo al posto del link breve attuale | AU-NAV10 (BLOCKED) |
 | RF-07 | I link social (per ora testuali) portano agli indirizzi stabili delle pagine Facebook e Instagram del locale, non a link di condivisione temporanei | AU-NAV07 |
@@ -57,7 +57,7 @@ Dal 18/10 (grafica 2) la home è solo l'hero; orari e contatti sono nella pagina
 
 | ID | Requisito | Risolve |
 |---|---|---|
-| RF-16 | Accede all'area riservata con email e password ed esce con il logout | — |
+| RF-16 | Accede all'area riservata con email e password ed esce con il logout; dal 24/10 cambia la propria password dall'area (serve quella attuale). Account, password dimenticate e blocchi li gestisce lo sviluppatore da riga di comando (`docs/GESTIONE_SITO.md`) | — |
 | RF-17 | Aggiunge, modifica, nasconde e rimostra le voci del menù: nome, ingredienti, prezzi, categoria, posizione nella categoria, etichetta di edizione, nota | AU-NAV01-06 (il menù si aggiorna senza rifare il PDF) |
 | RF-18 | Modifica gli orari settimanali: per ogni giorno, chiuso oppure uno o più turni, anche oltre la mezzanotte | AU-NAV11 |
 | RF-19 | Le modifiche sono visibili subito nelle pagine pubbliche | — |
@@ -146,6 +146,20 @@ Contiene gli account dell'area riservata. Esiste un solo ruolo, il proprietario,
 | `password_hash` | VARCHAR(255), obbligatoria | Hash Argon2id della password (`argon2-cffi`); la password in chiaro non viene mai salvata |
 | `attivo` | BOOLEAN, obbligatoria, predefinito sì | Se vale no l'account non può accedere; si disattiva invece di cancellare |
 | `creato_il` | DATETIME, obbligatoria, predefinito data e ora attuali | Momento di creazione, scritto dal database |
+| `totp_segreto` | VARCHAR(255), facoltativa | Segreto della verifica in due passaggi (160 bit), cifrato con Fernet e una chiave ricavata dalla `SECRET_KEY` (HKDF); vuoto se mai attivata |
+| `totp_attivo` | BOOLEAN, obbligatoria, predefinito no | Diventa sì solo dopo il primo codice giusto dell'app |
+| `totp_ultimo_passo` | BIGINT, facoltativa | Intervallo di 30 secondi dell'ultimo codice accettato: i codici fino a quello non valgono più (niente riutilizzo) |
+
+### Tabella `codici_riserva`
+
+Codici di riserva della verifica in due passaggi, per entrare senza telefono: 10 per account, ognuno vale una volta.
+
+| Colonna | Tipo | Significato |
+|---|---|---|
+| `id` | INT, chiave primaria, auto-incrementale | Identificativo |
+| `utente_id` | INT, obbligatoria, chiave esterna verso `utenti` (cancellazione a cascata) | Account a cui appartiene |
+| `codice_hash` | VARCHAR(255), obbligatoria | Hash Argon2id del codice (10 caratteri senza lettere ambigue); il codice si mostra una volta sola |
+| `usato_il` | DATETIME, facoltativa | Momento d'uso, in UTC; vuoto = ancora valido |
 
 ### Tabella `categorie`
 
@@ -226,10 +240,25 @@ Contiene i dati del locale mostrati nelle pagine. Ha una sola riga, creata dai d
 | `indirizzo` | VARCHAR(255), obbligatoria | Indirizzo mostrato e usato per costruire il link a Google Maps |
 | `telefono` | VARCHAR(20), obbligatoria | Telefono con prefisso internazionale, senza spazi (es. `+390810000000`), come serve al link `tel:`; sul sito si mostra con gli spazi |
 | `telefono_di_prova` | BOOLEAN, obbligatoria, predefinito sì | Se vale sì il sito mostra "numero di prova" accanto al numero e lo esclude dal JSON-LD |
+| `whatsapp` | VARCHAR(20), obbligatoria | Numero WhatsApp, stesso formato del telefono; il link `wa.me` usa solo le cifre. Separato dal telefono perché può essere un cellulare |
+| `whatsapp_di_prova` | BOOLEAN, obbligatoria, predefinito sì | Se vale sì il numero WhatsApp è un segnaposto (il pulsante lo dice nel suggerimento "Numero di prova") |
 | `email` | VARCHAR(255), obbligatoria | Email del locale |
 | `url_facebook` | VARCHAR(255), obbligatoria | Indirizzo della pagina Facebook |
 | `url_instagram` | VARCHAR(255), obbligatoria | Indirizzo del profilo Instagram |
 | `fuso_orario` | VARCHAR(64), obbligatoria, predefinito 'Europe/Rome' | Fuso orario IANA usato da `zoneinfo` per "aperto ora" |
+
+### Tabella `tentativi_accesso`
+
+Contiene i tentativi sbagliati di login e di cambio password, per il limite di 5 al minuto (sezione 7). Sta nel database, e non nella memoria del server, perché il limite deve valere anche quando l'hosting fa girare il sito su più processi.
+
+| Colonna | Tipo | Significato |
+|---|---|---|
+| `id` | BIGINT, chiave primaria, auto-incrementale | Identificativo del tentativo |
+| `ambito` | VARCHAR(20), obbligatoria | `login` oppure `password` (cambio password dall'area): i due limiti sono separati |
+| `impronta_ip` | CHAR(64), obbligatoria | HMAC-SHA256 dell'indirizzo IP con la `SECRET_KEY`: l'IP in chiaro non si salva |
+| `tentato_il` | DATETIME(6), obbligatoria | Momento del tentativo, in UTC |
+
+Indici su (`ambito`, `impronta_ip`, `tentato_il`) per il conteggio e su `tentato_il` per la pulizia: a ogni nuovo tentativo si cancellano quelli più vecchi di un'ora. Nessuna relazione con `utenti`: si conta per indirizzo, anche per email inesistenti.
 
 ### Dati iniziali
 
@@ -242,6 +271,7 @@ Li carica lo script dei dati iniziali dopo `schema.sql`. I prezzi sono stati let
 | `nome_locale` | SmashBroski Pompei |
 | `indirizzo` | Vico dei Paninari, 7 - 80045 Pompei (NA) |
 | `telefono` | +39 081 000 0000 (FITTIZIO), `telefono_di_prova` = sì |
+| `whatsapp` | +39 300 000 0000 (FITTIZIO, prefisso non assegnato), `whatsapp_di_prova` = sì |
 | `email` | info@example.com (FITTIZIO) |
 | `url_facebook` | https://example.com/facebook-segnaposto (FITTIZIO) |
 | `url_instagram` | https://example.com/instagram-segnaposto (FITTIZIO) |
@@ -369,6 +399,8 @@ Una classe per ogni gruppo di tabelle. Contengono tutte le query SQL, sempre par
 | `MenuRepository` | `categorie`, `formati_prezzo`, `voci_menu`, `prezzi_voce` |
 | `OrariRepository` | `orari_settimanali` |
 | `ImpostazioniRepository` | `impostazioni` |
+| `CodiciRiservaRepository` | `codici_riserva` |
+| `TentativiRepository` | `tentativi_accesso` (contare, registrare, cancellare i tentativi vecchi; lavora con valori semplici, senza modello) |
 
 `MenuRepository` legge il menù pubblico con poche query (categorie, formati, voci attive, prezzi) e lo ricompone in Python, senza una query per ogni voce.
 
@@ -378,8 +410,10 @@ Contengono le regole di business della sezione 3. Usano i repository e non dipen
 
 | Servizio | Compito |
 |---|---|
-| `AuthService` | Login con verifica Argon2id, controllo che l'account sia attivo, aggiornamento dell'hash quando i parametri di Argon2 cambiano, creazione del proprietario da riga di comando |
+| `AuthService` | Login con verifica Argon2id, controllo che l'account sia attivo, aggiornamento dell'hash quando i parametri di Argon2 cambiano, creazione del proprietario da riga di comando; cambio della password (con quella attuale), reimpostazione e attivazione/disattivazione dell'account da riga di comando |
 | `MenuService` | Menù pubblico (solo voci attive, in ordine di posizione); creazione e modifica di una voce con le regole sui prezzi (prezzo unico oppure formati della sua categoria) salvate in un'unica transazione; nascondere e rimostrare una voce; conversione del prezzo scritto dal proprietario ("7,50") in centesimi |
+| `DuePassaggiService` | Verifica in due passaggi: segreto TOTP cifrato, attivazione con il primo codice, controllo del codice al login (finestra di ±30 secondi, nessun riutilizzo), 10 codici di riserva monouso salvati con Argon2id, rigenerazione e disattivazione |
+| `TentativiService` | Limite di 5 tentativi sbagliati al minuto per IP e per ambito: blocco, registrazione con l'impronta HMAC dell'IP, pulizia dei tentativi più vecchi di un'ora. Riceve l'istante come parametro nei test, come `stato_apertura(adesso)` |
 | `OrariService` | Lettura e salvataggio del calendario settimanale con il controllo delle sovrapposizioni, anche oltre la mezzanotte; calcolo di `StatoApertura` |
 
 Il calcolo dell'apertura riceve l'istante come parametro (`stato_apertura(adesso)`) invece di leggere l'orologio: così i test controllano martedì alle 00:30 o lunedì alle 01:30 senza dipendere dall'ora in cui vengono eseguiti. La rotta gli passa l'ora attuale nel fuso delle impostazioni.
@@ -412,11 +446,13 @@ smashbroski/
 │   ├── templates/         # pagine Jinja
 │   ├── static/            # CSS, js/navbar.js, immagini WebP (logo, foto dell'hero, motivo dello sfondo)
 │   ├── eccezioni.py
-│   ├── comandi.py         # comandi da terminale (flask crea-proprietario)
+│   ├── limiti.py          # decoratore limita_tentativi delle rotte con password
+│   ├── comandi.py         # comandi da terminale (crea-proprietario, reimposta-password, disattiva/riattiva-proprietario)
 │   └── db.py              # connessione a MySQL
 ├── database/
 │   ├── schema.sql         # creazione delle tabelle
-│   └── dati_iniziali.sql  # menù, orari e impostazioni della sezione 4
+│   ├── dati_iniziali.sql  # menù, orari e impostazioni della sezione 4
+│   └── aggiornamenti/     # SQL per aggiornare un database già esistente senza ricaricarlo
 ├── strumenti/
 │   └── prepara_immagini.py # Pillow, solo sviluppo: originali → WebP
 ├── tests/
@@ -436,7 +472,7 @@ Ogni Blueprint ha un prefisso nell'URL; quello riservato ha un controllo in `bef
 |---|---|---|---|
 | `pubblico` | `/` | Tutti | `/` home, `/menu` menù, `/info` orari e contatti, `/privacy` privacy e cookie |
 | `auth` | `/auth` | Tutti | `/auth/login` (GET e POST), `/auth/logout` (solo POST) |
-| `proprietario` | `/proprietario` | Solo proprietario con account attivo | `/proprietario/` elenco delle voci per categoria; `/proprietario/voci/nuova`; `/proprietario/voci/<id>` modifica; `/proprietario/voci/<id>/visibilita` nascondi o rimostra (POST); `/proprietario/orari` calendario settimanale |
+| `proprietario` | `/proprietario` | Solo proprietario con account attivo | `/proprietario/` elenco delle voci per categoria; `/proprietario/voci/nuova`; `/proprietario/voci/<id>` modifica; `/proprietario/voci/<id>/visibilita` nascondi o rimostra (POST); `/proprietario/orari` calendario settimanale; `/proprietario/password` cambio della password (stesso limite di 5 tentativi al minuto del login) |
 
 Un visitatore non loggato che apre una rotta di `proprietario` viene mandato al login. Con un solo ruolo non esiste il caso "ruolo sbagliato" (403).
 
@@ -452,16 +488,19 @@ L'applicazione non è creata a livello di modulo, ma dalla funzione `create_app(
 
 ### Autenticazione e sessione
 
-- **Password con Argon2id** (`argon2-cffi`, classe `PasswordHasher` con i parametri predefiniti della libreria). Al login, se `check_needs_rehash()` indica parametri superati, l'hash viene ricalcolato e salvato. Lunghezza minima della password: 12 caratteri.
+- **Password con Argon2id** (`argon2-cffi`, classe `PasswordHasher` con i parametri predefiniti della libreria). Al login, se `check_needs_rehash()` indica parametri superati, l'hash viene ricalcolato e salvato. Lunghezza della password: da 15 a 128 caratteri (15 è il minimo del NIST SP 800-63B rev. 4 quando la password è l'unico fattore; oltre 128 è rifiutata senza calcolare l'hash, così una password enorme non fa lavorare il server). Nessuna regola di composizione (maiuscole, simboli) e nessun cambio periodico obbligatorio, come chiede il NIST. Rifiutate le password facili da indovinare: presenti in `app/dati/password_comuni.txt` (circa 11.000 password di almeno 15 caratteri dagli elenchi di SecLists), con meno di 5 caratteri diversi, o che contengono il nome del sito o la parte dell'email prima della @ (ignorando maiuscole, spazi e segni).
 - **Stesso tempo di risposta per email esistenti e inesistenti**: se l'email non esiste, `AuthService` verifica comunque la password contro un hash fittizio, così dai tempi non si capisce quali email sono registrate. Il messaggio di errore è sempre generico ("email o password non corretti").
-- **Login con la sessione di Flask**, senza librerie esterne: dopo il controllo della password la sessione viene svuotata e riceve solo l'`id` dell'utente (protezione dalla session fixation). Il logout è una richiesta POST e svuota la sessione.
+- **Login con la sessione di Flask**, senza librerie esterne: dopo il controllo della password la sessione viene svuotata e riceve solo l'`id` dell'utente e l'impronta della password (protezione dalla session fixation; `app/sessione.py`). L'impronta è un HMAC-SHA256 dell'hash Argon2 con la `SECRET_KEY` (il cookie è firmato ma leggibile, l'hash non deve finirci): a ogni richiesta il `before_request` la confronta con quella della password attuale, quindi un cambio di password (dall'area o con `reimposta-password`) chiude subito le sessioni sugli altri dispositivi. Il logout è una richiesta POST e svuota la sessione.
 - **Utente ricaricato a ogni richiesta** dal `before_request` di `proprietario`: un account disattivato perde l'accesso subito.
-- **Cookie di sessione** con `HttpOnly`, `SameSite=Lax` e, in produzione, `Secure`; durata massima della sessione di 8 ore.
-- **Rate limiting con Flask-Limiter**: al massimo 5 tentativi di login al minuto per indirizzo IP, poi risposta 429. L'IP serve solo a contare i tentativi e non viene salvato.
+- **Cookie di sessione** con `HttpOnly`, `SameSite=Lax` e, in produzione, `Secure`; sessione chiusa dal server dopo **1 ora di inattività** o **8 ore dal login** (OWASP WSTG e ASVS 3.3/3.4): ora del login e dell'ultima attività sono nella sessione firmata e il `before_request` le controlla. Senza questo controllo Flask rinnoverebbe il cookie a ogni richiesta e la sessione non scadrebbe mai per chi la usa.
+- **Limite ai tentativi sbagliati** (`TentativiService` e decoratore `limita_tentativi` in `app/limiti.py`): al massimo 5 tentativi sbagliati al minuto per indirizzo IP sul login e, separatamente, sul cambio password, poi risposta 429 fino a quando il più vecchio esce dalla finestra di un minuto; si contano solo le password sbagliate (al login ogni errore, nel cambio password solo la password attuale sbagliata, non una conferma diversa) e le richieste rifiutate non allungano il blocco. Dopo ogni errore la pagina dice quanti tentativi restano ("Tentativi rimasti: 3 su 5.", poi "Ultimo tentativo", al quinto "l'accesso è bloccato per un minuto"): il contatore è per connessione e scende allo stesso modo per email esistenti e inesistenti, quindi non rivela quali email sono registrate. I tentativi stanno nella tabella `tentativi_accesso`, quindi il limite vale per tutti i processi del server e non si azzera a un riavvio (dal 24/10 al posto di Flask-Limiter in memoria, che con 3 processi permetteva fino a 15 tentativi). Dell'IP si salva solo un HMAC con la `SECRET_KEY`, cancellato dopo un'ora. Dietro il proxy dell'hosting l'IP vero si legge con `ProxyFix`, attivo solo se `PROXY_FIDATI` in `.env` indica quanti proxy ci sono (0 in sviluppo): senza, tutti i visitatori avrebbero l'IP del proxy e 5 errori di chiunque bloccherebbero il login a tutti; con un numero troppo alto chiunque potrebbe falsificare l'IP.
+- **Verifica in due passaggi** facoltativa (`DuePassaggiService`, consigliata da OWASP MFA Cheat Sheet e NIST SP 800-63B): dopo la password giusta la sessione contiene solo chi deve scrivere il codice (5 minuti, nessun accesso all'area); poi codice TOTP di 6 cifre (RFC 6238) da Google Authenticator o un codice di riserva. Codici sbagliati con lo stesso limite di 5 al minuto (ambito `codice`). Togliere la verifica o rifare i codici di riserva chiede la password. Lo sviluppatore la toglie con `disattiva-due-passaggi`.
+- **Pagine riservate fuori dai motori di ricerca**: header `X-Robots-Tag: noindex, nofollow` su `/auth` e `/proprietario`. Non si usa `robots.txt`, che renderebbe pubblico l'elenco degli indirizzi riservati. L'indirizzo `/auth/login` resta quello: nasconderlo non protegge (OWASP, sicurezza non basata sul segreto), la protezione è nella password, nel limite dei tentativi e nella verifica in due passaggi.
 - **Nessuna registrazione pubblica**: il proprietario si crea con `flask crea-proprietario`, che chiede la password senza mostrarla (`getpass`).
 
 ### Protezione delle richieste
 
+- **Dimensione delle richieste**: `MAX_CONTENT_LENGTH` di 64 KB, oltre la richiesta è rifiutata con 413.
 - **CSRF**: `CSRFProtect` di Flask-WTF protegge tutti i moduli POST, compreso il logout.
 - **SQL injection**: tutte le query usano parametri (`%s`) passati separatamente al driver.
 - **XSS**: Jinja applica l'escape automatico; `|safe` non si usa mai su dati inseriti dal proprietario. Il JSON-LD si scrive con il filtro `tojson`, che rende innocui i caratteri `<`, `>` e `&`.
@@ -477,6 +516,8 @@ Un `after_request` registrato in `create_app()` aggiunge a tutte le risposte:
 | `X-Content-Type-Options` | `nosniff` | Il browser rispetta il tipo dichiarato dei file |
 | `X-Frame-Options` | `DENY` | Stessa protezione di `frame-ancestors` per i browser più vecchi |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Ai siti esterni (Maps, social) arriva solo il dominio, non il percorso |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | Il browser nega queste funzioni a tutte le pagine del sito |
+| `Cross-Origin-Opener-Policy` | `same-origin` | Una pagina di un altro sito aperta dal nostro non può controllare la nostra finestra |
 | `Strict-Transport-Security` | `max-age=31536000` (solo in produzione) | Il browser usa sempre HTTPS |
 
 Le pagine di `proprietario` hanno anche `Cache-Control: no-store`. Nessuna pagina contiene il meta `generator` (AU-SEO03).
@@ -490,7 +531,8 @@ Le pagine di `proprietario` hanno anche `Cache-Control: no-store`. Nessuna pagin
 
 - **Segreti solo nel file `.env`**, escluso da Git e letto con `python-dotenv`: `SECRET_KEY` (lunga e casuale, generata con il modulo `secrets`) e credenziali del database. Nel repository c'è solo `.env.example`.
 - **Utente MySQL dedicato all'app**, con permessi solo sul database del progetto, mai `root`.
-- **Debug solo in sviluppo**: in produzione è spento e gli errori mostrano una pagina generica.
+- **Debug solo in sviluppo**: in produzione è spento e gli errori mostrano una pagina generica. `run.py` (che accende il debugger) si rifiuta di partire con `PRODUZIONE=1`; online il sito gira con un server WSGI.
+- **Repository pubblico**: i comandi di gestione e l'indirizzo del login possono stare in Git; mai `.env`, password, `SECRET_KEY`, email reali degli account (neanche negli esempi), IP e dati dell'hosting, copie del database.
 
 ### Test degli accessi
 

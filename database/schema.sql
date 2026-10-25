@@ -11,7 +11,9 @@ DROP TABLE IF EXISTS formati_prezzo;
 DROP TABLE IF EXISTS categorie;
 DROP TABLE IF EXISTS orari_settimanali;
 DROP TABLE IF EXISTS impostazioni;
+DROP TABLE IF EXISTS codici_riserva;
 DROP TABLE IF EXISTS utenti;
+DROP TABLE IF EXISTS tentativi_accesso;
 
 -- Account dell'area riservata: esiste solo il proprietario, quindi nessuna colonna ruolo.
 CREATE TABLE utenti (
@@ -19,7 +21,24 @@ CREATE TABLE utenti (
     email         VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     attivo        BOOLEAN      NOT NULL DEFAULT TRUE,
-    creato_il     DATETIME     NOT NULL DEFAULT (UTC_TIMESTAMP())
+    creato_il     DATETIME     NOT NULL DEFAULT (UTC_TIMESTAMP()),
+    -- Verifica in due passaggi (DuePassaggiService): segreto TOTP cifrato con una chiave ricavata
+    -- dalla SECRET_KEY, vuoto se mai attivata; totp_attivo diventa vero solo dopo il primo codice giusto;
+    -- totp_ultimo_passo è l'ultimo intervallo di 30 secondi usato, così un codice non vale due volte.
+    totp_segreto      VARCHAR(255) NULL,
+    totp_attivo       BOOLEAN      NOT NULL DEFAULT FALSE,
+    totp_ultimo_passo BIGINT       NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+-- Codici di riserva della verifica in due passaggi (per quando il telefono non c'è): 10 per
+-- account, ognuno vale una volta. Si salva solo l'hash Argon2id, mai il codice.
+CREATE TABLE codici_riserva (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    utente_id   INT          NOT NULL,
+    codice_hash VARCHAR(255) NOT NULL,
+    usato_il    DATETIME     NULL,
+    CONSTRAINT fk_codici_utente FOREIGN KEY (utente_id) REFERENCES utenti (id) ON DELETE CASCADE,
+    INDEX idx_codici_utente (utente_id, usato_il)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- Le 7 categorie del PDF, fisse: le crea lo script dei dati iniziali.
@@ -93,9 +112,24 @@ CREATE TABLE impostazioni (
     indirizzo         VARCHAR(255) NOT NULL,
     telefono          VARCHAR(20)  NOT NULL,
     telefono_di_prova BOOLEAN      NOT NULL DEFAULT TRUE,
+    whatsapp          VARCHAR(20)  NOT NULL,
+    whatsapp_di_prova BOOLEAN      NOT NULL DEFAULT TRUE,
     email             VARCHAR(255) NOT NULL,
     url_facebook      VARCHAR(255) NOT NULL,
     url_instagram     VARCHAR(255) NOT NULL,
     fuso_orario       VARCHAR(64)  NOT NULL DEFAULT 'Europe/Rome',
     CONSTRAINT chk_impostazioni_riga_unica CHECK (id = 1)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+-- Tentativi sbagliati di login e di cambio password, per il limite di 5 al minuto (TentativiService).
+-- Stanno nel database e non nella memoria del server, così il limite vale anche con più processi.
+-- L'IP non si salva: impronta_ip è un HMAC-SHA256 dell'IP con la SECRET_KEY. Le righe più vecchie
+-- di un'ora si cancellano a ogni nuovo tentativo.
+CREATE TABLE tentativi_accesso (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ambito      VARCHAR(20) NOT NULL,
+    impronta_ip CHAR(64)    NOT NULL,
+    tentato_il  DATETIME(6) NOT NULL,
+    INDEX idx_tentativi_conteggio (ambito, impronta_ip, tentato_il),
+    INDEX idx_tentativi_pulizia (tentato_il)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;

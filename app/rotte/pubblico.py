@@ -1,7 +1,7 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from flask import Blueprint, render_template, url_for
+from flask import Blueprint, current_app, render_template, url_for
 
 from app.db import ottieni_connessione
 from app.repository.impostazioni import ImpostazioniRepository
@@ -105,3 +105,9 @@ def info():
 @bp.get("/privacy")
 def privacy():
     return render_template("privacy.html", impostazioni=_impostazioni())
+
+
+@bp.get("/favicon.ico")
+def favicon():
+    # I browser chiedono l'icona alla radice anche senza il <link> (feed, segnalibri): niente 404.
+    return current_app.send_static_file("img/favicon.ico")

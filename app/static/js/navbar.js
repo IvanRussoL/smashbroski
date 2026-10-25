@@ -7,7 +7,8 @@
     if (!navbar || !pulsante || !voci) {
         return;
     }
-    // La classe "js" mostra il pulsante e trasforma le voci in un pannello a scomparsa (stile.css).
+    // La classe "js" (messa nel <head> da js-attivo.js) mostra il pulsante e trasforma le voci
+    // in un pannello a scomparsa (stile.css); qui si ripete nel caso quel file non si carichi.
     document.documentElement.classList.add("js");
 
     function aperto() {
@@ -44,8 +45,16 @@
     });
 
     // Passando a uno schermo largo (telefono ruotato, finestra allargata) le voci tornano nella barra.
+    // Nel passaggio (anche con lo zoom Ctrl +/- del computer) le animazioni del pannello sono spente
+    // per un attimo, altrimenti le voci "volano" via o entrano come se si aprisse il menù.
+    let attesa = null;
     window.matchMedia("(min-width: 900px)").addEventListener("change", function () {
+        document.documentElement.classList.add("senza-animazioni");
         imposta(false);
+        clearTimeout(attesa);
+        attesa = setTimeout(function () {
+            document.documentElement.classList.remove("senza-animazioni");
+        }, 400);
     });
 })();
 

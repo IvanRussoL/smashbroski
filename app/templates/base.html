@@ -7,6 +7,11 @@
     <meta name="color-scheme" content="only light">
     <title>{% block titolo %}SmashBroski Pompei – Hamburgeria a Pompei{% endblock %}</title>
     <meta name="description" content="{% block descrizione %}SmashBroski Pompei, hamburgeria in Vico dei Paninari a Pompei: smash burger, menù, orari e contatti.{% endblock %}">
+    {# Icona nella scheda del browser (favicon) e sulla schermata home del telefono: la mascotte del logo. #}
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" sizes="16x16 32x32 48x48">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon-32.png') }}" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+    <script src="{{ url_for('static', filename='js/js-attivo.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stile.css') }}">
     {% block testa %}{% endblock %}
 </head>
@@ -52,7 +57,10 @@
                 <h2 id="titolo-dove" class="etichetta-footer">Dove siamo</h2>
                 <p class="footer-indirizzo">{{ impostazioni.indirizzo }}</p>
             </div>
+            {# La home ha già "Come arrivare" nell'hero, subito sopra: lì il pulsante non si ripete. #}
+            {% block footer_come_arrivare %}
             <a class="pulsante-footer" href="{{ impostazioni.link_maps() }}" rel="noopener">Come arrivare</a>
+            {% endblock %}
         </div>
     </section>
     {% endif %}
@@ -93,5 +101,6 @@
             {% block crediti %}{% endblock %}
         </div>
     </footer>
+    <script src="{{ url_for('static', filename='js/fondo-pagina.js') }}" defer></script>
 </body>
 </html>

@@ -8,6 +8,16 @@
     <h1>Gestione del menù</h1>
     <p>Le voci nascoste non compaiono nel menù pubblico; una categoria con tutte le voci nascoste non compare.</p>
 
+    {# Stesso indice a pillole del menù pubblico (e stesso indice.js): sul telefono l'elenco è lungo. #}
+    <nav id="indice" class="indice" aria-label="Categorie da gestire">
+        <ul>
+            {% for categoria in categorie %}
+            <li><a href="#{{ categoria.slug }}">{{ categoria.nome }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+    <script src="{{ url_for('static', filename='js/indice.js') }}" defer></script>
+
     {% for categoria in categorie %}
     <section class="categoria" aria-labelledby="{{ categoria.slug }}">
         <h2 id="{{ categoria.slug }}">{{ categoria.nome }}</h2>

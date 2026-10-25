@@ -1,13 +1,16 @@
 from app.modelli.utente import Utente
 
-_SELECT = "SELECT id, email, password_hash, attivo, creato_il FROM utenti "
+_SELECT = (
+    "SELECT id, email, password_hash, attivo, creato_il, totp_segreto, totp_attivo, totp_ultimo_passo FROM utenti "
+)
 
 
 def _da_riga(riga: dict) -> Utente:
     """
-    Trasforma una riga di utenti in un Utente, convertendo attivo da 0/1 a bool.
+    Trasforma una riga di utenti in un Utente, convertendo attivo e totp_attivo da 0/1 a bool.
     """
     riga["attivo"] = bool(riga["attivo"])
+    riga["totp_attivo"] = bool(riga["totp_attivo"])
     return Utente(**riga)
 
 
@@ -57,3 +60,30 @@ class UtenteRepository:
         """
         with self._conn.cursor() as cur:
             cur.execute("UPDATE utenti SET password_hash = %s WHERE id = %s", (password_hash, utente_id))
+
+    def aggiorna_attivo(self, utente_id: int, attivo: bool) -> None:
+        """
+        Attiva o disattiva un account: un account disattivato non entra e perde subito l'accesso.
+        """
+        with self._conn.cursor() as cur:
+            cur.execute("UPDATE utenti SET attivo = %s WHERE id = %s", (attivo, utente_id))
+
+    def salva_totp(self, utente_id: int, segreto_cifrato: str | None, attivo: bool) -> None:
+        """
+        Salva il segreto TOTP (già cifrato) e se la verifica in due passaggi è attiva; azzera
+        l'ultimo intervallo usato. Con segreto None e attivo False la verifica è tolta.
+        """
+        with self._conn.cursor() as cur:
+            cur.execute(
+                "UPDATE utenti SET totp_segreto = %s, totp_attivo = %s, totp_ultimo_passo = NULL WHERE id = %s",
+                (segreto_cifrato, attivo, utente_id),
+            )
+
+    def aggiorna_ultimo_passo(self, utente_id: int, passo: int) -> None:
+        """
+        Ricorda l'intervallo di 30 secondi dell'ultimo codice accettato: i codici dello stesso
+        intervallo o di quelli prima non valgono più.
+        """
+        with self._conn.cursor() as cur:
+            cur.execute("UPDATE utenti SET totp_ultimo_passo = %s WHERE id = %s", (passo, utente_id))
+

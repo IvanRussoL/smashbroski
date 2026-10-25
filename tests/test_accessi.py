@@ -2,7 +2,7 @@ import pytest
 from flask import url_for
 
 from app import create_app
-from app.limiti import limiter
+from app.servizi.tentativi import FINESTRA, LIMITE_TENTATIVI
 from conftest import configurazione_test
 
 EMAIL, PASSWORD = "proprietario@example.com", "password-dei-test-123"
@@ -62,7 +62,8 @@ def test_login_sessione_solo_id(client):
     client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD})
     with client.session_transaction() as sessione:
         assert sessione["utente_id"] == 1
-        assert set(sessione.keys()) <= {"utente_id", "_permanent"}
+        assert set(sessione.keys()) <= {"utente_id", "impronta", "entrato_il", "ultima_attivita", "_permanent"}
+        assert len(sessione["impronta"]) == 64 and "argon2" not in sessione["impronta"]
 
 
 def test_login_messaggio_generico(client):
@@ -88,24 +89,103 @@ def test_csrf_post_senza_token(database_di_prova):
     with client.session_transaction() as sessione:
         sessione["utente_id"] = 1
     for indirizzo in ("/auth/logout", "/proprietario/voci/nuova?categoria=3",
-                      "/proprietario/voci/1/visibilita", "/proprietario/orari", "/auth/login"):
+                      "/proprietario/voci/1/visibilita", "/proprietario/orari", "/proprietario/password",
+                      "/auth/login"):
         risposta = client.post(indirizzo, data={"attiva": "0"})
         assert risposta.status_code == 400, indirizzo
         assert "Modulo scaduto o non valido" in risposta.get_data(as_text=True)
 
 
-def test_rate_limit_login(database_di_prova):
-    app = create_app(configurazione_test(RATELIMIT_ENABLED=True))
-    client = app.test_client()
-    with app.app_context():
-        limiter.reset()
+def test_login_avvisa_del_limite_di_tentativi(client):
+    pagina = client.get("/auth/login").get_data(as_text=True)
+    # La nota deve dire lo stesso numero e la stessa durata del limite configurato.
+    assert (LIMITE_TENTATIVI, FINESTRA.total_seconds()) == (5, 60)
+    assert "Dopo 5 tentativi sbagliati l'accesso si blocca per un minuto" in pagina
+    assert 'aria-describedby="nota-tentativi"' in pagina
+
+
+def _conta_tentativi(connessione) -> int:
+    # Chiude la lettura precedente: con REPEATABLE READ si vedrebbe ancora la tabella di allora.
+    connessione.commit()
+    with connessione.cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM tentativi_accesso")
+        return cur.fetchone()[0]
+
+
+def test_rate_limit_login(database_modificato):
+    # database_modificato: i tentativi restano nel database di prova e a fine test viene ricaricato.
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
     for _ in range(5):
         assert client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"}).status_code == 400
     risposta = client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"})
     assert risposta.status_code == 429
     assert "Troppi tentativi" in risposta.get_data(as_text=True)
-    with app.app_context():
-        limiter.reset()
+    # Bloccata anche la password giusta, come dice la nota sotto "Entra".
+    assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 429
+    # Le richieste rifiutate con 429 non allungano il blocco.
+    assert _conta_tentativi(database_modificato) == 5
+
+
+def test_login_conta_i_tentativi_rimasti(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    attesi = [
+        "Tentativi rimasti: 4 su 5.",
+        "Tentativi rimasti: 3 su 5.",
+        "Tentativi rimasti: 2 su 5.",
+        "Ultimo tentativo: se sbagli ancora, l&#39;accesso si blocca per un minuto.",
+        "Hai sbagliato 5 volte: l&#39;accesso è bloccato per un minuto, anche con la password giusta.",
+    ]
+    for numero, atteso in enumerate(attesi):
+        # Email esistente e inesistente alternate: il contatore scende allo stesso modo.
+        email = EMAIL if numero % 2 == 0 else "nessuno@example.com"
+        pagina = client.post("/auth/login", data={"email": email, "password": "sbagliata"}).get_data(as_text=True)
+        assert "Email o password non corretti. " + atteso in pagina
+    assert client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"}).status_code == 429
+
+
+def test_login_senza_limite_niente_contatore(client):
+    pagina = client.post("/auth/login", data={"email": EMAIL, "password": "sbagliata"}).get_data(as_text=True)
+    assert "Email o password non corretti." in pagina
+    assert "Tentativi rimasti" not in pagina
+
+
+def test_cambio_password_conta_solo_la_password_attuale(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
+    # Password attuale giusta, conferma diversa: errore, ma nessun tentativo consumato.
+    pagina = client.post("/proprietario/password", data={
+        "attuale": PASSWORD, "nuova": "nuova-password-dei-test", "conferma": "altra-password-dei-test",
+    }).get_data(as_text=True)
+    assert "La nuova password e la conferma non coincidono." in pagina
+    assert "Tentativi rimasti" not in pagina
+    assert _conta_tentativi(database_modificato) == 0
+    # Password attuale sbagliata: conta e lo dice.
+    pagina = client.post("/proprietario/password", data={
+        "attuale": "sbagliata", "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test",
+    }).get_data(as_text=True)
+    assert "Tentativi rimasti: 4 su 5." in pagina
+    assert _conta_tentativi(database_modificato) == 1
+
+
+def test_rate_limit_login_riuscito_non_conta(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    for _ in range(6):
+        assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
+    assert _conta_tentativi(database_modificato) == 0
+
+
+def test_rate_limit_condiviso_fra_processi(database_modificato):
+    """
+    Due app create a parte sono come due processi del server: con il conteggio in memoria ognuna
+    avrebbe i suoi 5 tentativi, con il database il limite è unico.
+    """
+    primo = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    secondo = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    sbagliato = {"email": EMAIL, "password": "sbagliata"}
+    for client in (primo, secondo, primo, secondo, primo):
+        assert client.post("/auth/login", data=sbagliato).status_code == 400
+    assert secondo.post("/auth/login", data=sbagliato).status_code == 429
+    assert primo.post("/auth/login", data=sbagliato).status_code == 429
 
 
 def test_cache_no_store_area_riservata(client_proprietario):
@@ -121,3 +201,89 @@ def test_cookie_sessione_attributi(database_di_prova, produzione):
     assert "HttpOnly" in cookie
     assert "SameSite=Lax" in cookie
     assert ("Secure" in cookie) is produzione
+
+
+def test_rate_limit_cambio_password(database_modificato):
+    client = create_app(configurazione_test(LIMITE_TENTATIVI_ATTIVO=True)).test_client()
+    assert client.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
+    dati = {"attuale": "sbagliata", "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test"}
+    for _ in range(5):
+        assert client.post("/proprietario/password", data=dati).status_code == 400
+    assert client.post("/proprietario/password", data=dati).status_code == 429
+
+
+
+def test_richiesta_troppo_grande_rifiutata(client):
+    risposta = client.post("/auth/login", data={"email": EMAIL, "password": "x" * 70_000})
+    assert risposta.status_code == 413
+    assert "Dati inviati troppo grandi." in risposta.get_data(as_text=True)
+
+
+@pytest.mark.parametrize("proxy, ip_atteso", [(0, "127.0.0.1"), (1, "203.0.113.7")])
+def test_ip_del_visitatore_dietro_proxy(database_di_prova, proxy, ip_atteso):
+    """
+    Senza proxy dichiarati X-Forwarded-For si ignora (chiunque potrebbe scriverlo); con un proxy
+    l'IP che conta i tentativi di login è quello del visitatore, non quello del proxy.
+    """
+    from flask import request
+
+    app = create_app(configurazione_test(PROXY_FIDATI=proxy))
+    app.add_url_rule("/ip-di-prova", "ip_di_prova", lambda: request.remote_addr)
+    risposta = app.test_client().get("/ip-di-prova", headers={"X-Forwarded-For": "203.0.113.7"})
+    assert risposta.get_data(as_text=True) == ip_atteso
+
+
+def test_sessione_vecchia_non_basta(client):
+    # Una sessione con il solo id (per esempio di prima di questa versione) non apre l'area.
+    with client.session_transaction() as sessione:
+        sessione["utente_id"] = 1
+    assert client.get("/proprietario/").headers["Location"].endswith("/auth/login")
+
+
+def test_cambio_password_chiude_le_altre_sessioni(app, database_modificato):
+    telefono, computer = app.test_client(), app.test_client()
+    for dispositivo in (telefono, computer):
+        assert dispositivo.post("/auth/login", data={"email": EMAIL, "password": PASSWORD}).status_code == 302
+    risposta = telefono.post("/proprietario/password", data={
+        "attuale": PASSWORD, "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test",
+    })
+    assert risposta.status_code == 302
+    assert telefono.get("/proprietario/").status_code == 200  # chi l'ha cambiata resta dentro
+    risposta = computer.get("/proprietario/")
+    assert risposta.headers["Location"].endswith("/auth/login")  # l'altro dispositivo esce subito
+    with computer.session_transaction() as sessione:
+        assert "utente_id" not in sessione
+
+
+def test_reimposta_password_chiude_le_sessioni(app, client_proprietario, database_modificato):
+    risultato = app.test_cli_runner().invoke(
+        args=["reimposta-password"], input=f"{EMAIL}\nreimpostata-dallo-sviluppatore\nreimpostata-dallo-sviluppatore\n",
+    )
+    assert risultato.exit_code == 0, risultato.output
+    assert client_proprietario.get("/proprietario/").headers["Location"].endswith("/auth/login")
+
+
+def _sposta_indietro(client, chiave, secondi):
+    with client.session_transaction() as sessione:
+        sessione[chiave] -= secondi
+
+
+@pytest.mark.parametrize("chiave, secondi", [
+    ("ultima_attivita", 60 * 60 + 1),       # più di un'ora senza attività
+    ("entrato_il", 8 * 60 * 60 + 1),        # più di 8 ore dal login, anche se attivo
+])
+def test_sessione_scaduta(client_proprietario, chiave, secondi):
+    _sposta_indietro(client_proprietario, chiave, secondi)
+    risposta = client_proprietario.get("/proprietario/")
+    assert risposta.headers["Location"].endswith("/auth/login")
+    pagina = client_proprietario.get("/auth/login").get_data(as_text=True)
+    assert "Sessione scaduta" in pagina
+    with client_proprietario.session_transaction() as sessione:
+        assert "utente_id" not in sessione
+
+
+def test_attivita_rinnova_il_timeout_di_inattivita(client_proprietario):
+    _sposta_indietro(client_proprietario, "ultima_attivita", 50 * 60)
+    assert client_proprietario.get("/proprietario/").status_code == 200
+    _sposta_indietro(client_proprietario, "ultima_attivita", 50 * 60)  # 50 minuti dall'ultima pagina, non 100
+    assert client_proprietario.get("/proprietario/").status_code == 200

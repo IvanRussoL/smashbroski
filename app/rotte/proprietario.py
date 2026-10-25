@@ -1,14 +1,19 @@
 import re
 from collections import defaultdict
 
-from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, g, redirect, render_template, request, session, url_for
 
 from app.db import ottieni_connessione
 from app.eccezioni import DatiNonValidiError
 from app.formato import prezzo_per_modulo
+from app.limiti import limita_tentativi
 from app.repository.utente import UtenteRepository
+from app.servizi.auth import MESSAGGIO_ATTUALE_ERRATA, AuthService
+from app.servizi.due_passaggi import DuePassaggiService, codice_qr_svg
 from app.servizi.menu import DatiVoce, MenuService
 from app.servizi.orari import NOMI_GIORNI, OrariService
+from app.servizi.tentativi import AMBITO_CAMBIO_PASSWORD, messaggio_tentativi_rimasti
+from app.sessione import apri_sessione, sessione_scaduta, sessione_valida
 
 bp = Blueprint("proprietario", __name__, url_prefix="/proprietario")
 
@@ -21,13 +26,18 @@ RIGHE_MINIME_PER_GIORNO = 2
 def richiedi_proprietario():
     """
     Eseguito prima di ogni rotta di questo Blueprint, comprese quelle aggiunte in futuro (nega per
-    default). L'utente si ricarica dal database a ogni richiesta: un account disattivato perde
-    subito l'accesso.
+    default). L'utente si ricarica dal database a ogni richiesta: un account disattivato, o una
+    password cambiata da un altro dispositivo o dallo sviluppatore, chiude subito la sessione.
+    Dopo un'ora di inattività o 8 ore dal login si rientra (app/sessione.py).
     """
     utente_id = session.get("utente_id")
     utente = UtenteRepository(ottieni_connessione()).leggi_per_id(utente_id) if utente_id else None
-    if utente is None or not utente.attivo:
+    if not sessione_valida(utente):
         session.clear()
+        return redirect(url_for("auth.login"))
+    if sessione_scaduta():
+        session.clear()
+        flash("Sessione scaduta: per sicurezza si esce dopo un'ora senza attività o 8 ore dall'accesso. Entra di nuovo.")
         return redirect(url_for("auth.login"))
     g.utente = utente
 
@@ -35,9 +45,11 @@ def richiedi_proprietario():
 @bp.after_request
 def non_salvare_in_cache(risposta):
     """
-    Le pagine riservate non restano nella cache del browser (es. dopo il logout con il tasto Indietro).
+    Le pagine riservate non restano nella cache del browser (es. dopo il logout con il tasto Indietro)
+    e non finiscono nei risultati dei motori di ricerca.
     """
     risposta.headers["Cache-Control"] = "no-store"
+    risposta.headers["X-Robots-Tag"] = "noindex, nofollow"
     return risposta
 
 
@@ -191,3 +203,91 @@ def orari():
             (turno.ora_inizio.strftime("%H:%M"), turno.ora_fine.strftime("%H:%M"))
         )
     return render_template("proprietario/orari.html", giorni=_righe_orari(esistenti))
+
+
+# --- Password ---
+
+@bp.route("/password", methods=["GET", "POST"])
+@limita_tentativi(AMBITO_CAMBIO_PASSWORD)
+def password():
+    """
+    Cambio della password del proprietario. Stesso limite del login sui tentativi con la password
+    attuale sbagliata, così con la sessione aperta non si può provarla all'infinito. Dopo il cambio
+    la sessione di chi l'ha cambiata viene rinnovata; quelle aperte su altri dispositivi si chiudono.
+    """
+    if request.method == "POST":
+        try:
+            AuthService(ottieni_connessione()).cambia_password(
+                g.utente.id, request.form.get("attuale", ""), request.form.get("nuova", ""),
+                request.form.get("conferma", ""),
+            )
+        except DatiNonValidiError as errore:
+            messaggi = errore.messaggi
+            # Solo la password attuale sbagliata consuma il limite: una conferma che non coincide no.
+            if MESSAGGIO_ATTUALE_ERRATA in messaggi:
+                g.password_sbagliata = True
+                if "tentativi_rimasti" in g:
+                    messaggi = messaggi + [messaggio_tentativi_rimasti(g.tentativi_rimasti)]
+            return render_template("proprietario/password.html", errori=messaggi), 400
+        apri_sessione(UtenteRepository(ottieni_connessione()).leggi_per_id(g.utente.id))
+        flash("Password cambiata. Da ora entra con quella nuova.")
+        return redirect(url_for("proprietario.password"))
+    return render_template("proprietario/password.html")
+
+
+# --- Verifica in due passaggi ---
+
+@bp.route("/due-passaggi", methods=["GET", "POST"])
+@limita_tentativi(AMBITO_CAMBIO_PASSWORD)
+def due_passaggi():
+    """
+    Attivazione e gestione della verifica in due passaggi. Attivare: "prepara" mostra il QR,
+    "conferma" controlla il primo codice e mostra i codici di riserva una volta sola. Togliere la
+    verifica o rifare i codici di riserva chiede la password, con lo stesso limite di tentativi
+    del cambio password.
+    """
+    servizio = DuePassaggiService(ottieni_connessione(), current_app.secret_key)
+    utente = g.utente
+    if request.method == "GET":
+        return _pagina_due_passaggi(servizio)
+
+    azione = request.form.get("azione")
+    try:
+        if azione == "prepara":
+            servizio.prepara(utente.id)
+            return _pagina_due_passaggi(servizio)
+        if azione == "conferma":
+            codici = servizio.conferma(utente.id, request.form.get("codice", ""))
+            return _pagina_due_passaggi(servizio, codici_riserva=codici)
+        if azione in ("disattiva", "nuovi_codici"):
+            if not AuthService(ottieni_connessione()).password_corretta(utente.id, request.form.get("password", "")):
+                g.password_sbagliata = True
+                messaggi = [MESSAGGIO_ATTUALE_ERRATA]
+                if "tentativi_rimasti" in g:
+                    messaggi.append(messaggio_tentativi_rimasti(g.tentativi_rimasti))
+                raise DatiNonValidiError(messaggi)
+            if azione == "nuovi_codici":
+                return _pagina_due_passaggi(servizio, codici_riserva=servizio.rigenera_codici_riserva(utente.id))
+            servizio.disattiva(utente.id)
+            flash("Verifica in due passaggi tolta: da ora basta la password. Puoi cancellare SmashBroski Pompei dall'app del telefono.")
+            return redirect(url_for("proprietario.due_passaggi"))
+    except DatiNonValidiError as errore:
+        return _pagina_due_passaggi(servizio, errori=errore.messaggi), 400
+    return redirect(url_for("proprietario.due_passaggi"))
+
+
+def _pagina_due_passaggi(servizio: DuePassaggiService, codici_riserva: list[str] | None = None,
+                         errori: list[str] | None = None):
+    """
+    Pagina della verifica in due passaggi nello stato attuale dell'account (rilegge l'utente:
+    l'azione appena fatta può averlo cambiato).
+    """
+    utente = UtenteRepository(ottieni_connessione()).leggi_per_id(g.utente.id)
+    dati = {"attiva": utente.totp_attivo, "codici_riserva": codici_riserva, "errori": errori}
+    if utente.totp_attivo:
+        dati["rimasti"] = servizio.codici_riserva_rimasti(utente.id)
+    elif (in_corso := servizio.attivazione_in_corso(utente.id)) is not None:
+        uri, segreto = in_corso
+        dati.update(qr=codice_qr_svg(uri), segreto=" ".join(segreto[i:i + 4] for i in range(0, len(segreto), 4)))
+    return render_template("proprietario/due_passaggi.html", **dati)
+

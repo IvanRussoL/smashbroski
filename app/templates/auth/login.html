@@ -5,6 +5,7 @@
 {% block contenuto %}
 <div class="pagina-testo pagina-modulo">
     <h1>Accesso all'area riservata</h1>
+    {% for messaggio in get_flashed_messages() %}<p class="avviso" role="status">{{ messaggio }}</p>{% endfor %}
     {% if errore %}<p class="errori" role="alert">{{ errore }}</p>{% endif %}
     <form method="post" action="{{ url_for('auth.login') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -14,9 +15,11 @@
         </p>
         <p>
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" autocomplete="current-password" required>
+            <input id="password" name="password" type="password" autocomplete="current-password" maxlength="128" aria-describedby="nota-tentativi" required>
         </p>
         <p><button class="pulsante-modulo" type="submit">Entra</button></p>
+        {# Il limite vale per la connessione, quindi blocca anche la password giusta: meglio dirlo prima. #}
+        <p id="nota-tentativi" class="nota-modulo">Dopo 5 tentativi sbagliati l'accesso si blocca per un minuto, anche con la password giusta.</p>
     </form>
 </div>
 {% endblock %}

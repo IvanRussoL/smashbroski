@@ -47,6 +47,14 @@ def test_home_contenuti(client):
     assert "wa.me" not in pagina
 
 
+def test_home_come_arrivare_una_volta(client):
+    # Nell'hero sì, nella fascia "Dove siamo" subito sotto no; nelle altre pagine la fascia lo tiene.
+    assert html(client.get("/")).count("Come arrivare</a>") == 1
+    assert 'class="pulsante-footer"' not in html(client.get("/"))
+    assert 'class="pulsante-footer"' in html(client.get("/info"))
+    assert 'class="pulsante-footer"' in html(client.get("/menu"))
+
+
 def test_home_nessun_link_area_riservata(client):
     for indirizzo in ("/", "/menu", "/info", "/privacy"):
         pagina = html(client.get(indirizzo))
@@ -114,15 +122,59 @@ def test_info_contenuti(client):
 
 def test_info_orari_martedi_chiuso(client):
     pagina = html(client.get("/info"))
-    assert re.search(r"<dt>(?:<strong>)?Martedì(?: \(oggi\)</strong>)?</dt>\s*<dd>Chiuso</dd>", pagina)
+    assert re.search(r"<dt>(?:<strong>)?Martedì(?: <span class=.visivamente-nascosto.>oggi</span></strong>)?</dt>\s*<dd>Chiuso</dd>", pagina)
     assert '<span class="turno">12:00–15:00</span> · <span class="turno">18:00–01:00</span>' in pagina
 
 
 def test_info_oggi_evidenziato(client, ora_fissa):
     ora_fissa(2026, 10, 20, 10)  # martedì 10:00
     pagina = html(client.get("/info"))
-    assert "<strong>Martedì (oggi)</strong>" in pagina
+    assert '<strong>Martedì <span class="visivamente-nascosto">oggi</span></strong>' in pagina
     assert "Chiuso · apre domani alle 12:00" in pagina
+    assert pagina.count('class="orari-giorno oggi"') == 1
+
+
+def test_info_insegna_segue_lo_stato(client, ora_fissa):
+    ora_fissa(2026, 10, 20, 10)  # martedì 10:00: chiuso
+    pagina = html(client.get("/info"))
+    assert "lavagna-testata locale-chiuso" in pagina
+    assert '<p class="insegna">SmashBroski Pompei</p>' in pagina
+    ora_fissa(2026, 10, 21, 13)  # mercoledì 13:00: aperto
+    assert "lavagna-testata locale-aperto" in html(client.get("/info"))
+
+
+def test_info_azioni_rapide(client):
+    pagina = html(client.get("/info"))
+    azioni = re.search(r'<ul class="azioni-info">(.*?)</ul>', pagina, re.S).group(1)
+    assert 'href="tel:+390810000000"' in azioni
+    assert "https://www.google.com/maps/search/?api=1&amp;query=Vico+dei+Paninari" in azioni
+    assert 'href="https://wa.me/393000000000"' in azioni
+    assert "mailto:" not in azioni  # l'email resta solo nei contatti
+    for etichetta in ("Chiama", "Indicazioni", "WhatsApp"):
+        assert etichetta in azioni
+    assert "Scrivi" not in azioni
+
+
+def test_info_contatti_righe_intere(client):
+    # Ogni contatto è un'unica riga-link: icona, etichetta, valore e freccia nello stesso <a>.
+    pagina = html(client.get("/info"))
+    contatti = re.search(r'<ul class="contatti">(.*?)</ul>', pagina, re.S).group(1)
+    righe = re.findall(r'<a class="contatto" href="([^"]+)"', contatti)
+    assert righe[:2] == ["tel:+390810000000", "mailto:info@example.com"]
+    assert len(righe) == 4  # telefono, email, Facebook, Instagram
+    assert contatti.count('class="contatto-freccia"') == 4
+    for etichetta in ("Telefono", "Email", "Facebook", "Instagram"):
+        assert f'<span class="contatto-etichetta">{etichetta}</span>' in contatti
+
+
+def test_info_sezioni_e_ancore(client):
+    pagina = html(client.get("/info"))
+    assert '<div class="lavagna">' in pagina  # tutto il contenuto sta sulla lavagna
+    for ancora in ('id="orari"', 'id="contatti"'):
+        assert ancora in pagina
+    # Come arrivare tolto: indirizzo sotto l'insegna e pulsante Indicazioni bastano
+    assert 'id="come-arrivare"' not in pagina
+    assert "<iframe" not in pagina  # niente mappa incorporata: cookie di terze parti (RNF-11)
 
 
 # --- Menù ---
@@ -140,6 +192,13 @@ def test_menu_struttura(client):
     assert "Smash Cheeseburger" in pagina
     assert 'href="#kids-menu"' in pagina
     assert 'aria-current="page"' in pagina
+
+
+def test_menu_indice_senza_torna_indice(client):
+    pagina = html(client.get("/menu"))
+    assert 'src="/static/js/indice.js"' in pagina  # evidenzia la categoria al tocco e durante lo scroll
+    assert "Torna all'indice" not in pagina
+    assert 'href="#indice"' not in pagina
 
 
 def test_menu_prezzi_e_formati(client):
@@ -186,6 +245,30 @@ def test_privacy(client):
     risposta = client.get("/privacy")
     assert risposta.status_code == 200
     assert "Privacy e cookie" in html(risposta)
+
+
+def test_favicon(client):
+    for indirizzo in ("/", "/menu", "/info", "/privacy"):
+        pagina = html(client.get(indirizzo))
+        assert 'rel="icon" href="/static/img/favicon.ico"' in pagina
+        assert 'rel="apple-touch-icon" href="/static/img/apple-touch-icon.png"' in pagina
+    risposta = client.get("/favicon.ico")
+    assert risposta.status_code == 200
+    assert risposta.mimetype in ("image/vnd.microsoft.icon", "image/x-icon")
+    risposta.close()
+
+
+def test_fondo_rosso_al_footer(client):
+    for indirizzo in ("/", "/menu", "/info", "/privacy"):
+        assert "/static/js/fondo-pagina.js" in html(client.get(indirizzo))
+
+
+def test_classe_js_prima_del_primo_disegno(client):
+    # Nel <head> e prima del CSS: altrimenti sul telefono il pannello del menù si vede aperto e poi sfuma.
+    for indirizzo in ("/", "/menu", "/info", "/privacy", "/auth/login"):
+        testa = html(client.get(indirizzo)).split("</head>")[0]
+        assert "/static/js/js-attivo.js" in testa
+        assert testa.index("/static/js/js-attivo.js") < testa.index("/static/css/stile.css")
 
 
 def test_nessun_generator(client):

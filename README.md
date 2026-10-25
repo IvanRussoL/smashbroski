@@ -6,7 +6,7 @@ Il progetto nasce da un audit QA del sito attuale (32 casi di test, 21 FAIL). Og
 
 **Stato:** progettazione completata (Fase 1). Il codice non è ancora iniziato.
 
-**Tecnologie previste:** Python 3.13, Flask 3, MySQL 8, Jinja2, argon2-cffi, Flask-WTF, Flask-Limiter, pytest.
+**Tecnologie previste:** Python 3.13, Flask 3, MySQL 8, Jinja2, argon2-cffi, Flask-WTF, pytest.
 
 ## Documentazione
 

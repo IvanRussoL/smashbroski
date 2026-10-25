@@ -3,12 +3,14 @@ from datetime import datetime, timedelta
 
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFError, CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-from app.comandi import crea_proprietario
+from app.comandi import (
+    crea_proprietario, disattiva_due_passaggi, disattiva_proprietario, reimposta_password, riattiva_proprietario,
+)
 from app.db import chiudi_connessione
 from app.eccezioni import NonTrovatoError
 from app.formato import descrivi_stato_apertura, euro, ora, telefono_leggibile
-from app.limiti import limiter
 from app.rotte import auth, proprietario, pubblico
 from app.sicurezza import crea_aggiungi_header
 
@@ -17,6 +19,7 @@ csrf = CSRFProtect()
 MESSAGGI_ERRORE = {
     404: "Pagina non trovata.",
     405: "Operazione non consentita.",
+    413: "Dati inviati troppo grandi.",
     429: "Troppi tentativi: aspetta un minuto e riprova.",
     500: "Si è verificato un errore: riprova più tardi.",
 }
@@ -51,6 +54,15 @@ def create_app(configurazione: dict | None = None) -> Flask:
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=produzione,
         PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
+        # I moduli del sito pesano pochi KB: oltre 64 KB la richiesta è rifiutata (413).
+        MAX_CONTENT_LENGTH=64 * 1024,
+        # Numero di proxy dell'hosting davanti all'app (0 in sviluppo): serve a leggere il vero IP
+        # del visitatore, che conta i tentativi di login. Mai più alto dei proxy reali, altrimenti
+        # chiunque potrebbe falsificare l'IP con l'header X-Forwarded-For.
+        PROXY_FIDATI=int(os.environ.get("PROXY_FIDATI", "0")),
+        # Limite di 5 tentativi sbagliati al minuto su login e cambio password (app/limiti.py).
+        # Si spegne solo nei test che non lo verificano.
+        LIMITE_TENTATIVI_ATTIVO=True,
     )
     if configurazione is not None:
         app.config.update(configurazione)
@@ -59,15 +71,22 @@ def create_app(configurazione: dict | None = None) -> Flask:
     if not app.config["SECRET_KEY"]:
         raise RuntimeError("SECRET_KEY mancante: copia .env.example in .env e genera la chiave.")
 
+    if app.config["PROXY_FIDATI"]:
+        fidati = app.config["PROXY_FIDATI"]
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=fidati, x_proto=fidati)
+
     app.teardown_appcontext(chiudi_connessione)
     app.after_request(crea_aggiungi_header(app.config["PRODUZIONE"]))
     csrf.init_app(app)
-    limiter.init_app(app)
 
     app.register_blueprint(pubblico.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(proprietario.bp)
     app.cli.add_command(crea_proprietario)
+    app.cli.add_command(reimposta_password)
+    app.cli.add_command(disattiva_proprietario)
+    app.cli.add_command(riattiva_proprietario)
+    app.cli.add_command(disattiva_due_passaggi)
 
     app.add_template_filter(euro)
     app.add_template_filter(ora)

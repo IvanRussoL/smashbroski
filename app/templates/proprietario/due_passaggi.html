@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block titolo %}Area riservata – Verifica in due passaggi{% endblock %}
+
+{% block contenuto %}
+<div class="pagina-testo pagina-modulo area area-password">
+    {% include "proprietario/_testata.html" %}
+    <h1>Verifica in due passaggi</h1>
+
+    {% if codici_riserva %}
+    <div class="codici-riserva" role="status">
+        <h2>Codici di riserva</h2>
+        <p>Servono se il telefono si perde o si rompe: ognuno vale <strong>una volta</strong> al posto del codice dell'app.
+        Scrivili su un foglio o fai una foto e conservala fuori dal telefono. <strong>Non li vedrai più</strong>: se li perdi, creane di nuovi.</p>
+        <ul class="elenco-codici">{% for codice in codici_riserva %}<li><code>{{ codice }}</code></li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    {% if attiva %}
+    <p class="avviso-acceso">La verifica in due passaggi è <strong>attiva</strong>: per entrare servono la password e il codice dell'app sul telefono.</p>
+    <p>Codici di riserva non ancora usati: <strong>{{ rimasti }}</strong> su 10.</p>
+
+    <h2>Nuovi codici di riserva</h2>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="azione" value="nuovi_codici">
+        <p>
+            <label for="password-codici">Password</label>
+            <input id="password-codici" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+        </p>
+        <p><button class="pulsante-modulo" type="submit">Crea nuovi codici</button></p>
+        <p class="nota-modulo">I codici vecchi, anche quelli non usati, smettono di valere.</p>
+    </form>
+
+    <h2>Togliere la verifica</h2>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="azione" value="disattiva">
+        <p>
+            <label for="password-disattiva">Password</label>
+            <input id="password-disattiva" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+        </p>
+        <p><button class="pulsante-modulo pulsante-pericolo" type="submit">Togli la verifica in due passaggi</button></p>
+        <p class="nota-modulo">Da quel momento per entrare basta la password. Sconsigliato.</p>
+    </form>
+
+    {% elif qr %}
+    <ol class="passi-attivazione">
+        <li>Sul telefono installa <strong>Google Authenticator</strong> (o Microsoft Authenticator) dallo store.</li>
+        <li>Nell'app tocca <strong>+</strong>, poi <strong>Scansiona un codice QR</strong>, e inquadra questo codice:
+            <div class="codice-qr">{{ qr|safe }}</div>
+            <p class="nota-modulo">Se il QR non si legge, scegli "Inserisci una chiave di configurazione" e scrivi:<br><code class="segreto">{{ segreto }}</code></p>
+        </li>
+        <li>L'app mostra "SmashBroski Pompei" con un numero di 6 cifre che cambia ogni 30 secondi. Scrivilo qui:</li>
+    </ol>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="azione" value="conferma">
+        <p>
+            <label for="codice">Codice di 6 cifre</label>
+            <input id="codice" name="codice" type="text" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" autocomplete="one-time-code" required>
+        </p>
+        <p><button class="pulsante-modulo" type="submit">Attiva</button></p>
+    </form>
+
+    {% else %}
+    <p>Con la verifica in due passaggi, per entrare servono la password <strong>e</strong> un codice di 6 cifre che l'app del telefono cambia ogni 30 secondi.
+    Anche chi scoprisse la password non potrebbe entrare senza il tuo telefono.</p>
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="azione" value="prepara">
+        <p><button class="pulsante-modulo" type="submit">Attiva la verifica in due passaggi</button></p>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

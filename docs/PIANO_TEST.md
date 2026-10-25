@@ -31,7 +31,7 @@ Ogni caso indica il **traguardo** per cui serve (sezione 1 di `PROGETTAZIONE.md`
 
 ### 1.3 Account di test
 
-- Proprietario di test creato con `flask crea-proprietario`, email `proprietario@example.com`. La password (almeno 12 caratteri) si sceglie al momento e non si scrive in questo documento né nel repository.
+- Proprietario di test creato con `flask crea-proprietario`, email `proprietario@example.com`. La password (almeno 15 caratteri, non comune) si sceglie al momento e non si scrive in questo documento né nel repository.
 - Per il caso dell'account disattivato si usa il client MySQL: `UPDATE utenti SET attivo = 0 WHERE email = 'proprietario@example.com';` e poi `attivo = 1` per ripristinare.
 
 ### 1.4 Browser, strumenti e viewport
@@ -118,6 +118,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | TC-S07 | Nessuna risorsa esterna né analisi del traffico | Demo |
 | TC-S08 | Pagine di errore e nessuna registrazione pubblica | Demo + Pubblicazione |
 | TC-S09 | HTTPS e redirect | Pubblicazione |
+| TC-S10 | Verifica in due passaggi | Demo + Pubblicazione |
 | TC-NS01 | Caricamento della home e del menù | Demo + Pubblicazione |
 | TC-NS02 | Immagini: formato, peso e dimensioni | Demo + Pubblicazione |
 | TC-NS03 | Lighthouse mobile | Demo + Pubblicazione |
@@ -279,8 +280,8 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV08 (BLOCKED), AU-CON02 · RF-04 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | `/info` aperta su desktop; smartphone reale per il passo 3. |
-| **Passi** | 1) In Elements leggere l'`href` del telefono.<br>2) Cercare `wa.me` e `whatsapp` nel sorgente (Ctrl+U) di `/` e `/info`.<br>3) Su smartphone reale toccare il numero. |
-| **Atteso** | `href="tel:+390810000000"`, numero mostrato come "+39 081 000 0000"; accanto al numero la scritta "numero di prova". Nessun link WhatsApp. Sul telefono si apre il compositore con il numero già scritto, senza chiamare. Per la pubblicazione: numero reale, senza la scritta. |
+| **Passi** | 1) In Elements leggere l'`href` del telefono.<br>2) Cercare `wa.me` nel sorgente (Ctrl+U) di `/` e `/info`.<br>3) Su smartphone reale toccare il numero. |
+| **Atteso** | `href="tel:+390810000000"`, numero mostrato come "+39 081 000 0000"; accanto al numero la scritta "numero di prova". Il numero fisso non porta mai a WhatsApp: nessun `wa.me` in `/`; in `/info` un solo `wa.me`, quello del pulsante WhatsApp (`https://wa.me/393000000000`, numero di prova). Sul telefono si apre il compositore con il numero già scritto, senza chiamare. Per la pubblicazione: numero reale, senza la scritta. |
 
 #### TC-H04 — Link dell'email con e senza JavaScript
 
@@ -299,7 +300,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV10 (BLOCKED) · RF-06 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | `/` e `/info` aperte su desktop; smartphone reale per il passo 3. |
-| **Passi** | 1) Leggere l'`href` dei pulsanti "Come arrivare" (hero della home e fascia "Dove siamo" in fondo alle pagine) e del link "Apri in Google Maps" di `/info`.<br>2) Fare clic su ognuno da desktop.<br>3) Toccarli su smartphone reale. |
+| **Passi** | 1) Leggere l'`href` dei pulsanti "Come arrivare" (hero della home e fascia "Dove siamo" in fondo alle pagine) e del pulsante "Indicazioni" di `/info`.<br>2) Fare clic su ognuno da desktop.<br>3) Toccarli su smartphone reale. |
 | **Atteso** | I tre link sono uguali, costruiti dall'indirizzo "Vico dei Paninari, 7 - 80045 Pompei (NA)", non link brevi `maps.app.goo.gl`. Google Maps (sito o app) si apre sulla posizione del locale. |
 
 #### TC-H06 — Link ai social
@@ -309,7 +310,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Origine** | AU-NAV07 · RF-07 |
 | **Traguardo** | Demo + Pubblicazione |
 | **Precondizione** | `/info` aperta. |
-| **Passi** | 1) Leggere l'`href` dei link Facebook e Instagram nei contatti e nella colonna "Seguici" del footer.<br>2) Controllare che ogni link abbia un testo visibile (per ora non ci sono icone).<br>3) Solo per la pubblicazione: aprire i due link senza essere loggati a Facebook o Instagram. |
+| **Passi** | 1) Leggere l'`href` dei link Facebook e Instagram nei contatti e nella colonna "Seguici" del footer.<br>2) Controllare che ogni link abbia un testo visibile; nei contatti di `/info` ogni social è una riga intera (icona, nome, "Pagina/Profilo del locale", freccia) allineata alle righe di telefono ed email.<br>3) Solo per la pubblicazione: aprire i due link senza essere loggati a Facebook o Instagram. |
 | **Atteso** | Demo: `https://example.com/facebook-segnaposto` e `https://example.com/instagram-segnaposto`, uguali nei due punti. Nessun link di condivisione temporaneo (`/share/`). Pubblicazione: si aprono le pagine corrette di SmashBroski Pompei anche senza login. |
 
 #### TC-H07 — Doppio footer, pagina Privacy e nessun link all'area riservata
@@ -434,7 +435,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Traguardo** | Demo |
 | **Precondizione** | Proprietario di test attivo. Finestra in incognito. |
 | **Passi** | 1) Aprire `/auth/login`.<br>2) Inserire email e password corrette e fare clic su "Accedi".<br>3) In DevTools → Application → Cookies leggere gli attributi del cookie di sessione. |
-| **Atteso** | Redirect a `/proprietario/` con l'elenco delle voci per categoria. Cookie di sessione con `HttpOnly` e `SameSite=Lax`, durata massima 8 ore. |
+| **Atteso** | Redirect a `/proprietario/` con l'elenco delle voci per categoria. Cookie di sessione con `HttpOnly` e `SameSite=Lax`, sessione chiusa dopo 1 ora di inattività o 8 ore dal login. |
 
 #### TC-P02 — Login con credenziali errate
 
@@ -566,11 +567,11 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 
 | | |
 |---|---|
-| **Origine** | — · Sezione 7 (Flask-Limiter) |
+| **Origine** | — · Sezione 7 (limite dei tentativi nel database) |
 | **Traguardo** | Demo |
 | **Precondizione** | Nessun login. |
 | **Passi** | 1) Sbagliare la password 6 volte entro un minuto.<br>2) Attendere un minuto e accedere con le credenziali corrette. |
-| **Atteso** | I primi 5 tentativi mostrano il messaggio generico; il sesto riceve la risposta 429. Dopo un minuto il login funziona. |
+| **Atteso** | I primi 4 tentativi mostrano il messaggio generico seguito da "Tentativi rimasti: 4 su 5.", poi 3 e 2, poi "Ultimo tentativo"; il quinto dice "Hai sbagliato 5 volte: l'accesso è bloccato per un minuto". Il sesto riceve la risposta 429, anche con la password giusta. Dopo un minuto il login funziona. |
 
 #### TC-S04 — Header di sicurezza
 
@@ -631,6 +632,16 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Precondizione** | Sito sull'hosting. DevTools → Network con Preserve log attivo. |
 | **Passi** | 1) Digitare l'indirizzo del sito con `http://`.<br>2) Annotare la catena di redirect e i codici di stato. |
 | **Atteso** | Un solo redirect 301 verso HTTPS, poi 200. Nessun 4xx/5xx, nessun contenuto misto. |
+
+#### TC-S10 — Verifica in due passaggi
+
+| | |
+|---|---|
+| **Origine** | — · Sezione 7 (verifica in due passaggi) |
+| **Traguardo** | Demo + Pubblicazione |
+| **Precondizione** | Proprietario autenticato; Google Authenticator sul telefono. |
+| **Passi** | 1) **Verifica in due passaggi** → **Attiva**, inquadrare il QR, scrivere il codice dell'app.<br>2) Annotare un codice di riserva, uscire e rientrare con email e password.<br>3) Scrivere 000000, poi il codice dell'app.<br>4) Uscire, rientrare e usare il codice di riserva; ripetere con lo stesso codice di riserva.<br>5) Aprire `/proprietario/` dopo la sola password, senza codice.<br>6) Togliere la verifica con una password sbagliata, poi con quella giusta. |
+| **Atteso** | 1) 10 codici di riserva e stato "attiva". 2) Pagina "Codice di verifica". 3) Prima "Il codice non è corretto o è scaduto." con i tentativi rimasti, poi l'area. 4) Il codice di riserva funziona una volta, la seconda no. 5) Rimanda al login. 6) Prima "La password attuale non è corretta.", poi la verifica è tolta e basta la password. |
 
 ### TC-NS — Rete, prestazioni e SEO
 
@@ -716,7 +727,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 
 ## 3. Test unitari (pytest)
 
-I test si trovano in `tests/` e si eseguono con `pytest` dalla cartella del progetto. Le fixture di `tests/conftest.py` creano un'app con `create_app()` e la configurazione di test, un database di prova con i dati iniziali, un client di test e un proprietario di test. Nei test CSRF e rate limiting sono disattivati, tranne nei test che li verificano (sezione 3.6).
+I test si trovano in `tests/` e si eseguono con `pytest` dalla cartella del progetto. Le fixture di `tests/conftest.py` creano un'app con `create_app()` e la configurazione di test, un database di prova con i dati iniziali, un client di test e un proprietario di test. Nei test CSRF e limite dei tentativi (`LIMITE_TENTATIVI_ATTIVO`) sono disattivati, tranne nei test che li verificano (sezione 3.6).
 
 I servizi si testano senza Flask; le rotte con il client di test di Flask.
 
@@ -798,6 +809,7 @@ File: `tests/test_filtri.py`, `tests/test_modelli.py`
 | test_euro | 700 → "7,00 €"; 750 → "7,50 €"; 1 → "0,01 €"; 99999 → "999,99 €" |
 | test_ha_prezzo_unico | Voce con un prezzo senza formato → sì; voce con formati → no |
 | test_link_maps | `Impostazioni.link_maps()` → URL di Google Maps con l'indirizzo codificato, non `maps.app.goo.gl` |
+| test_link_whatsapp | `Impostazioni.link_whatsapp()` → `https://wa.me/` con le sole cifre del numero (senza "+" né spazi) |
 
 ### 3.5 AuthService
 
@@ -814,6 +826,39 @@ File: `tests/test_auth_service.py`
 | test_crea_proprietario_password_corta | Password di 11 caratteri → `DatiNonValidiError` |
 | test_crea_proprietario_email_duplicata | Email già registrata → `DatiNonValidiError` |
 
+### 3.5 bis TentativiService
+
+File: `tests/test_tentativi_service.py` (l'istante si passa come parametro)
+
+| Test | Scenario |
+|---|---|
+| test_quattro_errori_non_bloccano | 4 tentativi sbagliati in 4 secondi → non bloccato |
+| test_cinque_errori_bloccano | 5 tentativi sbagliati → bloccato |
+| test_blocco_finisce_dopo_un_minuto | Errori dalle 18:00:00 alle 18:00:04: bloccato alle 18:01:00, libero alle 18:01:01 |
+| test_ambiti_e_indirizzi_separati | 5 errori di login non bloccano il cambio password né un altro IP |
+| test_ip_non_salvato_in_chiaro | Nel database c'è solo l'impronta HMAC di 64 caratteri, diversa con un'altra chiave |
+| test_tentativi_vecchi_cancellati | Un tentativo nuovo cancella quelli di più di un'ora prima |
+| test_rimasti_scende_da_5_a_0 | Da 5 a 0 tentativi rimasti, mai negativo |
+| test_messaggio_tentativi_rimasti | Frasi del contatore per 4, 2, 1 e 0 |
+
+### 3.5 ter DuePassaggiService e pagine
+
+File: `tests/test_due_passaggi.py` (istante passato come parametro nei test del servizio)
+
+| Test | Scenario |
+|---|---|
+| test_prepara_segreto_cifrato_e_non_ancora_attivo | Indirizzo otpauth con "SmashBroski Pompei", segreto di 32 caratteri, nel database solo cifrato |
+| test_conferma_con_codice_sbagliato / test_conferma_attiva_e_da_10_codici_di_riserva | Codice sbagliato: resta spenta; giusto: attiva e 10 codici diversi, nel database solo hash Argon2id |
+| test_prepara_rifiutato_se_gia_attiva | Non si riattiva sopra una verifica attiva |
+| test_codice_valido_una_volta_sola / test_finestra_di_un_intervallo | Lo stesso codice non vale due volte; vale quello di 30 s prima, non quello di 90 s prima |
+| test_codice_di_riserva_una_volta_sola / test_rigenera_codici_annulla_i_vecchi | Codice di riserva in maiuscolo o con spazi accettato una volta; i nuovi codici annullano i vecchi |
+| test_disattiva_cancella_segreto_e_codici / test_secret_key_cambiata_chiede_di_riattivare | Disattivazione completa; con un'altra chiave il segreto non si decifra |
+| test_attivazione_e_accesso_con_codice / test_accesso_con_codice_di_riserva | Percorso completo dalle pagine: attivazione, login che chiede il codice, area chiusa senza codice, codice sbagliato 400, giusto entra |
+| test_codice_dopo_5_minuti_si_riparte_dalla_password / test_pagina_codice_senza_password_rimanda_al_login | Attesa scaduta o pagina aperta direttamente: si torna al login |
+| test_codice_sbagliato_conta_i_tentativi | Sesto codice sbagliato → 429 |
+| test_togliere_la_verifica_chiede_la_password / test_comando_disattiva_due_passaggi | Password sbagliata rifiutata; comando dello sviluppatore |
+| test_pagine_riservate_non_indicizzate / test_pagine_pubbliche_indicizzate | `X-Robots-Tag: noindex, nofollow` su login, codice e area, non sulla home |
+
 ### 3.6 Rotte, accessi e sicurezza
 
 File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_header_sicurezza.py`
@@ -826,6 +871,8 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | test_home_json_ld, test_home_json_ld_con_telefono_reale | JSON-LD leggibile, `@type` Restaurant, indirizzo, orari, link al menù; nessun `telephone` con `telefono_di_prova` = sì; `telephone` presente con `telefono_di_prova` = no, e allora nessun "numero di prova" in `/info` |
 | test_json_ld_escape | Nome del locale con `</script>` → il JSON-LD non chiude lo script |
 | test_info_contenuti | GET `/info` → 200; un solo `<h1>`; `<title>` con "Orari e contatti"; `tel:+390810000000` mostrato come "+39 081 000 0000" con "numero di prova"; `mailto:info@example.com`; link a Google Maps; voce della navbar con `aria-current="page"` |
+| test_info_azioni_rapide | Pulsanti in cima alla lavagna: Chiama (`tel:`), Indicazioni (Google Maps), WhatsApp (`https://wa.me/393000000000`); nessun `mailto:` e nessuno "Scrivi" tra i pulsanti (l'email resta nei contatti) |
+| test_info_contatti_righe_intere | Contatti di `/info` come quattro righe-link (`tel:`, `mailto:`, Facebook, Instagram), ognuna con etichetta e freccia |
 | test_info_orari_martedi_chiuso | Martedì "Chiuso"; turni "12:00–15:00 · 18:00–01:00", ogni turno in uno `<span class="turno">` (non va a capo sul trattino) |
 | test_info_oggi_evidenziato | Con l'ora sostituita: martedì 10:00 → "Martedì (oggi)" in grassetto e stato "Chiuso · apre domani alle 12:00" |
 | test_menu_struttura | GET `/menu` → 200; nel contenuto di `<main>` (il footer ha altri `<h2>`) 7 `<h2>` con `id` uguale allo slug, nell'ordine del PDF; 25 `<h3>`; "Smash Cheeseburger" scritto così nell'HTML |
@@ -844,7 +891,12 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | test_login_messaggio_generico | Password errata ed email inesistente → stesso messaggio e stesso codice |
 | test_logout_solo_post | GET `/auth/logout` → 405; POST → sessione svuotata |
 | test_csrf_post_senza_token | Con CSRF attivo: POST a `/auth/logout`, `/proprietario/voci/nuova`, `/proprietario/voci/1/visibilita`, `/proprietario/orari` senza token → 400 |
-| test_rate_limit_login | Con il limite attivo: il sesto POST a `/auth/login` nello stesso minuto → 429 |
+| test_rate_limit_login | Con il limite attivo: il sesto POST a `/auth/login` nello stesso minuto → 429, anche con la password giusta; le richieste rifiutate non si registrano (5 righe in `tentativi_accesso`) |
+| test_login_conta_i_tentativi_rimasti | Contatore 4, 3, 2, "Ultimo tentativo", "Hai sbagliato 5 volte", poi 429; uguale con email esistente e inesistente |
+| test_login_senza_limite_niente_contatore | Con il limite spento il messaggio resta solo "Email o password non corretti." |
+| test_cambio_password_conta_solo_la_password_attuale | Conferma diversa con la password attuale giusta: nessun tentativo consumato; password attuale sbagliata: "Tentativi rimasti: 4 su 5." |
+| test_rate_limit_login_riuscito_non_conta | 6 login riusciti di fila: nessun tentativo registrato |
+| test_rate_limit_condiviso_fra_processi | Due app separate (come due processi del server) dividono lo stesso limite: dopo 5 errori fra le due, entrambe rispondono 429 |
 | test_dati_non_validi_400 | POST di una voce con prezzo "abc" → 400 con il messaggio nel modulo |
 | test_voce_inesistente_404 | GET `/proprietario/voci/99999` da autenticato → 404 |
 | test_header_sicurezza | Su `/`, `/menu`, `/info`, `/privacy` e sulla pagina 404: CSP con il valore della sezione 7, `nosniff`, `DENY`, `strict-origin-when-cross-origin` |
@@ -881,7 +933,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | AU-NAV05 | FAIL | RF-14 | TC-M07 | test_menu_struttura |
 | AU-NAV06 | FAIL | RF-11, RF-12, RF-15 | TC-M03, TC-M04, TC-M08 | test_menu_prezzi_e_formati |
 | AU-NAV07 | FAIL | RF-07 | TC-H06, TC-H08 | — |
-| AU-NAV08 | BLOCKED | RF-04 | TC-H03 | test_info_contenuti |
+| AU-NAV08 | BLOCKED | RF-04 | TC-H03 | test_info_contenuti, test_info_azioni_rapide, test_link_whatsapp |
 | AU-NAV09 | PASS | RF-05 | TC-H04 | test_info_contenuti |
 | AU-NAV10 | BLOCKED | RF-06 | TC-H05 | test_link_maps |
 | AU-NAV11 | FAIL | RF-02, RF-03, RF-18 | TC-H01, TC-H02, TC-P10 | sezioni 3.1 e 3.2, test_home_stato_apertura_*, test_info_orari_martedi_chiuso, test_info_oggi_evidenziato |
@@ -891,7 +943,7 @@ File: `tests/test_rotte_pubbliche.py`, `tests/test_accessi.py`, `tests/test_head
 | AU-SEO03 | FAIL | RNF-09 | TC-NS07 | test_nessun_generator |
 | AU-SEO04 | FAIL | RNF-10 | TC-NS08 | test_home_json_ld |
 
-Parti dell'audit lasciate fuori perimetro (sezione 2 di `PROGETTAZIONE.md`): allergeni e servizi offerti (AU-NAV06, AU-NAV11), WhatsApp (AU-NAV08).
+Parti dell'audit lasciate fuori perimetro (sezione 2 di `PROGETTAZIONE.md`): allergeni e servizi offerti (AU-NAV06, AU-NAV11). WhatsApp (AU-NAV08) è rientrato il 22/10 come pulsante con un numero suo (TC-H03).
 
 ### 4.2 Requisiti senza un caso dell'audit
 

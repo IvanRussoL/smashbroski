@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block titolo %}Accesso – codice – SmashBroski Pompei{% endblock %}
+
+{% block contenuto %}
+<div class="pagina-testo pagina-modulo">
+    <h1>Codice di verifica</h1>
+    {% if errore %}<p class="errori" role="alert">{{ errore }}</p>{% endif %}
+    <p>Apri l'app di autenticazione sul telefono e scrivi il numero di 6 cifre di "SmashBroski Pompei".</p>
+    <form method="post" action="{{ url_for('auth.codice') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p>
+            <label for="codice">Codice</label>
+            <input id="codice" name="codice" type="text" autocomplete="one-time-code" maxlength="20" aria-describedby="nota-codice" required autofocus>
+        </p>
+        <p><button class="pulsante-modulo" type="submit">Entra</button></p>
+        <p id="nota-codice" class="nota-modulo">Senza telefono? Scrivi uno dei codici di riserva (es. abcde-fghjk): ognuno vale una volta.
+        Il codice va scritto entro 5 minuti dalla password.</p>
+    </form>
+</div>
+{% endblock %}

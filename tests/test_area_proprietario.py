@@ -22,6 +22,21 @@ def test_indice_mostra_tutte_le_voci(client_proprietario):
     assert "Aggiungi una voce in Kids Menù" in pagina
 
 
+def test_barra_area_distinta_dalla_navbar_e_pagina_corrente(client_proprietario):
+    indice = html(client_proprietario.get("/proprietario/"))
+    assert 'aria-current="page">Gestisci il menù</a>' in indice
+    assert 'aria-current="page">Gestisci gli orari</a>' not in indice
+    orari = html(client_proprietario.get("/proprietario/orari"))
+    assert 'aria-current="page">Gestisci gli orari</a>' in orari
+
+
+def test_indice_categorie_nella_gestione_del_menu(client_proprietario):
+    pagina = html(client_proprietario.get("/proprietario/"))
+    assert 'aria-label="Categorie da gestire"' in pagina
+    assert pagina.count('<li><a href="#') == 7
+    assert 'href="#the-originals"' in pagina and 'id="the-originals"' in pagina
+
+
 def test_nuova_voce_compare_nel_menu(client_proprietario, database_modificato):
     risposta = client_proprietario.post(f"/proprietario/voci/nuova?categoria={BURGER}", data=dati_voce(
         nome="Smash Pompei", descrizione="Hamburger, provola", **{f"prezzo_{PANINO_SINGLE}": "8,50"},
@@ -125,7 +140,56 @@ def test_comando_crea_proprietario(app, database_modificato):
 def test_comando_crea_proprietario_password_corta(app, database_di_prova):
     risultato = app.test_cli_runner().invoke(args=["crea-proprietario"], input="corta@example.com\ncorta\ncorta\n")
     assert risultato.exit_code != 0
-    assert "La password deve avere almeno 12 caratteri." in risultato.output
+    assert "La password deve avere almeno 15 caratteri." in risultato.output
+
+
+def test_comando_reimposta_password(app, database_modificato):
+    risultato = app.test_cli_runner().invoke(
+        args=["reimposta-password"],
+        input="proprietario@example.com\nreimpostata-dallo-sviluppatore\nreimpostata-dallo-sviluppatore\n",
+    )
+    assert risultato.exit_code == 0, risultato.output
+    assert "Password reimpostata" in risultato.output
+    assert AuthService(database_modificato).login("proprietario@example.com", "reimpostata-dallo-sviluppatore")
+
+
+def test_comando_reimposta_password_email_sconosciuta(app, database_di_prova):
+    risultato = app.test_cli_runner().invoke(
+        args=["reimposta-password"], input="nessuno@example.com\nuna-password-sicura\nuna-password-sicura\n",
+    )
+    assert risultato.exit_code != 0
+    assert "Nessun account con questa email." in risultato.output
+
+
+def test_comandi_disattiva_e_riattiva(app, client_proprietario, database_modificato):
+    runner = app.test_cli_runner()
+    assert runner.invoke(args=["disattiva-proprietario", "proprietario@example.com"]).exit_code == 0
+    risposta = client_proprietario.get("/proprietario/")
+    assert risposta.status_code == 302 and "/auth/login" in risposta.headers["Location"]  # fuori subito
+    assert runner.invoke(args=["riattiva-proprietario", "proprietario@example.com"]).exit_code == 0
+    assert AuthService(database_modificato).login("proprietario@example.com", "password-dei-test-123")
+
+
+# --- Cambio della password ---
+
+def test_cambia_password_dalla_pagina(client_proprietario, database_modificato):
+    assert 'aria-current="page">Cambia password</a>' in html(client_proprietario.get("/proprietario/password"))
+    risposta = client_proprietario.post("/proprietario/password", data={
+        "attuale": "password-dei-test-123", "nuova": "nuova-password-dei-test", "conferma": "nuova-password-dei-test",
+    }, follow_redirects=True)
+    assert "Password cambiata." in html(risposta)
+    assert AuthService(database_modificato).login("proprietario@example.com", "nuova-password-dei-test")
+
+
+def test_cambia_password_dalla_pagina_errata(client_proprietario):
+    risposta = client_proprietario.post("/proprietario/password", data={
+        "attuale": "sbagliata", "nuova": "nuova-password-dei-test", "conferma": "altra",
+    })
+    assert risposta.status_code == 400
+    pagina = html(risposta)
+    assert "La password attuale non è corretta." in pagina
+    assert "La nuova password e la conferma non coincidono." in pagina
+    assert "sbagliata" not in pagina  # le password scritte non tornano nella pagina
 
 
 # --- Cambio di categoria ---

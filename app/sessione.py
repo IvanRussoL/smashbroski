@@ -11,6 +11,8 @@ from app.modelli.utente import Utente
 # Senza questi controlli Flask rinnoverebbe il cookie a ogni richiesta e la sessione non finirebbe mai.
 INATTIVITA_MASSIMA_SECONDI = 60 * 60
 DURATA_MASSIMA_SECONDI = 8 * 60 * 60
+# Tra la password giusta e il codice della verifica in due passaggi: dopo 5 minuti si riparte dalla password.
+ATTESA_CODICE_SECONDI = 5 * 60
 
 
 def impronta_password(password_hash: str) -> str:
@@ -35,6 +37,27 @@ def apri_sessione(utente: Utente) -> None:
     session["entrato_il"] = adesso
     session["ultima_attivita"] = adesso
     session.permanent = True
+
+
+def attendi_codice(utente: Utente) -> None:
+    """
+    Password giusta con la verifica in due passaggi attiva: la sessione ricorda solo chi deve
+    scrivere il codice e da quando. Non dà accesso all'area (manca utente_id).
+    """
+    session.clear()
+    session["in_attesa_id"] = utente.id
+    session["in_attesa_dal"] = int(time.time())
+
+
+def utente_in_attesa() -> int | None:
+    """
+    Returns: l'id di chi ha scritto la password giusta e deve ancora scrivere il codice, oppure
+    None se non c'è o sono passati più di 5 minuti.
+    """
+    utente_id, dal = session.get("in_attesa_id"), session.get("in_attesa_dal", 0)
+    if utente_id is None or int(time.time()) - dal > ATTESA_CODICE_SECONDI:
+        return None
+    return utente_id
 
 
 def sessione_scaduta() -> bool:

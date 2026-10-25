@@ -146,6 +146,20 @@ Contiene gli account dell'area riservata. Esiste un solo ruolo, il proprietario,
 | `password_hash` | VARCHAR(255), obbligatoria | Hash Argon2id della password (`argon2-cffi`); la password in chiaro non viene mai salvata |
 | `attivo` | BOOLEAN, obbligatoria, predefinito sì | Se vale no l'account non può accedere; si disattiva invece di cancellare |
 | `creato_il` | DATETIME, obbligatoria, predefinito data e ora attuali | Momento di creazione, scritto dal database |
+| `totp_segreto` | VARCHAR(255), facoltativa | Segreto della verifica in due passaggi (160 bit), cifrato con Fernet e una chiave ricavata dalla `SECRET_KEY` (HKDF); vuoto se mai attivata |
+| `totp_attivo` | BOOLEAN, obbligatoria, predefinito no | Diventa sì solo dopo il primo codice giusto dell'app |
+| `totp_ultimo_passo` | BIGINT, facoltativa | Intervallo di 30 secondi dell'ultimo codice accettato: i codici fino a quello non valgono più (niente riutilizzo) |
+
+### Tabella `codici_riserva`
+
+Codici di riserva della verifica in due passaggi, per entrare senza telefono: 10 per account, ognuno vale una volta.
+
+| Colonna | Tipo | Significato |
+|---|---|---|
+| `id` | INT, chiave primaria, auto-incrementale | Identificativo |
+| `utente_id` | INT, obbligatoria, chiave esterna verso `utenti` (cancellazione a cascata) | Account a cui appartiene |
+| `codice_hash` | VARCHAR(255), obbligatoria | Hash Argon2id del codice (10 caratteri senza lettere ambigue); il codice si mostra una volta sola |
+| `usato_il` | DATETIME, facoltativa | Momento d'uso, in UTC; vuoto = ancora valido |
 
 ### Tabella `categorie`
 
@@ -385,6 +399,7 @@ Una classe per ogni gruppo di tabelle. Contengono tutte le query SQL, sempre par
 | `MenuRepository` | `categorie`, `formati_prezzo`, `voci_menu`, `prezzi_voce` |
 | `OrariRepository` | `orari_settimanali` |
 | `ImpostazioniRepository` | `impostazioni` |
+| `CodiciRiservaRepository` | `codici_riserva` |
 | `TentativiRepository` | `tentativi_accesso` (contare, registrare, cancellare i tentativi vecchi; lavora con valori semplici, senza modello) |
 
 `MenuRepository` legge il menù pubblico con poche query (categorie, formati, voci attive, prezzi) e lo ricompone in Python, senza una query per ogni voce.
@@ -397,6 +412,7 @@ Contengono le regole di business della sezione 3. Usano i repository e non dipen
 |---|---|
 | `AuthService` | Login con verifica Argon2id, controllo che l'account sia attivo, aggiornamento dell'hash quando i parametri di Argon2 cambiano, creazione del proprietario da riga di comando; cambio della password (con quella attuale), reimpostazione e attivazione/disattivazione dell'account da riga di comando |
 | `MenuService` | Menù pubblico (solo voci attive, in ordine di posizione); creazione e modifica di una voce con le regole sui prezzi (prezzo unico oppure formati della sua categoria) salvate in un'unica transazione; nascondere e rimostrare una voce; conversione del prezzo scritto dal proprietario ("7,50") in centesimi |
+| `DuePassaggiService` | Verifica in due passaggi: segreto TOTP cifrato, attivazione con il primo codice, controllo del codice al login (finestra di ±30 secondi, nessun riutilizzo), 10 codici di riserva monouso salvati con Argon2id, rigenerazione e disattivazione |
 | `TentativiService` | Limite di 5 tentativi sbagliati al minuto per IP e per ambito: blocco, registrazione con l'impronta HMAC dell'IP, pulizia dei tentativi più vecchi di un'ora. Riceve l'istante come parametro nei test, come `stato_apertura(adesso)` |
 | `OrariService` | Lettura e salvataggio del calendario settimanale con il controllo delle sovrapposizioni, anche oltre la mezzanotte; calcolo di `StatoApertura` |
 
@@ -478,6 +494,8 @@ L'applicazione non è creata a livello di modulo, ma dalla funzione `create_app(
 - **Utente ricaricato a ogni richiesta** dal `before_request` di `proprietario`: un account disattivato perde l'accesso subito.
 - **Cookie di sessione** con `HttpOnly`, `SameSite=Lax` e, in produzione, `Secure`; sessione chiusa dal server dopo **1 ora di inattività** o **8 ore dal login** (OWASP WSTG e ASVS 3.3/3.4): ora del login e dell'ultima attività sono nella sessione firmata e il `before_request` le controlla. Senza questo controllo Flask rinnoverebbe il cookie a ogni richiesta e la sessione non scadrebbe mai per chi la usa.
 - **Limite ai tentativi sbagliati** (`TentativiService` e decoratore `limita_tentativi` in `app/limiti.py`): al massimo 5 tentativi sbagliati al minuto per indirizzo IP sul login e, separatamente, sul cambio password, poi risposta 429 fino a quando il più vecchio esce dalla finestra di un minuto; si contano solo le password sbagliate (al login ogni errore, nel cambio password solo la password attuale sbagliata, non una conferma diversa) e le richieste rifiutate non allungano il blocco. Dopo ogni errore la pagina dice quanti tentativi restano ("Tentativi rimasti: 3 su 5.", poi "Ultimo tentativo", al quinto "l'accesso è bloccato per un minuto"): il contatore è per connessione e scende allo stesso modo per email esistenti e inesistenti, quindi non rivela quali email sono registrate. I tentativi stanno nella tabella `tentativi_accesso`, quindi il limite vale per tutti i processi del server e non si azzera a un riavvio (dal 24/10 al posto di Flask-Limiter in memoria, che con 3 processi permetteva fino a 15 tentativi). Dell'IP si salva solo un HMAC con la `SECRET_KEY`, cancellato dopo un'ora. Dietro il proxy dell'hosting l'IP vero si legge con `ProxyFix`, attivo solo se `PROXY_FIDATI` in `.env` indica quanti proxy ci sono (0 in sviluppo): senza, tutti i visitatori avrebbero l'IP del proxy e 5 errori di chiunque bloccherebbero il login a tutti; con un numero troppo alto chiunque potrebbe falsificare l'IP.
+- **Verifica in due passaggi** facoltativa (`DuePassaggiService`, consigliata da OWASP MFA Cheat Sheet e NIST SP 800-63B): dopo la password giusta la sessione contiene solo chi deve scrivere il codice (5 minuti, nessun accesso all'area); poi codice TOTP di 6 cifre (RFC 6238) da Google Authenticator o un codice di riserva. Codici sbagliati con lo stesso limite di 5 al minuto (ambito `codice`). Togliere la verifica o rifare i codici di riserva chiede la password. Lo sviluppatore la toglie con `disattiva-due-passaggi`.
+- **Pagine riservate fuori dai motori di ricerca**: header `X-Robots-Tag: noindex, nofollow` su `/auth` e `/proprietario`. Non si usa `robots.txt`, che renderebbe pubblico l'elenco degli indirizzi riservati. L'indirizzo `/auth/login` resta quello: nasconderlo non protegge (OWASP, sicurezza non basata sul segreto), la protezione è nella password, nel limite dei tentativi e nella verifica in due passaggi.
 - **Nessuna registrazione pubblica**: il proprietario si crea con `flask crea-proprietario`, che chiede la password senza mostrarla (`getpass`).
 
 ### Protezione delle richieste

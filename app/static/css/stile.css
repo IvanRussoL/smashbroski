@@ -972,6 +972,17 @@ main:has(> .pagina-testo) { background: var(--crema); }
 .errori { padding: 0.75rem 1rem; border-left: 4px solid var(--rosso); background: #FBE9EC; }
 .nota-modulo { font-size: 0.875rem; color: var(--testo-secondario); }
 .avviso { padding: 0.75rem 1rem; border-left: 4px solid var(--blu); background: #E7F0F9; }
+/* Verifica in due passaggi: stato acceso, QR su fondo bianco (si legge meglio), codici di riserva in colonna. */
+.avviso-acceso { padding: 0.75rem 1rem; border-left: 4px solid #1E7B45; background: #E6F4EC; }
+.pulsante-pericolo { background: var(--rosso); }
+.pulsante-pericolo:hover { background: var(--rosso-scuro); }
+.passi-attivazione { padding-left: 1.25rem; }
+.passi-attivazione li + li { margin-top: 0.75rem; }
+.codice-qr { width: min(100%, 15rem); margin: 0.75rem 0; padding: 0.5rem; background: #fff; border: 1px solid var(--bordo); border-radius: var(--raggio); }
+.codice-qr svg { display: block; width: 100%; height: auto; }
+.segreto { font-size: 1rem; letter-spacing: 0.05em; overflow-wrap: anywhere; }
+.codici-riserva { margin-bottom: 1.5rem; padding: 0.75rem 1rem; border: 2px dashed var(--blu-scuro); border-radius: var(--raggio); background: #fff; }
+.elenco-codici { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.25rem 1rem; padding: 0; list-style: none; font-size: 1.125rem; }
 .area .pagina-menu, .area { max-width: 1000px; }
 /* Indice dell'area: stesso spazio delle altre pagine dell'area, schede staccate fra loro. */
 .pagina-menu.area { padding: 1.5rem 1rem 3rem; }

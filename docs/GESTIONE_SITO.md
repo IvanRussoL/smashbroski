@@ -56,6 +56,18 @@ Regole:
 - Dopo 5 tentativi sbagliati in un minuto (accesso o cambio password) quella connessione è bloccata per un minuto, poi si riprova. Non serve sbloccare niente. I tentativi sono nella tabella `tentativi_accesso` (con un'impronta dell'IP, mai l'IP in chiaro): riavviare il server non li azzera e il limite vale anche con più processi. Per sbloccare subito, in sviluppo: `DELETE FROM tentativi_accesso;` in Workbench.
 - Non esiste un blocco permanente dopo N errori, per scelta: chi conosce l'email potrebbe chiudere fuori il proprietario apposta.
 
+### Verifica in due passaggi
+
+Il proprietario la attiva e la gestisce dall'area (**Verifica in due passaggi**: QR per Google Authenticator, 10 codici di riserva). Allo sviluppatore resta un solo comando, per quando il proprietario ha perso telefono e codici di riserva:
+
+| Cosa | Comando |
+|---|---|
+| Togliere la verifica in due passaggi (poi entra con la sola password e può riattivarla) | `flask --app app disattiva-due-passaggi EMAIL` |
+
+- Il segreto di ogni account è cifrato nel database con una chiave ricavata dalla `SECRET_KEY`: **cambiare la `SECRET_KEY` rende inutilizzabili i segreti**, e chi ha la verifica attiva al codice vede "va riattivata". In quel caso: `disattiva-due-passaggi` e il proprietario la riattiva dall'area.
+- Codici di 6 cifre (RFC 6238), accettati anche 30 secondi prima o dopo; un codice già usato non vale una seconda volta. Dopo la password ci sono 5 minuti per scrivere il codice. Codici sbagliati: stesso limite di 5 al minuto (ambito `codice` in `tentativi_accesso`).
+- L'orologio del server deve essere giusto (gli hosting lo sincronizzano da soli): con più di un minuto di differenza i codici non valgono.
+
 ### Se l'account sembra compromesso
 
 1. `flask --app app disattiva-proprietario EMAIL`: esce subito da tutti i dispositivi.
@@ -73,7 +85,7 @@ Cambiare la password, dall'area o con `reimposta-password`, chiude subito le ses
 | Dopo la ricarica | `flask --app app crea-proprietario` |
 | Copia di sicurezza prima di cambiare i dati | `mysqldump -u root -p smashbroski > copia_smashbroski.sql` (in PowerShell: `cmd /c "mysqldump -u root -p smashbroski > copia_smashbroski.sql"`) |
 
-| Aggiornare un database già esistente senza perdere i dati | Eseguire una volta come `root`, in ordine di data, i file di `database/aggiornamenti/` non ancora applicati (24/10/2026: `2026-10-24_tentativi_accesso.sql`, tabella dei tentativi di accesso) |
+| Aggiornare un database già esistente senza perdere i dati | Eseguire una volta come `root`, in ordine di data, i file di `database/aggiornamenti/` non ancora applicati (24/10/2026: `2026-10-24_tentativi_accesso.sql`, tabella dei tentativi di accesso; 25/10/2026: `2026-10-25_verifica_due_passaggi.sql`, colonne della verifica in due passaggi e tabella dei codici di riserva) |
 
 L'utente MySQL dell'app (`smashbroski_app`) ha solo SELECT, INSERT, UPDATE e DELETE sul database del sito: le operazioni sulle tabelle si fanno come `root`.
 

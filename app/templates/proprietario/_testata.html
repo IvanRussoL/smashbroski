@@ -4,6 +4,7 @@
         <li><a href="{{ url_for('proprietario.indice') }}"{% if request.endpoint in ('proprietario.indice', 'proprietario.nuova_voce', 'proprietario.modifica_voce') %} aria-current="page"{% endif %}>Gestisci il menù</a></li>
         <li><a href="{{ url_for('proprietario.orari') }}"{% if request.endpoint == 'proprietario.orari' %} aria-current="page"{% endif %}>Gestisci gli orari</a></li>
         <li><a href="{{ url_for('proprietario.password') }}"{% if request.endpoint == 'proprietario.password' %} aria-current="page"{% endif %}>Cambia password</a></li>
+        <li><a href="{{ url_for('proprietario.due_passaggi') }}"{% if request.endpoint == 'proprietario.due_passaggi' %} aria-current="page"{% endif %}>Verifica in due passaggi</a></li>
         <li>
             <form method="post" action="{{ url_for('auth.logout') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

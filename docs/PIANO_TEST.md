@@ -118,6 +118,7 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | TC-S07 | Nessuna risorsa esterna né analisi del traffico | Demo |
 | TC-S08 | Pagine di errore e nessuna registrazione pubblica | Demo + Pubblicazione |
 | TC-S09 | HTTPS e redirect | Pubblicazione |
+| TC-S10 | Verifica in due passaggi | Demo + Pubblicazione |
 | TC-NS01 | Caricamento della home e del menù | Demo + Pubblicazione |
 | TC-NS02 | Immagini: formato, peso e dimensioni | Demo + Pubblicazione |
 | TC-NS03 | Lighthouse mobile | Demo + Pubblicazione |
@@ -632,6 +633,16 @@ Nella demo telefono, email e social sono segnaposto (sezione 3 di `PROGETTAZIONE
 | **Passi** | 1) Digitare l'indirizzo del sito con `http://`.<br>2) Annotare la catena di redirect e i codici di stato. |
 | **Atteso** | Un solo redirect 301 verso HTTPS, poi 200. Nessun 4xx/5xx, nessun contenuto misto. |
 
+#### TC-S10 — Verifica in due passaggi
+
+| | |
+|---|---|
+| **Origine** | — · Sezione 7 (verifica in due passaggi) |
+| **Traguardo** | Demo + Pubblicazione |
+| **Precondizione** | Proprietario autenticato; Google Authenticator sul telefono. |
+| **Passi** | 1) **Verifica in due passaggi** → **Attiva**, inquadrare il QR, scrivere il codice dell'app.<br>2) Annotare un codice di riserva, uscire e rientrare con email e password.<br>3) Scrivere 000000, poi il codice dell'app.<br>4) Uscire, rientrare e usare il codice di riserva; ripetere con lo stesso codice di riserva.<br>5) Aprire `/proprietario/` dopo la sola password, senza codice.<br>6) Togliere la verifica con una password sbagliata, poi con quella giusta. |
+| **Atteso** | 1) 10 codici di riserva e stato "attiva". 2) Pagina "Codice di verifica". 3) Prima "Il codice non è corretto o è scaduto." con i tentativi rimasti, poi l'area. 4) Il codice di riserva funziona una volta, la seconda no. 5) Rimanda al login. 6) Prima "La password attuale non è corretta.", poi la verifica è tolta e basta la password. |
+
 ### TC-NS — Rete, prestazioni e SEO
 
 #### TC-NS01 — Caricamento della home e del menù
@@ -829,6 +840,24 @@ File: `tests/test_tentativi_service.py` (l'istante si passa come parametro)
 | test_tentativi_vecchi_cancellati | Un tentativo nuovo cancella quelli di più di un'ora prima |
 | test_rimasti_scende_da_5_a_0 | Da 5 a 0 tentativi rimasti, mai negativo |
 | test_messaggio_tentativi_rimasti | Frasi del contatore per 4, 2, 1 e 0 |
+
+### 3.5 ter DuePassaggiService e pagine
+
+File: `tests/test_due_passaggi.py` (istante passato come parametro nei test del servizio)
+
+| Test | Scenario |
+|---|---|
+| test_prepara_segreto_cifrato_e_non_ancora_attivo | Indirizzo otpauth con "SmashBroski Pompei", segreto di 32 caratteri, nel database solo cifrato |
+| test_conferma_con_codice_sbagliato / test_conferma_attiva_e_da_10_codici_di_riserva | Codice sbagliato: resta spenta; giusto: attiva e 10 codici diversi, nel database solo hash Argon2id |
+| test_prepara_rifiutato_se_gia_attiva | Non si riattiva sopra una verifica attiva |
+| test_codice_valido_una_volta_sola / test_finestra_di_un_intervallo | Lo stesso codice non vale due volte; vale quello di 30 s prima, non quello di 90 s prima |
+| test_codice_di_riserva_una_volta_sola / test_rigenera_codici_annulla_i_vecchi | Codice di riserva in maiuscolo o con spazi accettato una volta; i nuovi codici annullano i vecchi |
+| test_disattiva_cancella_segreto_e_codici / test_secret_key_cambiata_chiede_di_riattivare | Disattivazione completa; con un'altra chiave il segreto non si decifra |
+| test_attivazione_e_accesso_con_codice / test_accesso_con_codice_di_riserva | Percorso completo dalle pagine: attivazione, login che chiede il codice, area chiusa senza codice, codice sbagliato 400, giusto entra |
+| test_codice_dopo_5_minuti_si_riparte_dalla_password / test_pagina_codice_senza_password_rimanda_al_login | Attesa scaduta o pagina aperta direttamente: si torna al login |
+| test_codice_sbagliato_conta_i_tentativi | Sesto codice sbagliato → 429 |
+| test_togliere_la_verifica_chiede_la_password / test_comando_disattiva_due_passaggi | Password sbagliata rifiutata; comando dello sviluppatore |
+| test_pagine_riservate_non_indicizzate / test_pagine_pubbliche_indicizzate | `X-Robots-Tag: noindex, nofollow` su login, codice e area, non sulla home |
 
 ### 3.6 Rotte, accessi e sicurezza
 

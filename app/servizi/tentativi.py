@@ -13,6 +13,7 @@ CONSERVAZIONE = timedelta(hours=1)
 
 AMBITO_LOGIN = "login"
 AMBITO_CAMBIO_PASSWORD = "password"
+AMBITO_CODICE = "codice"
 
 
 def adesso_utc() -> datetime:

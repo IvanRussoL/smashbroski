@@ -101,11 +101,30 @@ Consigli:
 - puoi farla ricordare al browser o a un gestore di password;
 - se pensi che qualcuno la conosca, cambiala subito.
 
+## 4 bis. La verifica in due passaggi (consigliata)
+
+Con la verifica in due passaggi, per entrare servono la password **e** un codice di 6 cifre che un'app del telefono cambia ogni 30 secondi. Anche chi scoprisse la password non entra senza il tuo telefono.
+
+**Attivarla** (una volta sola, 2 minuti):
+
+1. Sul telefono installa **Google Authenticator** (o Microsoft Authenticator) dallo store.
+2. Nell'area apri **Verifica in due passaggi** e premi **Attiva la verifica in due passaggi**.
+3. Nell'app tocca **+** → **Scansiona un codice QR** e inquadra il codice sullo schermo. Se sei già sul telefono e non puoi inquadrarlo, scegli "Inserisci una chiave di configurazione" e scrivi la chiave mostrata sotto il QR.
+4. Scrivi nel sito il numero di 6 cifre che compare nell'app sotto "SmashBroski Pompei" e premi **Attiva**.
+5. Compaiono **10 codici di riserva**: scrivili su un foglio o fotografali e conservali **fuori dal telefono**. Non li vedrai più.
+
+**Entrare** con la verifica attiva: email e password come sempre, poi la pagina **Codice di verifica**: apri l'app e scrivi il numero di 6 cifre (entro 5 minuti dalla password). Anche qui dopo 5 codici sbagliati si aspetta un minuto.
+
+**Senza telefono**: al posto del numero scrivi uno dei codici di riserva (es. `abcde-fghjk`); ognuno vale una volta. Quando ne restano 3 o meno il sito lo ricorda: da **Verifica in due passaggi** puoi crearne 10 nuovi (serve la password). Se hai perso telefono **e** codici, chiedi allo sviluppatore di togliere la verifica: entrerai con la sola password e potrai riattivarla.
+
+**Telefono nuovo**: togli la verifica (serve la password) e riattivala inquadrando il nuovo QR con il telefono nuovo.
+
 ## 5. Cosa fa lo sviluppatore (non si fa dall'area)
 
 Per sicurezza alcune operazioni non esistono nel sito e vanno chieste allo sviluppatore:
 
 - **password dimenticata**: ne imposta una nuova, da cambiare subito dall'area;
+- **telefono e codici di riserva persi**: toglie la verifica in due passaggi;
 - **account bloccato o compromesso** (accessi che non hai fatto tu): blocca l'account e fa uscire tutti;
 - telefono, email, indirizzo, link social, logo, foto, testo della privacy;
 - nuove categorie o nuovi formati di prezzo (es. un panino "triple");
@@ -117,6 +136,7 @@ Per sicurezza alcune operazioni non esistono nel sito e vanno chieste allo svilu
 |---|---|
 | "Tentativi rimasti: … su 5." o "Ultimo tentativo" | Fermati e ricontrolla la password (maiuscole, tastiera) prima di riprovare. |
 | "Hai sbagliato 5 volte…" o "Troppi tentativi: aspetta un minuto e riprova." | Aspetta un minuto e riprova con calma. |
+| "Il codice non è corretto o è scaduto." | Scrivi il numero che l'app mostra **adesso** (cambia ogni 30 secondi). Se sbaglia sempre, controlla che data e ora del telefono siano automatiche. |
 | "Sessione scaduta" | Normale dopo un'ora di pausa: entra di nuovo. |
 | "Modulo scaduto o non valido: ricarica la pagina e riprova." | La pagina è rimasta aperta a lungo: ricaricala e rifai la modifica. |
 | Il prezzo non viene accettato | Usa la virgola (7,50), non il punto. |

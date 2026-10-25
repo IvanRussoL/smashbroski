@@ -120,6 +120,16 @@ class AuthService:
         self._utenti.aggiorna_password_hash(utente.id, self._hasher.hash(nuova))
         self._conn.commit()
 
+    def password_corretta(self, utente_id: int, password: str) -> bool:
+        """
+        Conferma della password prima di un'operazione delicata (es. togliere la verifica in due passaggi).
+        Returns: True se la password è quella dell'utente.
+        """
+        utente = self._utenti.leggi_per_id(utente_id)
+        if utente is None or len(password or "") > LUNGHEZZA_MASSIMA_PASSWORD:
+            return False
+        return self._verifica(utente.password_hash, password or "")
+
     def reimposta_password(self, email: str, nuova: str) -> None:
         """
         Nuova password scelta dallo sviluppatore (comando flask reimposta-password), per quando il

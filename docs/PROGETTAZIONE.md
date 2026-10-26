@@ -2,6 +2,8 @@
 
 ## 1. Problema e utenti
 
+> **Progetto dimostrativo.** SmashBroski è un locale fittizio: nome, logo e indirizzo sono inventati e telefono, email e social sono segnaposto. Il progetto è nato da un audit QA del sito di un locale reale, qui anonimizzato, ed è un lavoro di portfolio e di studio, non un sito in uso (DEVLOG, 26/10/2026). I "titolari" e il "sito attuale" di questo documento sono quelli dello scenario di partenza.
+
 **Obiettivo.** Realizzare un prototipo funzionante del nuovo sito di SmashBroski Pompei da presentare ai titolari, e da pubblicare nel portfolio GitHub. Il prototipo usa i dati reali del locale (menù, prezzi, orari, indirizzo) e segnaposto dichiarati per ciò che non abbiamo ancora (telefono, email, social, foto). Deve dimostrare, con i FAIL dell'audit come riferimento, che il nuovo sito risolve i problemi di quello attuale e che il titolare può aggiornare da solo menù e orari. Se la proposta viene accettata, si sostituiscono i segnaposto e si pubblica senza riprogettare.
 
 Il lavoro ha due traguardi:
@@ -121,8 +123,8 @@ Dal 18/10 (grafica 2) la home è solo l'hero; orari e contatti sono nella pagina
   - Telefono: `+39 081 000 0000`; sul sito compare con la scritta "numero di prova" e non si inserisce nei dati strutturati JSON-LD.
   - Email: `info@example.com`.
   - Facebook e Instagram: `https://example.com/facebook-segnaposto` e `https://example.com/instagram-segnaposto` (il dominio `example.com` è riservato agli esempi e non porta al sito di nessuno).
-- Indirizzo: Vico dei Paninari, 7 - 80045 Pompei (NA), dato pubblico del locale, usato anche per il link a Google Maps.
-- Logo: l'attuale `Burger.png`, convertito in WebP senza modificarne il contenuto.
+- Indirizzo: Vico dei Paninari, 7 - 80045 Pompei (NA), inventato, usato anche per il link a Google Maps (che porta su Pompei).
+- Logo: disegnato per il progetto (`strumenti/logo/logo.svg`), convertito in WebP con `strumenti/prepara_immagini.py`.
 - In questa fase contatti e logo si cambiano solo dai dati iniziali, non dall'area proprietario.
 
 ### Accessi

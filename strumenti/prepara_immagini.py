@@ -6,7 +6,8 @@ Uso, dalla cartella del progetto:
     python strumenti/prepara_immagini.py <cartella con gli originali>
 
 Originali attesi nella cartella (fuori da Git):
-    Burger.png          logo del locale (anche per il motivo di piccoli loghi dello sfondo)
+    logo.png            logo esportato da strumenti/logo/logo.svg, trasparente, largo almeno 1920 px
+                        (anche per il motivo di piccoli loghi dello sfondo)
     hero.jpg            foto del locale per l'hero, entrata o sala (facoltativa finché manca)
 """
 import sys
@@ -53,8 +54,9 @@ def prepara_logo(originale: Path) -> None:
 def _ritaglia_personaggio(logo: Image.Image) -> Image.Image:
     """
     Returns: solo il personaggio del logo, cioè la parte sopra la prima riga del tutto trasparente
-    (sotto c'è la scritta "SmashBroski").
+    (sotto c'è la scritta "SmashBroski"). Il margine trasparente in alto non conta.
     """
+    logo = logo.crop((0, logo.getbbox()[1], logo.width, logo.height))
     alfa = logo.getchannel("A")
     larghezza, altezza = logo.size
     for y in range(1, altezza):
@@ -120,9 +122,9 @@ def main() -> None:
     cartella = Path(sys.argv[1])
     CARTELLA_USCITA.mkdir(parents=True, exist_ok=True)
     trovato = False
-    if (cartella / "Burger.png").exists():
-        prepara_logo(cartella / "Burger.png")
-        prepara_motivo(cartella / "Burger.png")
+    if (cartella / "logo.png").exists():
+        prepara_logo(cartella / "logo.png")
+        prepara_motivo(cartella / "logo.png")
         trovato = True
     if (cartella / "hero.jpg").exists():
         prepara_hero(cartella / "hero.jpg")

@@ -94,6 +94,7 @@ L'utente MySQL dell'app (`smashbroski_app`) ha solo SELECT, INSERT, UPDATE e DEL
 | Cosa | Comando |
 |---|---|
 | Convertire e ridimensionare le foto in WebP per il sito | `python strumenti/prepara_immagini.py CARTELLA_CON_GLI_ORIGINALI` |
+| Ridisegnare il logo (`strumenti/logo/logo.svg`), poi esportarlo come `logo.png` negli originali | `pip install fonttools brotli`, poi `python strumenti/logo/genera_logo.py` |
 
 Gli originali restano fuori da Git; nel sito vanno solo i WebP prodotti dallo script. Crediti delle immagini in `docs/CREDITI_IMMAGINI.md`.
 

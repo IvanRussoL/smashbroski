@@ -626,3 +626,10 @@ Diario delle scelte di sviluppo: cosa ho fatto, perché e quali alternative ho s
 - **Insegna al neon di Orari e contatti**: il nome è più lungo di tre lettere e usciva dal riquadro (a 360 px 331 px di testo in 297 di spazio). Divisore della formula da 13,3 a 16 sotto i 768 px; da 768 px in su `min(3rem, calc((100vw - 120px) / 16))` invece di `3rem` fissi. Misurato con Playwright a 320, 360, 390, 768 e 1366 px: il nome sta su una riga in tutti.
 - **Chiave della verifica in due passaggi**: l'etichetta HKDF usata per ricavare la chiave dal `SECRET_KEY` contiene il nome del sito ed è cambiata, quindi una verifica attivata prima va disattivata con `flask --app app disattiva-due-passaggi EMAIL` e riattivata dall'area.
 - **Test**: 268 superati nel cloud su MariaDB, con le asserzioni su nome e indirizzo aggiornate. Prova nel browser di Home, Menù e Orari e contatti a 390 e 1366 px.
+
+## 2026-10-26 · Contatti invisibili al passaggio del mouse
+
+- **Difetto** (visto da Ivan sul computer): in Orari e contatti, passando il mouse su una riga dei contatti, icona, etichetta e valore diventavano blu scuro sulla lavagna blu scuro, cioè invisibili.
+- **Causa**: la regola generale `a:hover { color: var(--blu-scuro); }` è più specifica di `.contatto` (elemento + pseudo-classe contro una sola classe), quindi vinceva sul colore gesso della riga.
+- **Correzione**: `.contatto:hover { color: var(--gesso); }`, fuori dal blocco `@media (hover: hover)` perché anche sul telefono, dopo un tocco, il link può restare in stato hover. Il segnale del passaggio resta la freccia che si accende e si sposta.
+- **Controllo** con Playwright: passaggio del mouse su tutti i link di Home, Menù, Orari e contatti, Privacy e accesso, colore prima e dopo. Solo i contatti finivano sul colore del fondo; ora non cambiano più. 268 test superati.

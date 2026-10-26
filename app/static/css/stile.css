@@ -542,6 +542,8 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; color: var(--rosso); }
     color: var(--gesso);
     text-decoration: none;
 }
+/* La regola generale a:hover (blu scuro) renderebbe la riga invisibile sulla lavagna. */
+.contatto:hover { color: var(--gesso); }
 .contatto-icona {
     grid-area: icona;
     display: grid;
